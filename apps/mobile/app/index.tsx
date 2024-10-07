@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import * as React from "react";
 import { View } from "react-native";
 import Animated, {
@@ -120,6 +121,15 @@ export default function Screen() {
                         variant="outline"
                         className="shadow shadow-foreground/5"
                         onPress={updateProgressValue}
+                    >
+                        <Text>Update</Text>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        className="shadow shadow-foreground/5"
+                        onPress={() => {
+                            router.push("/hello");
+                        }}
                     >
                         <Text>Update</Text>
                     </Button>

@@ -5,13 +5,14 @@
     "scripts": {
         "dev:mobile": "cd apps/mobile && npm run dev",
         "dev:web": "cd apps/web && npm run dev",
-        "install:all": "npm run clean && npm run install:web && npm run install:mobile",
+        "install:all": "npm run clean && npm i &&  npm run install:web && npm run install:mobile",
         "install:web": "cd apps/web && npm install",
         "install:mobile": "cd apps/mobile && npm install",
         "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && cd ../mobile && rm -rf node_modules"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.7",
+        "axios": "^1.7.7",
         "react-redux": "^9.1.2",
         "typescript": "^5.6.2"
     }
