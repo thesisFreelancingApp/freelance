@@ -4,7 +4,7 @@ export const fetchHello = (
     client: AxiosInstance,
 ): Promise<{ message: string }> => {
     return client
-        .get<{ message: string }>(`http://localhost:3000/api/hello`)
+        .get<{ message: string }>(`/api/hello`)
         .then((response) => {
             return response.data;
         })
