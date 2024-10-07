@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:3000",
+    baseURL: process.env.NEXT_PUBLIC_BASE_URL,
     // headers: {
-    //     Authorization: `Bearer ${apiConfig.apiKey}`,
+    //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
     // },
 });
 
