@@ -497,7 +497,7 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <button className="px-4 py-2 text-gray-700 hover:text-gray-900 focus:outline-none">
+            <button className="px-4 text-gray-700 hover:text-gray-900 focus:outline-none">
                 {category.name}
                 <ChevronDown className="inline-block w-4 h-4 ml-1" />
             </button>
@@ -519,19 +519,38 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
 
 export default function MultiLevelMenu() {
     return (
-        <nav className="bg-white shadow-md">
-            <div className="px-4 mx-auto ">
-                <div className="flex justify-between h-16">
-                    <div className="flex">
-                        {menuItems.slice(0, 4).map((category, index) => (
-                            <MainCategory
-                                key={index}
-                                category={category}
-                            />
-                        ))}
+        <nav className="max-w-4xl mx-auto bg-white">
+            <div className="px-4 ">
+                <div className="flex justify-between h-16 bg-white whitespace-nowrap">
+                    <div className="flex ">
+                        {menuItems
+                            .slice(0, menuItems.length)
+                            .map((category, index) => (
+                                <MainCategory
+                                    key={index}
+                                    category={category}
+                                />
+                            ))}
                     </div>
                 </div>
             </div>
         </nav>
     );
 }
+
+// export default function MultiLevelMenu() {
+//     return (
+//         <nav className="bg-white shadow-md">
+//             <div className="overflow-x-auto whitespace-nowrap">
+//                 <div className="flex h-16 px-4 space-x-4">
+//                     {menuItems.map((category, index) => (
+//                         <MainCategory
+//                             key={index}
+//                             category={category}
+//                         />
+//                     ))}
+//                 </div>
+//             </div>
+//         </nav>
+//     );
+// }
