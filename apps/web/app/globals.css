@@ -3,76 +3,78 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: Helvetica, sans-serif;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
 }
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
+    :root {
+        --background: 0 0% 95%; /* Blanc */
+        --foreground: 240 5% 10%; /* Gris foncé */
+        --card: 0 0% 100%; /* Blanc */
+        --card-foreground: 240 5% 10%; /* Gris foncé */
+        --popover: 0 0% 100%; /* Blanc */
+        --popover-foreground: 240 5% 10%; /* Gris foncé */
+        --primary: 47 100% 50%; /* Jaune vif (Main) */
+        --primary-foreground: 240 5% 10%; /* Gris foncé */
+        --secondary: 47 100% 95%; /* Jaune très pâle */
+        --secondary-foreground: 240 5% 10%; /* Gris foncé */
+        --muted: 240 5% 90%; /* Gris clair */
+        --muted-foreground: 240 5% 40%; /* Gris moyen */
+        --accent: 47 100% 50%; /* Jaune vif (Main) */
+        --accent-foreground: 240 5% 10%; /* Gris foncé */
+        --destructive: 0 100% 50%; /* Rouge vif */
+        --destructive-foreground: 0 0% 98%; /* Blanc */
+        --border: 240 5% 90%; /* Gris clair */
+        --input: 240 5% 90%; /* Gris clair */
+        --ring: 47 100% 50%; /* Jaune vif */
+        --chart-1: 47 100% 50%; /* Jaune vif */
+        --chart-2: 240 5% 40%; /* Gris moyen */
+        --chart-3: 240 5% 10%; /* Gris foncé */
+        --chart-4: 0 0% 100%; /* Blanc */
+        --chart-5: 240 5% 80%; /* Gris clair */
+        --radius: 0.5rem;
+    }
+
+    /* Mode sombre */
+    .dark {
+        --background: 240 5% 10%; /* Gris foncé */
+        --foreground: 0 0% 95%; /* Blanc */
+        --card: 240 5% 20%; /* Gris foncé */
+        --card-foreground: 0 0% 98%; /* Blanc */
+        --popover: 240 5% 10%; /* Gris foncé */
+        --popover-foreground: 0 0% 98%; /* Blanc */
+        --primary: 47 100% 50%; /* Jaune vif (Main) */
+        --primary-foreground: 240 5% 10%; /* Gris foncé */
+        --secondary: 47 100% 30%; /* Jaune atténué */
+        --secondary-foreground: 0 0% 98%; /* Blanc */
+        --muted: 240 5% 20%; /* Gris très foncé */
+        --muted-foreground: 240 5% 60%; /* Gris clair */
+        --accent: 47 100% 50%; /* Jaune vif (Main) */
+        --accent-foreground: 0 0% 98%; /* Blanc */
+        --destructive: 0 62.8% 30.6%; /* Rouge foncé */
+        --destructive-foreground: 0 0% 98%; /* Blanc */
+        --border: 240 5% 10%; /* Gris foncé */
+        --input: 240 5% 10%; /* Gris foncé */
+        --ring: 47 100% 50%; /* Jaune vif */
+        --chart-1: 47 100% 50%; /* Jaune vif */
+        --chart-2: 240 5% 60%; /* Gris clair */
+        --chart-3: 0 0% 100%; /* Blanc */
+        --chart-4: 47 100% 30%; /* Jaune atténué */
+        --chart-5: 240 5% 80%; /* Gris clair */
+    }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
 }
