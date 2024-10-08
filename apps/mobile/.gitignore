@@ -15,7 +15,7 @@
 
 # === Production ===
 /build
-
+.env
 # === Miscellaneous ===
 .DS_Store
 *.pem
