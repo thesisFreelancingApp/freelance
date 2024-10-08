@@ -56,7 +56,7 @@ function ThemeToggleButton() {
 // Component: Navbar
 export default function MainNavbar() {
     return (
-        <header className="flex items-center justify-between w-full h-20 px-4 md:px-6">
+        <header className="flex items-center justify-between w-full h-20 px-7 md:px-6">
             <Sheet>
                 <SheetTrigger asChild>
                     <Button
