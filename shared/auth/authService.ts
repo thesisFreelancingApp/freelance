@@ -1,23 +1,6 @@
 // a shared service for authentication
-import { SupabaseClient, User, Session } from "@supabase/supabase-js";
-
-export interface AuthService {
-  signIn: (
-    email: string,
-    password: string
-  ) => Promise<{ user: User | null; session: Session | null }>;
-  signUp: (
-    email: string,
-    password: string
-  ) => Promise<{ user: User | null; session: Session | null }>;
-  signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-  getCurrentUser: () => Promise<User | null>;
-  onAuthStateChange: (
-    callback: (event: string, session: Session | null) => void
-  ) => () => void;
-  signInWithGoogle: () => Promise<void>;
-}
+import { SupabaseClient } from "@supabase/supabase-js";
+import { AuthService } from "../types/authTypes";
 
 export const createAuthService = (supabase: SupabaseClient): AuthService => ({
   signIn: async (email: string, password: string) => {
