@@ -1,30 +1,30 @@
-"use client";
 // a custom hook that is used to get the current user and the auth state
-import { useState, useEffect } from "react";
+"use client";
 import { User } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 import { authService } from "../lib/supabaseClient";
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-      setLoading(false);
-    };
+    useEffect(() => {
+        const fetchUser = async () => {
+            const currentUser = await authService.getCurrentUser();
+            setUser(currentUser);
+            setLoading(false);
+        };
 
-    fetchUser();
+        fetchUser();
 
-    const unsubscribe = authService.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
+        const unsubscribe = authService.onAuthStateChange((event, session) => {
+            setUser(session?.user ?? null);
+        });
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+        return () => {
+            unsubscribe();
+        };
+    }, []);
 
-  return { user, loading };
+    return { user, loading };
 }
