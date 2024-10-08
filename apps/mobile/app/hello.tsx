@@ -1,6 +1,6 @@
 "use client";
 
-import { isAxiosError } from "axios"; // Import isAxiosError directly from axios
+import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import axiosInstance from "~/axiosInstance";
