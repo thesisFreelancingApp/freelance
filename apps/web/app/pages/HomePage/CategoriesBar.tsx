@@ -1,556 +1,390 @@
 "use client";
-import { ChevronDown } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Icônes de chevron
 
-type MenuItem = {
+interface SubCategory {
     name: string;
-    subCategories: {
-        name: string;
-        items: string[];
-    }[];
-};
+    subcategories?: SubCategory[];
+}
 
-const menuItems: MenuItem[] = [
+interface Category {
+    name: string;
+    subcategories: SubCategory[];
+}
+
+const categories: Category[] = [
     {
-        name: "Graphisme & Design",
-        subCategories: [
+        name: "Graphisme & Design1",
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
-                ],
-            },
-            {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
-        name: "Graphisme & Design",
-        subCategories: [
+        name: "Graphisme & Design2",
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
+                ],
+            },
+        ],
+    },
+    {
+        name: "Graphisme & Design3",
+        subcategories: [
+            {
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                name: "Art et illustration4",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
         name: "Graphisme & Design",
-        subCategories: [
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
-                ],
-            },
-            {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
         name: "Graphisme & Design",
-        subCategories: [
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
-                ],
-            },
-            {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
         name: "Graphisme & Design",
-        subCategories: [
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
-                ],
-            },
-            {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
         name: "Graphisme & Design",
-        subCategories: [
+        subcategories: [
             {
-                name: "Logo et identité visuelle",
-                items: [
-                    "Design de logo",
-                    "Charte graphique",
-                    "Cartes de visite et print",
-                    "Polices et typographie",
-                    "Outil de création de logo",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
                 name: "Art et illustration",
-                items: [
-                    "Illustrations",
-                    "Artistes en IA",
-                    "Avatar IA",
-                    "Illustrations de livres pour enfants",
-                    "Portraits et caricatures",
-                ],
-            },
-            {
-                name: "Webdesign et mobile design",
-                items: [
-                    "Webdesign",
-                    "Mobile design",
-                    "UX Design",
-                    "Design de landing page",
-                    "Icônes et pictogrammes",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
-        name: "Programmation & Tech",
-        subCategories: [
+        name: "Graphisme & Design",
+        subcategories: [
             {
-                name: "Développement web",
-                items: [
-                    "Sites web",
-                    "E-commerce",
-                    "Applications web",
-                    "Landing pages",
-                    "API",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
-                name: "Développement mobile",
-                items: [
-                    "Applications iOS",
-                    "Applications Android",
-                    "Applications cross-platform",
-                    "Jeux mobiles",
+                name: "Art et illustration",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
     {
-        name: "Programmation & Tech",
-        subCategories: [
+        name: "Graphisme & Design",
+        subcategories: [
             {
-                name: "Développement web",
-                items: [
-                    "Sites web",
-                    "E-commerce",
-                    "Applications web",
-                    "Landing pages",
-                    "API",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
-                name: "Développement mobile",
-                items: [
-                    "Applications iOS",
-                    "Applications Android",
-                    "Applications cross-platform",
-                    "Jeux mobiles",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Programmation & Tech",
-        subCategories: [
-            {
-                name: "Développement web",
-                items: [
-                    "Sites web",
-                    "E-commerce",
-                    "Applications web",
-                    "Landing pages",
-                    "API",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
-                name: "Développement mobile",
-                items: [
-                    "Applications iOS",
-                    "Applications Android",
-                    "Applications cross-platform",
-                    "Jeux mobiles",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Programmation & Tech",
-        subCategories: [
-            {
-                name: "Développement web",
-                items: [
-                    "Sites web",
-                    "E-commerce",
-                    "Applications web",
-                    "Landing pages",
-                    "API",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
                 ],
             },
             {
-                name: "Développement mobile",
-                items: [
-                    "Applications iOS",
-                    "Applications Android",
-                    "Applications cross-platform",
-                    "Jeux mobiles",
+                name: "Logo & identité visuelle",
+                subcategories: [
+                    { name: "Design de logo" },
+                    { name: "Charte graphique" },
+                    { name: "Cartes de visite et print" },
+                ],
+            },
+            {
+                name: "Art et illustration",
+                subcategories: [
+                    { name: "Illustrations" },
+                    { name: "Artistes en IA" },
                 ],
             },
         ],
     },
-    {
-        name: "Marketing digital",
-        subCategories: [
-            {
-                name: "SEO",
-                items: [
-                    "Audit SEO",
-                    "Optimisation on-page",
-                    "Linkbuilding",
-                    "SEO local",
-                ],
-            },
-            {
-                name: "Réseaux sociaux",
-                items: [
-                    "Gestion de réseaux sociaux",
-                    "Publicité sur réseaux sociaux",
-                    "Stratégie de contenu",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Vidéo & Animastion",
-        subCategories: [
-            {
-                name: "Production vidéo",
-                items: [
-                    "Montage vidéo",
-                    "Animation 2D et 3D",
-                    "Effets spéciaux",
-                    "Motion design",
-                ],
-            },
-            {
-                name: "Voix off",
-                items: [
-                    "Voix off en français",
-                    "Voix off en anglais",
-                    "Doublage",
-                    "Sous-titrage",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Rédaction & Traduction",
-        subCategories: [
-            {
-                name: "Rédaction",
-                items: [
-                    "Articles de blog",
-                    "Copywriting",
-                    "Rédaction SEO",
-                    "Relecture et correction",
-                ],
-            },
-            {
-                name: "Traduction",
-                items: [
-                    "Traduction français-anglais",
-                    "Traduction anglais-français",
-                    "Traduction technique",
-                    "Localisation",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Rédaction & Traductions",
-        subCategories: [
-            {
-                name: "Rédaction",
-                items: [
-                    "Articles de blog",
-                    "Copywriting",
-                    "Rédaction SEO",
-                    "Relecture et correction",
-                ],
-            },
-            {
-                name: "Traduction",
-                items: [
-                    "Traduction français-anglais",
-                    "Traduction anglais-français",
-                    "Traduction technique",
-                    "Localisation",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Rédaction & Traduction",
-        subCategories: [
-            {
-                name: "Rédaction",
-                items: [
-                    "Articles de blog",
-                    "Copywriting",
-                    "Rédaction SEO",
-                    "Relecture et correction",
-                ],
-            },
-            {
-                name: "Traduction",
-                items: [
-                    "Traduction français-anglais",
-                    "Traduction anglais-français",
-                    "Traduction technique",
-                    "Localisation",
-                ],
-            },
-        ],
-    },
-    {
-        name: "Rédaction & Traduction",
-        subCategories: [
-            {
-                name: "Rédaction",
-                items: [
-                    "Articles de blog",
-                    "Copywriting",
-                    "Rédaction SEO",
-                    "Relecture et correction",
-                ],
-            },
-            {
-                name: "Traduction",
-                items: [
-                    "Traduction français-anglais",
-                    "Traduction anglais-français",
-                    "Traduction technique",
-                    "Localisation",
-                ],
-            },
-        ],
-    },
+    // Ajoutez d'autres catégories ici...
 ];
 
-const SubCategoryColumn: React.FC<{
-    subCategories: { name: string; items: string[] }[];
-}> = ({ subCategories }) => (
-    <div className="space-y-4">
-        {subCategories.map((subCategory, index) => (
-            <div key={index}>
-                <h3 className="mb-2 font-medium text-gray-900">
-                    {subCategory.name}
-                </h3>
-                <ul className="space-y-1">
-                    {subCategory.items.map((item, itemIndex) => (
-                        <li
-                            key={itemIndex}
-                            className="text-sm text-gray-600 cursor-pointer hover:text-gray-900"
-                        >
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        ))}
-    </div>
-);
-
-const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    const leftColumnSubCategories = category.subCategories.slice(
-        0,
-        Math.ceil(category.subCategories.length / 2),
-    );
-    const rightColumnSubCategories = category.subCategories.slice(
-        Math.ceil(category.subCategories.length / 2),
-    );
+// Sous-menu indépendant
+const SubMenu: React.FC<{ subcategories: SubCategory[]; visible: boolean }> = ({
+    subcategories,
+    visible,
+}) => {
+    if (!visible) return null;
 
     return (
-        <div
-            className="relative"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <button className="px-4 text-gray-700 hover:text-gray-900 focus:outline-none">
-                {category.name}
-                <ChevronDown className="inline-block w-4 h-4 ml-1" />
+        <div className="absolute left-0 z-10 grid w-full grid-cols-4 gap-4 p-4 bg-white shadow-lg top-full">
+            {subcategories.map((subcategory) => (
+                <div
+                    key={subcategory.name}
+                    className="pb-2 border-b"
+                >
+                    <h4 className="font-bold">{subcategory.name}</h4>
+                    {subcategory.subcategories && (
+                        <ul className="mt-2 space-y-1 list-none">
+                            {subcategory.subcategories.map((subSub) => (
+                                <li
+                                    key={subSub.name}
+                                    className="text-sm"
+                                >
+                                    {subSub.name}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const Menu: React.FC = () => {
+    const [activeCategory, setActiveCategory] = useState<number | null>(null);
+    const [isHovering, setIsHovering] = useState(false);
+    const menuRef = useRef<HTMLUListElement>(null);
+    const timeoutRef = useRef<number | null>(null);
+
+    // Fonction pour faire défiler vers la gauche
+    const scrollLeft = () => {
+        if (menuRef.current) {
+            menuRef.current.scrollBy({ left: -200, behavior: "smooth" });
+        }
+    };
+
+    // Fonction pour faire défiler vers la droite
+    const scrollRight = () => {
+        if (menuRef.current) {
+            menuRef.current.scrollBy({ left: 200, behavior: "smooth" });
+        }
+    };
+
+    // Gestion de l'entrée dans le menu
+    const handleMouseEnter = (index: number) => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current); // Annule tout délai en cours
+        }
+        setActiveCategory(index);
+        setIsHovering(true);
+    };
+
+    // Gestion de la sortie du menu avec délai
+    const handleMouseLeave = () => {
+        timeoutRef.current = window.setTimeout(() => {
+            setActiveCategory(null);
+            setIsHovering(false);
+        }, 300); // Délai avant de cacher le menu (300 ms)
+    };
+
+    // Empêche la sortie tant que la souris est sur le sous-menu
+    const handleSubMenuMouseEnter = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        setIsHovering(true);
+    };
+
+    const handleSubMenuMouseLeave = () => {
+        timeoutRef.current = window.setTimeout(() => {
+            setActiveCategory(null);
+            setIsHovering(false);
+        }, 300);
+    };
+
+    return (
+        <div className="relative ">
+            {/* Chevron gauche */}
+            <button
+                onClick={scrollLeft}
+                className="absolute left-0 z-20 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white SH"
+            >
+                <FaChevronLeft />
             </button>
-            {isHovered && (
-                <div className="absolute left-0 z-10 w-screen max-w-2xl mt-2 overflow-hidden bg-white rounded-lg shadow-lg">
-                    <div className="grid grid-cols-2 gap-8 p-8">
-                        <SubCategoryColumn
-                            subCategories={leftColumnSubCategories}
+
+            {/* Dégradation à gauche */}
+            <div className="absolute top-0 left-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-r from-white to-transparent"></div>
+
+            {/* Menu principal avec défilement horizontal */}
+            <ul
+                ref={menuRef}
+                className="relative flex p-4 mx-8 space-x-6 overflow-x-hidden bg-white scrollbar-hide"
+            >
+                {categories.map((category, index) => (
+                    <li
+                        key={category.name}
+                        onMouseEnter={() => handleMouseEnter(index)}
+                        onMouseLeave={handleMouseLeave}
+                        className={`relative cursor-pointer whitespace-nowrap ${
+                            activeCategory === index
+                                ? "border-b-4 border-primary"
+                                : "border-b-4 border-transparent"
+                        }`}
+                    >
+                        {category.name}
+                    </li>
+                ))}
+            </ul>
+
+            {/* Dégradation à droite */}
+            <div className="absolute top-0 right-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
+
+            {/* Chevron droit */}
+            <button
+                onClick={scrollRight}
+                className="absolute right-0 z-10 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white SH"
+            >
+                <FaChevronRight />
+            </button>
+
+            {/* Boîte (Sous-menu) */}
+            {activeCategory !== null && (
+                <div
+                    className="relative"
+                    onMouseEnter={handleSubMenuMouseEnter}
+                    onMouseLeave={handleSubMenuMouseLeave}
+                >
+                    {categories.map((category, index) => (
+                        <SubMenu
+                            key={category.name}
+                            subcategories={category.subcategories}
+                            visible={activeCategory === index && isHovering}
                         />
-                        <SubCategoryColumn
-                            subCategories={rightColumnSubCategories}
-                        />
-                    </div>
+                    ))}
                 </div>
             )}
         </div>
     );
 };
 
-export default function MultiLevelMenu() {
-    return (
-        <nav className="max-w-4xl mx-auto bg-white">
-            <div className="px-4 ">
-                <div className="flex justify-between h-16 bg-white whitespace-nowrap">
-                    <div className="flex ">
-                        {menuItems
-                            .slice(0, menuItems.length)
-                            .map((category, index) => (
-                                <MainCategory
-                                    key={index}
-                                    category={category}
-                                />
-                            ))}
-                    </div>
-                </div>
-            </div>
-        </nav>
-    );
-}
-
-// export default function MultiLevelMenu() {
-//     return (
-//         <nav className="bg-white shadow-md">
-//             <div className="overflow-x-auto whitespace-nowrap">
-//                 <div className="flex h-16 px-4 space-x-4">
-//                     {menuItems.map((category, index) => (
-//                         <MainCategory
-//                             key={index}
-//                             category={category}
-//                         />
-//                     ))}
-//                 </div>
-//             </div>
-//         </nav>
-//     );
-// }
+export default Menu;

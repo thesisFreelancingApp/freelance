@@ -464,19 +464,20 @@ const menuItems: MenuItem[] = [
     },
 ];
 
+// SubCategoryColumn Component
 const SubCategoryColumn: React.FC<{
     subCategories: { name: string; items: string[] }[];
 }> = ({ subCategories }) => (
-    <div className="space-y-4 bg-white">
-        {subCategories.map((subCategory, index) => (
-            <div key={index}>
+    <div className="space-y-4 ">
+        {subCategories.map((subCategory) => (
+            <div key={subCategory.name}>
                 <h3 className="mb-2 font-medium text-gray-900">
                     {subCategory.name}
                 </h3>
                 <ul className="space-y-1">
-                    {subCategory.items.map((item, itemIndex) => (
+                    {subCategory.items.map((item) => (
                         <li
-                            key={itemIndex}
+                            key={item}
                             className="text-sm text-gray-600 cursor-pointer hover:text-gray-900"
                         >
                             {item}
@@ -488,6 +489,7 @@ const SubCategoryColumn: React.FC<{
     </div>
 );
 
+// MainCategory Component
 const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
     const [isHovered, setIsHovered] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -497,7 +499,7 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
         () =>
             category.subCategories.slice(
                 0,
-                Math.ceil(category.subCategories.length / 2),
+                Math.ceil(category.subCategories.length / 1.5),
             ),
         [category.subCategories],
     );
@@ -505,18 +507,10 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
     const rightColumnSubCategories = useMemo(
         () =>
             category.subCategories.slice(
-                Math.ceil(category.subCategories.length / 2),
+                Math.ceil(category.subCategories.length / 1.5),
             ),
         [category.subCategories],
     );
-
-    const handleMouseEnter = useCallback(() => {
-        setIsHovered(true);
-    }, []);
-
-    const handleMouseLeave = useCallback(() => {
-        setIsHovered(false);
-    }, []);
 
     useEffect(() => {
         if (isHovered && buttonRef.current && submenuRef.current) {
@@ -528,22 +522,21 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
 
     return (
         <div
-            className="inline-block "
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            className="inline-block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             <button
                 ref={buttonRef}
                 className="z-50 px-4 text-gray-800 dark:text-white hover:text-gray-900 focus:outline-none"
             >
                 {category.name}
-                <ChevronDown className="inline-block w-4 h-4 ml-1" />
             </button>
             {isHovered &&
                 createPortal(
                     <div
                         ref={submenuRef}
-                        className="absolute z-50 max-h-full text-white bg-white rounded-lg shadow-lg"
+                        className="absolute z-50 max-h-full bg-white rounded-sm shadow-lg left-10"
                     >
                         <div className="grid grid-cols-2 gap-8 p-8 ">
                             <SubCategoryColumn
@@ -560,6 +553,7 @@ const MainCategory: React.FC<{ category: MenuItem }> = ({ category }) => {
     );
 };
 
+// MultiLevelMenu Component
 export default function MultiLevelMenu() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -613,30 +607,30 @@ export default function MultiLevelMenu() {
             {/* Left Scroll Button */}
             {canScrollLeft && (
                 <button
-                    className="absolute top-0 bottom-0 left-0 z-10 px-2 text-primary bg-gradient-to-r from-background to-transparent focus:outline-none"
+                    className="absolute top-0 bottom-0 left-0 z-10 px-2 text-primary focus:outline-none"
                     onClick={scrollLeft}
                 >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="size-7" />
                 </button>
             )}
             {/* Right Scroll Button */}
             {canScrollRight && (
                 <button
-                    className="absolute top-0 bottom-0 right-0 z-10 px-2 py-0 text-primary bg-gradient-to-l from-background to-transparent focus:outline-none"
+                    className="absolute top-0 bottom-0 right-0 z-10 px-2 text-primary focus:outline-none"
                     onClick={scrollRight}
                 >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="size-7" />
                 </button>
             )}
 
             <div
-                className="overflow-x-hidden whitespace-nowrap"
+                className="overflow-x-hidden max-lg whitespace-nowrap "
                 ref={scrollContainerRef}
             >
-                <div className="flex px-4 text-white dark:text-white">
-                    {menuItems.map((category, index) => (
+                <div className="flex px-4 text-gray-800 dark:text-white ">
+                    {menuItems.map((category) => (
                         <MainCategory
-                            key={index}
+                            key={category.name}
                             category={category}
                         />
                     ))}
@@ -645,11 +639,11 @@ export default function MultiLevelMenu() {
 
             {/* Fade effect on the left */}
             {canScrollLeft && (
-                <div className="absolute top-0 bottom-0 left-0 w-8 pointer-events-none bg-gradient-to-r from-background to-transparent"></div>
+                <div className="absolute top-0 bottom-0 left-0 pointer-events-none "></div>
             )}
             {/* Fade effect on the right */}
             {canScrollRight && (
-                <div className="absolute top-0 bottom-0 right-0 w-8 pointer-events-none bg-gradient-to-l from-background to-transparent"></div>
+                <div className="absolute top-0 bottom-0 right-0 pointer-events-none "></div>
             )}
         </nav>
     );
