@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -51,26 +51,33 @@ model User {
   phone_number   String?
   profile_pic    String?
   role           Role
-  is_freelancer  Boolean
-  is_client      Boolean
+  is_seller      Boolean
+  is_buyer       Boolean
   level          Level?
   plan           Plan?
   skills         Json?
   languages      Json?
   education      Json?
   certifications Json?
-  jobs           Jobs? 
+  jobs           Jobs?
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
+  providerId     String?
+  provider       String?
+  emailVerified  Boolean
 }
 
-model Category {
-  id           Int        @id @default(autoincrement())
-  name         String     @unique
-  path         String     @unique
-  parentId     Int?       // Champ optionnel pour la relation avec une catégorie parente
-  parent       Category?  @relation("Subcategories", fields: [parentId], references: [id])
-  subcategories Category[] @relation("Subcategories")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+model CategoryHierarchy {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  // New field
+  level       Int      // 1 for Category, 2 for SubCategory, 3 for SubSubCategory
+  parent_id   String?
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
+  children    CategoryHierarchy[] @relation("Hierarchy")
+
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([parent_id])
 }
