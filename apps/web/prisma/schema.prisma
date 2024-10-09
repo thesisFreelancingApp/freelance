@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -51,42 +51,33 @@ model User {
   phone_number   String?
   profile_pic    String?
   role           Role
-  is_freelancer  Boolean
-  is_client      Boolean
+  is_seller      Boolean
+  is_buyer       Boolean
   level          Level?
   plan           Plan?
   skills         Json?
   languages      Json?
   education      Json?
   certifications Json?
-  jobs           Jobs? 
+  jobs           Jobs?
   created_at     DateTime       @default(now())
   updated_at     DateTime       @updatedAt
+  providerId     String?
+  provider       String?
+  emailVerified  DateTime?
 }
 
-model Category {
-  id            String        @id @default(uuid())
-  name          String
-  subcategories SubCategory[]
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
-}
+model CategoryHierarchy {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  // New field
+  level       Int      // 1 for Category, 2 for SubCategory, 3 for SubSubCategory
+  parent_id   String?
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
+  children    CategoryHierarchy[] @relation("Hierarchy")
 
-model SubCategory {
-  id               String           @id @default(uuid())
-  name             String
-  category_id      String
-  category         Category         @relation(fields: [category_id], references: [id])
-  subsubcategories SubSubCategory[]
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-}
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-model SubSubCategory {
-  id             String      @id @default(uuid())
-  name           String
-  subCategory_id String
-  subCategory    SubCategory @relation(fields: [subCategory_id], references: [id])
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
+  @@index([parent_id])
 }
