@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+}
+
+enum Level {
+  beginner
+  intermediate
+  advanced
+}
+
+enum Plan {
+  Travail_principal
+  Travail_secondaire
+  usage_personnel
+}
+
+enum Jobs {
+  Graphisme_Design
+  Programmation_Tech
+  Marketing_digital
+  Video_Animation
+  Redaction_Traduction
+  Musique_Audio
+  Business
+  Finance
+  Services_IA
+  Croissance_personnelle
+  Consultations
+  Photographie
+}
+
+model User {
+  id             String         @id @default(uuid())
+  first_name     String?
+  last_name      String?
+  username       String         @unique
+  display_name   String?
+  bio            String?
+  email          String         @unique
+  password       String
+  phone_number   String?
+  profile_pic    String?
+  role           Role
+  is_freelancer  Boolean
+  is_client      Boolean
+  level          Level?
+  plan           Plan?
+  skills         Json?
+  languages      Json?
+  education      Json?
+  certifications Json?
+  jobs           Jobs? 
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String
+  subcategories SubCategory[]
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+}
+
+model SubCategory {
+  id               String           @id @default(uuid())
+  name             String
+  category_id      String
+  category         Category         @relation(fields: [category_id], references: [id])
+  subsubcategories SubSubCategory[]
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+}
+
+model SubSubCategory {
+  id             String      @id @default(uuid())
+  name           String
+  subCategory_id String
+  subCategory    SubCategory @relation(fields: [subCategory_id], references: [id])
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+}
