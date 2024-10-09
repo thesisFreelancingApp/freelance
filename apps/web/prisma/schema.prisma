@@ -65,28 +65,12 @@ model User {
 }
 
 model Category {
-  id            String        @id @default(uuid())
-  name          String
-  subcategories SubCategory[]
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
-}
-
-model SubCategory {
-  id               String           @id @default(uuid())
-  name             String
-  category_id      String
-  category         Category         @relation(fields: [category_id], references: [id])
-  subsubcategories SubSubCategory[]
-  created_at       DateTime         @default(now())
-  updated_at       DateTime         @updatedAt
-}
-
-model SubSubCategory {
-  id             String      @id @default(uuid())
-  name           String
-  subCategory_id String
-  subCategory    SubCategory @relation(fields: [subCategory_id], references: [id])
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
+  id           Int        @id @default(autoincrement())
+  name         String     @unique
+  path         String     @unique
+  parentId     Int?       // Champ optionnel pour la relation avec une catégorie parente
+  parent       Category?  @relation("Subcategories", fields: [parentId], references: [id])
+  subcategories Category[] @relation("Subcategories")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
