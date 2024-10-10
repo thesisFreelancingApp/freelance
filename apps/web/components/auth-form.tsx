@@ -1,9 +1,8 @@
 "use client";
-// a component that is used to sign in and sign up users
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
+import axiosInstance from "@/axiosInstance";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
     Card,
     CardContent,
@@ -14,247 +13,160 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BriefcaseIcon, LockIcon, MailIcon, UserIcon } from "lucide-react";
-import { FcGoogle } from "react-icons/fc";
-import { authService } from "../lib/supabaseClient";
+import axios from "axios";
+import { useState } from "react";
+import { FaGoogle, FaSpinner } from "react-icons/fa";
+const domaine = process.env.NEXT_PUBLIC_DOMAINE;
 
-export function AuthFormComponent() {
-    const [activeTab, setActiveTab] = useState("signin");
+export default function AuthForm() {
+    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
-    const [skill, setSkill] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+    const [isLoginView, setIsLoginView] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSignIn = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
+    const handleAuth = async (authType: "google" | "email") => {
+        setLoading(true);
+        setErrorMessage("");
+
         try {
-            await authService.signIn(email, password);
-            router.push("/dashboard");
-        } catch (err) {
-            setError((err as Error).message);
+            const { data } = await axiosInstance.post(
+                `${domaine}/auth/${authType}`,
+                {
+                    email,
+                    password: authType === "email" ? password : undefined,
+                    action: isLoginView ? "login" : "register",
+                },
+            );
+
+            if (data.url) {
+                window.location.href = data.url;
+            } else if (data.message && !isLoginView) {
+                setIsRegistered(true);
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setErrorMessage(
+                    error.response?.data?.error || "Une erreur est survenue.",
+                );
+            } else if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Une erreur inconnue est survenue.");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleSignUp = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        try {
-            await authService.signUp(email, password);
-
-            setActiveTab("signin");
-        } catch (err) {
-            setError((err as Error).message);
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        setError(null);
-        try {
-            const ok = await authService.signInWithGoogle();
-            console.log(ok);
-            // if (ok){ router.push("/welcome")}
-        } catch (err) {
-            setError((err as Error).message);
-        }
-    };
-
-    return (
-        <div className="flex items-center justify-center min-h-screen p-4">
-            <Card className="w-full max-w-md">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center">
-                        Welcome to FreelanceHub
+    if (isRegistered) {
+        return (
+            <Card className="w-full max-w-sm">
+                <CardHeader>
+                    <CardTitle className="text-center text-green-600">
+                        Inscription réussie !
                     </CardTitle>
-                    <CardDescription className="text-center">
-                        Sign in or create an account to get started
-                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Tabs
-                        value={activeTab}
-                        onValueChange={setActiveTab}
-                        className="w-full"
-                    >
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="signin">Sign In</TabsTrigger>
-                            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="signin">
-                            <form onSubmit={handleSignIn}>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="signinEmail">
-                                            Email
-                                        </Label>
-                                        <div className="relative">
-                                            <MailIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="signinEmail"
-                                                placeholder="m@example.com"
-                                                type="email"
-                                                className="pl-10"
-                                                value={email}
-                                                onChange={(e) =>
-                                                    setEmail(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="signinPassword">
-                                            Password
-                                        </Label>
-                                        <div className="relative">
-                                            <LockIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="signinPassword"
-                                                type="password"
-                                                className="pl-10"
-                                                value={password}
-                                                onChange={(e) =>
-                                                    setPassword(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        type="submit"
-                                        className="w-full text-white bg-yellow-500 hover:bg-yellow-600"
-                                    >
-                                        Sign In
-                                    </Button>
-                                </div>
-                            </form>
-                            <div className="mt-4">
-                                <Separator className="my-4" />
-                                <div className="space-y-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="w-full"
-                                        onClick={handleGoogleSignIn}
-                                    >
-                                        <FcGoogle className="w-4 h-4 mr-2" />
-                                        Sign in with Google
-                                    </Button>
-                                </div>
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="signup">
-                            <form onSubmit={handleSignUp}>
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="name">Full Name</Label>
-                                        <div className="relative">
-                                            <UserIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="name"
-                                                placeholder="John Doe"
-                                                className="pl-10"
-                                                value={name}
-                                                onChange={(e) =>
-                                                    setName(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="signupEmail">
-                                            Email
-                                        </Label>
-                                        <div className="relative">
-                                            <MailIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="signupEmail"
-                                                placeholder="m@example.com"
-                                                type="email"
-                                                className="pl-10"
-                                                value={email}
-                                                onChange={(e) =>
-                                                    setEmail(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="signupPassword">
-                                            Password
-                                        </Label>
-                                        <div className="relative">
-                                            <LockIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="signupPassword"
-                                                type="password"
-                                                className="pl-10"
-                                                value={password}
-                                                onChange={(e) =>
-                                                    setPassword(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="skill">
-                                            Primary Skill
-                                        </Label>
-                                        <div className="relative">
-                                            <BriefcaseIcon className="absolute w-5 h-5 text-yellow-500 left-3 top-3" />
-                                            <Input
-                                                id="skill"
-                                                placeholder="e.g., Web Development"
-                                                className="pl-10"
-                                                value={skill}
-                                                onChange={(e) =>
-                                                    setSkill(e.target.value)
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <Button
-                                        type="submit"
-                                        className="w-full text-white bg-yellow-500 hover:bg-yellow-600"
-                                    >
-                                        Sign Up
-                                    </Button>
-                                </div>
-                            </form>
-                            <div className="mt-4">
-                                <Separator className="my-4" />
-                                <div className="space-y-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="w-full"
-                                        onClick={handleGoogleSignIn}
-                                    >
-                                        <FcGoogle className="w-4 h-4 mr-2" />
-                                        Sign up with Google
-                                    </Button>
-                                </div>
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                    {error && (
-                        <p className="mt-2 text-sm text-red-500">{error}</p>
-                    )}
+                    <CardDescription className="text-center">
+                        Vérifiez votre email pour confirmer votre inscription et
+                        vous connecter.
+                    </CardDescription>
                 </CardContent>
-                <CardFooter>
-                    <p className="w-full mt-4 text-sm text-center text-gray-600">
-                        By signing in or creating an account, you agree to our
-                        Terms of Service and Privacy Policy.
-                    </p>
-                </CardFooter>
             </Card>
-        </div>
+        );
+    }
+
+    return (
+        <Card className="w-full max-w-sm">
+            <CardHeader>
+                <CardTitle>
+                    {isLoginView ? "Connexion" : "Inscription"}
+                </CardTitle>
+                <CardDescription>
+                    {isLoginView
+                        ? "Connectez-vous à votre compte"
+                        : "Créez un nouveau compte"}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {errorMessage && (
+                    <Alert variant="destructive">
+                        <AlertDescription>{errorMessage}</AlertDescription>
+                    </Alert>
+                )}
+                {!isLoginView && (
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => handleAuth("google")}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <FaSpinner className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                            <FaGoogle className="w-4 h-4 mr-2" />
+                        )}
+                        S'inscrire avec Google
+                    </Button>
+                )}
+                {!isLoginView && (
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="px-2 bg-background text-muted-foreground">
+                                Ou
+                            </span>
+                        </div>
+                    </div>
+                )}
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                {isLoginView && (
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Mot de passe</Label>
+                        <Input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                )}
+                <Button
+                    className="w-full bg-primary"
+                    onClick={() => handleAuth("email")}
+                    disabled={loading || !email || (isLoginView && !password)}
+                >
+                    {loading && (
+                        <FaSpinner className="w-4 h-4 mr-2 animate-spin" />
+                    )}
+                    {isLoginView ? "Se connecter" : "S'inscrire avec Email"}
+                </Button>
+            </CardContent>
+            <CardFooter>
+                <p className="text-sm text-center text-muted-foreground">
+                    {isLoginView ? "Pas de compte ?" : "Déjà un compte ?"}{" "}
+                    <Button
+                        variant="link"
+                        className="p-0"
+                        onClick={() => setIsLoginView(!isLoginView)}
+                    >
+                        {isLoginView ? "S'inscrire" : "Se connecter"}
+                    </Button>
+                </p>
+            </CardFooter>
+        </Card>
     );
 }

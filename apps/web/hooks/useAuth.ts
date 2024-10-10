@@ -1,30 +1,39 @@
-// a custom hook that is used to get the current user and the auth state
 "use client";
-import { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { authService } from "../lib/supabaseClient";
 
-export function useAuth() {
-    const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
+// Authentication service: You can create a separate service for handling auth logic
+import { useCallback, useState } from "react";
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            const currentUser = await authService.getCurrentUser();
-            setUser(currentUser);
-            setLoading(false);
-        };
+// useAuth hook
+export const useAuth = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-        fetchUser();
+    // Authenticate user with token
+    const authenticate = useCallback(
+        async (accessToken: string, refreshToken: string | null) => {
+            try {
+                // Simulating authentication process (you can add your API calls here)
+                // For example, you can store the token in localStorage or perform other auth logic
+                localStorage.setItem("accessToken", accessToken);
+                if (refreshToken) {
+                    localStorage.setItem("refreshToken", refreshToken);
+                }
+                setIsAuthenticated(true);
+            } catch (err) {
+                setError("Failed to authenticate");
+                console.error("Authentication error:", err);
+            }
+        },
+        [],
+    );
 
-        const unsubscribe = authService.onAuthStateChange((event, session) => {
-            setUser(session?.user ?? null);
-        });
-
-        return () => {
-            unsubscribe();
-        };
+    // Logout function
+    const logout = useCallback(() => {
+        // Remove tokens and reset state
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        setIsAuthenticated(false);
     }, []);
 
-    return { user, loading };
-}
+    return { isAuthenticated, error, authenticate, logout };
+};
