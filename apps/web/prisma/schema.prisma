@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url      = "mysql://root:root@localhost:3306/yesyes"
 }
 
 enum Role {
@@ -68,11 +68,11 @@ model User {
 }
 
 model CategoryHierarchy {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   name        String
-  description String?  // New field
-  level       Int      // 1 for Category, 2 for SubCategory, 3 for SubSubCategory
-  parent_id   String?
+  description String?
+  level       Int
+  parent_id   Int?
   parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
   children    CategoryHierarchy[] @relation("Hierarchy")
 

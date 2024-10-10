@@ -1,260 +1,36 @@
 "use client";
-import React, { useRef, useState } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Icônes de chevron
+import React, { useEffect, useRef, useState } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa"; // Chevron icons
 
+// Définition des types
 interface SubCategory {
     name: string;
-    subcategories?: SubCategory[];
+    children?: SubCategory[];
 }
 
 interface Category {
     name: string;
-    subcategories: SubCategory[];
+    children: SubCategory[];
 }
 
-const categories: Category[] = [
-    {
-        name: "Graphisme & Design1",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design2",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design3",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration4",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    {
-        name: "Graphisme & Design",
-        subcategories: [
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Logo & identité visuelle",
-                subcategories: [
-                    { name: "Design de logo" },
-                    { name: "Charte graphique" },
-                    { name: "Cartes de visite et print" },
-                ],
-            },
-            {
-                name: "Art et illustration",
-                subcategories: [
-                    { name: "Illustrations" },
-                    { name: "Artistes en IA" },
-                ],
-            },
-        ],
-    },
-    // Ajoutez d'autres catégories ici...
-];
-
-// Sous-menu indépendant
-const SubMenu: React.FC<{ subcategories: SubCategory[]; visible: boolean }> = ({
-    subcategories,
+// SubMenu Component
+const SubMenu: React.FC<{ children: SubCategory[]; visible: boolean }> = ({
+    children,
     visible,
 }) => {
     if (!visible) return null;
 
     return (
         <div className="absolute left-0 z-10 grid w-full grid-cols-4 gap-4 p-4 bg-white shadow-lg top-full">
-            {subcategories.map((subcategory) => (
+            {children.map((subcategory: SubCategory) => (
                 <div
                     key={subcategory.name}
                     className="pb-2 border-b"
                 >
                     <h4 className="font-bold">{subcategory.name}</h4>
-                    {subcategory.subcategories && (
+                    {subcategory.children && (
                         <ul className="mt-2 space-y-1 list-none">
-                            {subcategory.subcategories.map((subSub) => (
+                            {subcategory.children.map((subSub: SubCategory) => (
                                 <li
                                     key={subSub.name}
                                     className="text-sm"
@@ -270,48 +46,46 @@ const SubMenu: React.FC<{ subcategories: SubCategory[]; visible: boolean }> = ({
     );
 };
 
+// Menu Component
 const Menu: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState<number | null>(null);
     const [isHovering, setIsHovering] = useState(false);
+    const [categories, setCategories] = useState<Category[]>([]);
     const menuRef = useRef<HTMLUListElement>(null);
     const timeoutRef = useRef<number | null>(null);
 
-    // Fonction pour faire défiler vers la gauche
+    // Scroll to the left
     const scrollLeft = () => {
         if (menuRef.current) {
             menuRef.current.scrollBy({ left: -200, behavior: "smooth" });
         }
     };
 
-    // Fonction pour faire défiler vers la droite
+    // Scroll to the right
     const scrollRight = () => {
         if (menuRef.current) {
             menuRef.current.scrollBy({ left: 200, behavior: "smooth" });
         }
     };
 
-    // Gestion de l'entrée dans le menu
+    // Handle mouse enter for a category
     const handleMouseEnter = (index: number) => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current); // Annule tout délai en cours
-        }
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setActiveCategory(index);
         setIsHovering(true);
     };
 
-    // Gestion de la sortie du menu avec délai
+    // Handle mouse leave with delay
     const handleMouseLeave = () => {
         timeoutRef.current = window.setTimeout(() => {
             setActiveCategory(null);
             setIsHovering(false);
-        }, 300); // Délai avant de cacher le menu (300 ms)
+        }, 300); // 300ms delay before hiding the menu
     };
 
-    // Empêche la sortie tant que la souris est sur le sous-menu
+    // Handle sub-menu hover
     const handleSubMenuMouseEnter = () => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-        }
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
         setIsHovering(true);
     };
 
@@ -322,25 +96,39 @@ const Menu: React.FC = () => {
         }, 300);
     };
 
+    // Fetch categories from the API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch("/api/categories");
+                const data: Category[] = await response.json(); // Assurez-vous que la réponse soit bien du type Category[]
+                setCategories(data);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+        fetchCategories();
+    }, []);
+
     return (
-        <div className="relative ">
-            {/* Chevron gauche */}
+        <div className="relative">
+            {/* Left Chevron */}
             <button
                 onClick={scrollLeft}
-                className="absolute left-0 z-20 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white SH"
+                className="absolute left-0 z-20 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white"
             >
                 <FaChevronLeft />
             </button>
 
-            {/* Dégradation à gauche */}
+            {/* Left gradient overlay */}
             <div className="absolute top-0 left-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-r from-white to-transparent"></div>
 
-            {/* Menu principal avec défilement horizontal */}
+            {/* Main Menu */}
             <ul
                 ref={menuRef}
                 className="relative flex p-4 mx-8 space-x-6 overflow-x-hidden bg-white scrollbar-hide"
             >
-                {categories.map((category, index) => (
+                {categories.map((category: Category, index: number) => (
                     <li
                         key={category.name}
                         onMouseEnter={() => handleMouseEnter(index)}
@@ -356,28 +144,28 @@ const Menu: React.FC = () => {
                 ))}
             </ul>
 
-            {/* Dégradation à droite */}
+            {/* Right gradient overlay */}
             <div className="absolute top-0 right-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
 
-            {/* Chevron droit */}
+            {/* Right Chevron */}
             <button
                 onClick={scrollRight}
-                className="absolute right-0 z-10 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white SH"
+                className="absolute right-0 z-10 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white"
             >
                 <FaChevronRight />
             </button>
 
-            {/* Boîte (Sous-menu) */}
+            {/* Submenu */}
             {activeCategory !== null && (
                 <div
                     className="relative"
                     onMouseEnter={handleSubMenuMouseEnter}
                     onMouseLeave={handleSubMenuMouseLeave}
                 >
-                    {categories.map((category, index) => (
+                    {categories.map((category: Category, index: number) => (
                         <SubMenu
                             key={category.name}
-                            subcategories={category.subcategories}
+                            children={category.children}
                             visible={activeCategory === index && isHovering}
                         />
                     ))}
