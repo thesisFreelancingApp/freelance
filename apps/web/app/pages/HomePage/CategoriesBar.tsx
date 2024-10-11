@@ -33,7 +33,7 @@ const SubMenu: React.FC<{ children: SubCategory[]; visible: boolean }> = ({
                             {subcategory.children.map((subSub: SubCategory) => (
                                 <li
                                     key={subSub.name}
-                                    className="text-sm"
+                                    className="text-xs" // Changé de text-sm à text-xs
                                 >
                                     {subSub.name}
                                 </li>
@@ -115,42 +115,44 @@ const Menu: React.FC = () => {
             {/* Left Chevron */}
             <button
                 onClick={scrollLeft}
-                className="absolute left-0 z-20 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white"
+                className="absolute left-0 z-20 p-2 text-black bg-white rounded-full shadow-xl top-1/2 -translate-y-1/2"
+                aria-label="Scroll left"
             >
                 <FaChevronLeft />
             </button>
 
             {/* Left gradient overlay */}
-            <div className="absolute top-0 left-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-r from-white to-transparent"></div>
+            <div className="absolute top-0 left-0 z-10 w-12 h-full bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
 
             {/* Main Menu */}
             <ul
                 ref={menuRef}
-                className="relative flex p-4 mx-8 space-x-6 overflow-x-hidden bg-white scrollbar-hide"
+                className="flex p-4 mx-8 space-x-6 overflow-x-hidden bg-white scrollbar-hide"
             >
                 {categories.map((category: Category, index: number) => (
                     <li
                         key={category.name}
                         onMouseEnter={() => handleMouseEnter(index)}
                         onMouseLeave={handleMouseLeave}
-                        className={`relative cursor-pointer whitespace-nowrap ${
+                        className={`relative cursor-pointer whitespace-nowrap pb-1 ${
                             activeCategory === index
-                                ? "border-b-4 border-primary"
-                                : "border-b-4 border-transparent"
+                                ? "border-b-2 border-primary" // Changé de border-b-4 à border-b-2
+                                : ""
                         }`}
                     >
-                        {category.name}
+                        <span className="px-1">{category.name}</span> {/* Ajout d'un span avec padding */}
                     </li>
                 ))}
             </ul>
 
             {/* Right gradient overlay */}
-            <div className="absolute top-0 right-0 z-10 w-12 h-full pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
+            <div className="absolute top-0 right-0 z-10 w-12 h-full bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
 
             {/* Right Chevron */}
             <button
                 onClick={scrollRight}
-                className="absolute right-0 z-10 p-2 text-black transform -translate-y-1/2 bg-white rounded-md shadow-xl top-1/2 shadow-white"
+                className="absolute right-0 z-20 p-2 text-black bg-white rounded-full shadow-xl top-1/2 -translate-y-1/2"
+                aria-label="Scroll right"
             >
                 <FaChevronRight />
             </button>
@@ -165,9 +167,10 @@ const Menu: React.FC = () => {
                     {categories.map((category: Category, index: number) => (
                         <SubMenu
                             key={category.name}
-                            children={category.children}
                             visible={activeCategory === index && isHovering}
-                        />
+                        >
+                            {category.children}
+                        </SubMenu>
                     ))}
                 </div>
             )}

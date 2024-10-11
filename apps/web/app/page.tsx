@@ -4,12 +4,13 @@ import CategoriesBar from "./pages/HomePage/CategoriesBar";
 import MainNavbar from "./pages/HomePage/MainNavbar";
 // import Image from "next/image";
 import AuthFormComponent from "../components/auth-form";
-
+import CategoriesIcon from "./pages/HomePage/CategoriesIcon";
 export default function IndexPage() {
     return (
         <>
             <MainNavbar />
             <CategoriesBar />
+            <CategoriesIcon />
             <CenterWrapper>
                 <AuthFormComponent />
                 {/* <LoginCard /> */}

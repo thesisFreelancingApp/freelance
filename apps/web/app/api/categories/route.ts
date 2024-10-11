@@ -2,20 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prismaClient'; // Assurez-vous que ce chemin est correct
 import { CategoryHierarchy } from '@prisma/client';
 
-async function getCategoriesWithChildren(): Promise<CategoryHierarchy[]> {
-  const categories = await prisma.categoryHierarchy.findMany( 
 
-  );
-console.log(categories,"ok ok ok ");
-
-  return Promise.all(categories.map(async (category) => {
-    if (category.children.length > 0) {
-      const subCategories = await getCategoriesWithChildren(Number(category.id), level + 1);
-      return { ...category, children: subCategories };
-    }
-    return category;
-  }));
-}
 
 export async function GET() {
   try {
