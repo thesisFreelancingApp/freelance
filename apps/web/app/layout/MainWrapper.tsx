@@ -1,15 +1,13 @@
 import { ReactNode } from "react";
 
 interface WrapperProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export default function MainWrapper({ children }: WrapperProps) {
-    return (
-        <div className="flex items-center justify-center h-screen">
-            <div className="w-full h-full max-w-screen-xl p-4 max-h-screen-md">
-                {children}
-            </div>
-        </div>
-    );
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">{children}</main>
+    </div>
+  );
 }
