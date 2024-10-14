@@ -25,6 +25,34 @@ interface CategoryData {
   parent_id?: number;
 }
 
+interface ServiceData {
+  id: number;
+  name: string;
+  price: string;
+  description?: string;
+  category_id: number; // Add this to match the Prisma schema
+
+}
+interface UserData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
+  email: string;
+  password: string;
+  profile_pic: string;
+  is_seller: boolean;
+  is_buyer?: boolean;
+  jobs: string;
+  plan: string;
+  role: string;
+  level: string;
+  skills: string;
+  languages: string;
+  category_id: number; // Add this to match the Prisma schema
+
+}
+
 // Seeder for CategoryHierarchy
 const seedCategories = async () => {
   const allCategories: CategoryData[] = [
@@ -3473,10 +3501,160 @@ const seedCategories = async () => {
   }
 };
 
+
+
+
+const seedServices = async () => {
+  const allServices: ServiceData[] = [
+    {
+      id: 1,
+      name: "Logo Design",
+      price: "Starting at $50",
+      description: "Professional logo design services.",
+      category_id: 1,
+    },
+    {
+      id: 2,
+      name: "Content Writing",
+      price: "Starting at $30",
+      description: "High-quality content writing for various needs.",
+      category_id: 2,
+    },
+    {
+      id: 3,
+      name: "Web Development",
+      price: "Starting at $100",
+      description: "Custom web development services.",
+      category_id: 3,
+    },
+    {
+      id: 4,
+      name: "Social Media Marketing",
+      price: "Starting at $80",
+      description: "Effective social media marketing strategies.",
+      category_id: 4,
+    },
+  ];
+
+  try {
+    await seedEntities("service", allServices);
+    console.log("Services inserted successfully.");
+  } catch (error) {
+    console.error("Error inserting services:", error);
+  }
+};
+
+// Seeder for Users
+const seedUsers = async () => {
+  const allUsers: UserData[] = [
+    {
+      id: "1",
+      first_name: "John",
+      last_name: "Doe",
+      display_name: "John Doe",
+      email: "johndoe@example.com",
+      password: "password123",
+      profile_pic: "https://randomuser.me/api/portraits/men/1.jpg",
+      is_seller: true,
+      is_buyer: false,
+      jobs: "Programmation_Tech",
+      plan: "Travail_principal",
+      role: "user",
+      level: "advanced",
+      skills: JSON.stringify(["JavaScript", "React", "Node.js"]),
+      languages: JSON.stringify(["English", "French"]),
+      category_id: 3,
+    },
+    {
+      id: "2",
+      first_name: "Jane",
+      last_name: "Smith",
+      display_name: "Jane Smith",
+      email: "janesmith@example.com",
+      password: "password123",
+      profile_pic: "https://randomuser.me/api/portraits/women/2.jpg",
+      is_seller: true,
+      is_buyer: false,
+      jobs: "Graphisme_Design",
+      plan: "Travail_secondaire",
+      role: "user",
+      level: "intermediate",
+      skills: JSON.stringify(["Photoshop", "Illustrator", "Figma"]),
+      languages: JSON.stringify(["English", "Spanish"]),
+      category_id: 1,
+    },
+    {
+      id: "3",
+      first_name: "Mike",
+      last_name: "Johnson",
+      display_name: "Mike Johnson",
+      email: "mikejohnson@example.com",
+      password: "password123",
+      profile_pic: "https://randomuser.me/api/portraits/men/3.jpg",
+      is_seller: true,
+      is_buyer: false,
+      jobs: "Redaction_Traduction",
+      plan: "usage_personnel",
+      role: "user",
+      level: "beginner",
+      skills: JSON.stringify(["Content Writing", "SEO", "Copywriting"]),
+      languages: JSON.stringify(["English", "German"]),
+      category_id: 2,
+    },
+  ];
+
+  try {
+    await seedEntities("user", allUsers);
+    console.log("Users inserted successfully.");
+  } catch (error) {
+    console.error("Error inserting users:", error);
+  }
+};
+
+// Seeder for Ratings
+const seedRatings = async () => {
+  const allRatings = [
+    {
+      id: 1,
+      rating: 5,
+      review: "Excellent service! Highly recommended.",
+      buyer_id: "3", // Corresponds to John Doe (Buyer ID 1)
+      seller_id: "2", // Corresponds to Jane Smith (Seller ID 2)
+      service_id: 1, // Corresponds to Logo Design (Service ID 1)
+    },
+    {
+      id: 3,
+      rating: 3,
+      review: "Average service, nothing special.",
+      buyer_id: "1", // Corresponds to John Doe (Buyer ID 1)
+      seller_id: "3", // Corresponds to Emily Davis (Seller ID 3)
+      service_id: 3, // Corresponds to Web Development (Service ID 3)
+    },
+    {
+      id: 4,
+      rating: 4,
+      review: "Good quality, would hire again.",
+      buyer_id: "2", // Corresponds to Jane Smith (Buyer ID 2)
+      seller_id: "1", // Corresponds to John Doe (Seller ID 1)
+      service_id: 4, // Corresponds to Social Media Marketing (Service ID 4)
+    },
+  ];
+  
+  try {
+    await seedEntities("rating", allRatings);
+    console.log("Ratings inserted successfully.");
+  } catch (error) {
+    console.error("Error inserting ratings:", error);
+  }
+};
+
 // Main seeder function
 const runSeeder = async () => {
   try {
-    await seedCategories();
+    await seedCategories(); // Seed categories first
+    await seedServices();   // Seed services
+    await seedUsers();      // Seed users
+    await seedRatings();    // Seed ratings
   } catch (error) {
     console.error("Error in runSeeder:", error);
   } finally {
@@ -3484,8 +3662,10 @@ const runSeeder = async () => {
   }
 };
 
-// Run the seed function
+// Run the seeder
 runSeeder().catch((error) => {
   console.error("Error running seeder:", error);
   prisma.$disconnect();
 });
+
+

@@ -2,7 +2,7 @@
 
 import axiosInstance from "@/axiosInstance";
 import { useEffect, useState } from "react";
-import { fetchHello } from "../../../../shared/api/example.service";
+import { fetchHello } from "../../../../shared/API/example.service";
 const GetTestPage = () => {
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
