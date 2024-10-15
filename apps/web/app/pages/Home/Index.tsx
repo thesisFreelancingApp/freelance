@@ -10,13 +10,14 @@ import NewsletterSignUp from "./NewsletterSignUp";
 import MobileAppPromo from "./MobileAppPromo";
 import Footer from "./Footer";
 import FeaturedFreelancers from "./FeaturedFreelancers";
-
+import FreelancerCard from "./FreelancerCard";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main>
         <Hero />
         <PopularCategories />
+        <FreelancerCard/>
         <FeaturedFreelancers />
         <HowItWorks />
         <ExploreServices />

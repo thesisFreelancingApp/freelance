@@ -1,15 +1,32 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
 
-const services = [
-  { name: "Logo Design", price: "Starting at $50" },
-  { name: "Content Writing", price: "Starting at $30" },
-  { name: "Web Development", price: "Starting at $100" },
-  { name: "Social Media Marketing", price: "Starting at $80" },
-  { name: "Video Editing", price: "Starting at $70" },
-  { name: "SEO Optimization", price: "Starting at $90" },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react"; 
+import axios from "axios";
+
+interface Service {
+  id: number;
+  name: string;
+  price: string;
+  description?: string;
+}
 
 const ExploreServices = () => {
+  const [services, setServices] = useState<Service[]>([]);
+
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get("/api/services");
+      setServices(response.data);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4">
