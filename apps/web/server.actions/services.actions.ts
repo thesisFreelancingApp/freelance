@@ -42,3 +42,13 @@ export const deleteService = async (id: number) => {
   });
   return service;
 };
+
+// Récupérer les services en vedette
+export const getFeaturedGigs = async (limit = 3) => {
+  const services = await prisma.service.findMany({
+    take: limit,
+    include: { ratings: true },
+    orderBy: { id: "desc" },
+  });
+  return services;
+};
