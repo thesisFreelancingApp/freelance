@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prismaClient";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const getSession = async () => {
   // Initialize Supabase client

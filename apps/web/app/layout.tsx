@@ -1,9 +1,7 @@
-import { EnvVarWarning } from "@/components/env-var-warning";
 import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import Logo from "@/public/logo.svg";
+import Logo from "@/public/WaiaHub-LogoIcon.svg";
 import "@/styles/globals.css";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
@@ -13,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
   : "http://localhost:3000";
 
 export const metadata = {
-  // metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(defaultUrl),
   title: "WaiaHub",
   description: "The fastest way to Freelance",
 };
@@ -56,20 +54,20 @@ export default function RootLayout({
                         src={Logo.src}
                         alt="description"
                       />
-                      <p> Waiahub</p>
+                      <p className="text-3xl"> Waiahub</p>
                       {/* <div className="flex items-center gap-2">
                                             <DeployButton />
                                         </div> */}
                     </div>
                   </Link>
-                  {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+                  <HeaderAuth />
                 </div>
               </nav>
               <div className="flex flex-col max-w-5xl gap-20 p-5">
                 {children}
               </div>
 
-              <footer className="flex items-center justify-center w-full gap-8 py-16 mx-auto text-xs text-center border-t">
+              <footer className="flex items-center justify-center w-full gap-8 py-8 mx-auto text-xs text-center border-t">
                 <p>
                   Powered by{" "}
                   <a

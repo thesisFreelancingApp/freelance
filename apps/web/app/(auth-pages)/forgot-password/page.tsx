@@ -1,10 +1,17 @@
+import Page from "@/app/layout/Page";
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { forgotPasswordAction } from "@/server.actions/auth.actions";
 import Link from "next/link";
-import { SmtpMessage } from "../message";
 
 export default function ForgotPassword({
   searchParams,
@@ -12,27 +19,51 @@ export default function ForgotPassword({
   searchParams: Message;
 }) {
   return (
-    <>
-      <form className="flex-1 flex flex-col w-full gap-2 text-foreground [&>input]:mb-6 min-w-64 max-w-64 mx-auto">
-        <div>
-          <h1 className="text-2xl font-medium">Reset Password</h1>
-          <p className="text-sm text-secondary-foreground">
+    <Page>
+      <Card className="w-96">
+        <CardHeader>
+          <h1 className="text-2xl font-semibold text-center">Reset Password</h1>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="mt-2 text-sm text-center text-secondary-foreground">
             Already have an account?{" "}
-            <Link className="underline text-primary" href="/sign-in">
+            <Link
+              className="underline text-primary hover:text-primary/80"
+              href="/sign-in"
+            >
               Sign in
             </Link>
           </p>
-        </div>
-        <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
-          <Label htmlFor="email">Email</Label>
-          <Input name="email" placeholder="you@example.com" required />
-          <SubmitButton formAction={forgotPasswordAction}>
-            Reset Password
-          </SubmitButton>
-          <FormMessage message={searchParams} />
-        </div>
-      </form>
-      <SmtpMessage />
-    </>
+          <form className="mt-8 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <SubmitButton
+              pendingText="Resetting Password..."
+              formAction={forgotPasswordAction}
+              className="w-full"
+            >
+              Reset Password
+            </SubmitButton>
+            <FormMessage message={searchParams} />
+          </form>
+        </CardContent>
+        <CardFooter>
+          <div className="relative">
+            <Separator className="mt-6" />
+            <span className="absolute px-2 text-xs -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-background text-muted-foreground">
+              or
+            </span>
+          </div>
+        </CardFooter>
+      </Card>
+    </Page>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession, getUserDB } from "@/server.actions/user.actions";
+import { getUserDB } from "@/server.actions/user.actions";
 import { useEffect, useState } from "react";
 const GetTestPage = () => {
   const [data, setData] = useState<any>(null);
@@ -10,7 +10,7 @@ const GetTestPage = () => {
     const handleGetTest = async () => {
       try {
         const userData = await getUserDB();
-        console.log(userData);
+        // console.log(userData);
         setData(userData);
       } catch (error: any) {
         setError(error.message || "Get Data Error");

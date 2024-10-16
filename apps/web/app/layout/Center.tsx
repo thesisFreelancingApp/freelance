@@ -1,13 +1,11 @@
 import { ReactNode } from "react";
 
 interface WrapperProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export default function CenterWrapper({ children }: WrapperProps) {
-    return (
-        <div className="flex items-center justify-center h-screen">
-            {children}
-        </div>
-    );
+  return (
+    <div className="flex items-center justify-center h-screen">{children}</div>
+  );
 }

@@ -1,4 +1,4 @@
-import Account from "../../pages/accountSettings/Account";
+import Account from "../../pages/profile/accountSettings/Account";
 
 const AccountSettings: React.FC = () => {
   return <Account />;
