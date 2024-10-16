@@ -47,13 +47,13 @@ export default function UserMenu({ data }: UserMenuProps) {
               <Bell className="w-5 h-5" />
             </Button>
             <Button variant="ghost" className="relative w-8 h-8 rounded-full">
-              <Avatar className="w-8 h-8 ">
+              <Avatar className="w-10 h-10 ">
                 {/* <AvatarImage
                   src="https://github.com/shadcn.png"
                   alt="@shadcn"
                 /> */}
                 {/* <AvatarApi className="w-32 h-32" {...config} /> */}
-                <AvatarFallback className="text-black bg-gray-300 dark:bg-secondary dark:text-white ">
+                <AvatarFallback className="text-black/80 bg-secondary dark:bg-secondary dark:text-white/80 ">
                   {userLettre}
                 </AvatarFallback>
               </Avatar>
