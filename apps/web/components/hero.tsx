@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { getFeaturedServices, searchServices } from "@/server.actions/services.actions";
+import { getCategories } from "@/server.actions/category.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, Search, Star } from "lucide-react";
+import { CheckCircle, Router, Search, Star } from "lucide-react";
 import { debounce } from "lodash"; // lodash for debouncing
+import { log } from "console";
 
 // Define the types for the Service
 interface Rating {
@@ -34,14 +37,16 @@ interface Service {
   category: Category;
 }
 
-const popularCategories = [
-  { name: "Web Development", icon: "💻" },
-  { name: "Graphic Design", icon: "🎨" },
-  { name: "Digital Marketing", icon: "📱" },
-  { name: "Writing & Translation", icon: "✍️" },
-  { name: "Video & Animation", icon: "🎥" },
-  { name: "Music & Audio", icon: "🎵" },
-];
+// const popularCategories = [
+//   { name: "Web Development", icon: "💻", id: "" },
+//   { name: "Graphic Design", icon: "🎨", id: "" },
+//   { name: "Digital Marketing", icon: "📱", id: "" },
+//   { name: "Writing & Translation", icon: "✍️", id: "" },
+//   { name: "Video & Animation", icon: "🎥", id: "" },
+//   { name: "Music & Audio", icon: "🎵", id: "" },
+// ];
+
+
 
 const topFreelancers = [
   { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
@@ -50,7 +55,9 @@ const topFreelancers = [
 ];
 
 const Hero = () => {
+  const router = useRouter();
   const [featuredServices, setFeaturedServices] = useState<Service[]>([]);
+  const [popularCategories, setPopularCategories] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null); // Error state for search
@@ -61,6 +68,7 @@ const Hero = () => {
       setLoading(true);
       try {
         const services = await getFeaturedServices();
+        /* @ts-ignore */
         setFeaturedServices(services);
       } catch (error) {
         console.error("Error fetching featured services:", error);
@@ -70,6 +78,23 @@ const Hero = () => {
     };
 
     fetchFeaturedServices();
+  }, []);
+
+  useEffect(() => {
+    const fetchPopularCatgs = async () => {
+      setLoading(true);
+      try {
+        const categories = await getCategories(6);
+        /* @ts-ignore */
+        setPopularCategories(categories);
+      } catch (error) {
+        console.error("Error fetching catgs:", error);
+        setError("Failed to load catgs.");
+      }
+      setLoading(false);
+    };
+
+    fetchPopularCatgs();
   }, []);
 
   // Debounced search function to minimize API calls
@@ -92,10 +117,18 @@ const Hero = () => {
     const query = e.target.value;
     setSearchQuery(query);
     debouncedSearch(query); // Perform debounced search
+    
   };
 
+  const handleSearch = () => {
+    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}`)
+  }
 
 
+ const handleCategory = (id: any) =>{
+  console.log(id);
+    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}&category_id=${id}`)
+ }
 
   return (
     <section className="bg-background text-foreground">
@@ -112,7 +145,7 @@ const Hero = () => {
           </p>
           <Link
             className="bg-primary font-bold hover:bg-primary-foreground text-background py-3 px-8 rounded-lg shadow-md transition duration-300"
-            href="/signup"
+            href="/sign-up"
           >
             Inscrivez-vous
           </Link>
@@ -137,7 +170,7 @@ const Hero = () => {
             <Button
               className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
               size="lg"
-              onClick={() => debouncedSearch(searchQuery)} // Trigger search on button click
+              onClick={() => handleSearch()} // Trigger search on button click
             >
               Rechercher
             </Button>
@@ -155,23 +188,26 @@ const Hero = () => {
 
       {/* Popular Categories */}
       <div className="py-16">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            Catégories populaires
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {popularCategories.map((category, index) => (
-              <div
-                key={index}
-                className="text-center hover:scale-105 transition duration-300"
-              >
-                <div className="text-4xl mb-2">{category.icon}</div>
-                <p className="font-medium">{category.name}</p>
-              </div>
-            ))}
+    <div className="container mx-auto px-6">
+      <h2 className="text-3xl font-bold mb-8 text-center">Catégories populaires</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 select-none">
+        {popularCategories.map((category, index) => (
+          <div
+            key={index}
+            className="text-center hover:scale-105 transition duration-300"
+            onClick={() => handleCategory(category.id)} 
+          >
+            <div className="text-4xl mb-2">💻</div>
+            <p
+              className="font-medium"
+            >
+              {category.name}
+            </p>
           </div>
-        </div>
+        ))}
       </div>
+    </div>
+  </div>
 
       {/* Featured Gigs */}
       <div className="bg-secondary/10 py-16">

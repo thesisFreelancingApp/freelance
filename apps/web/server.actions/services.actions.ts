@@ -91,7 +91,7 @@ export const getAllServices = async () => {
 };
 
 // Search services
-export const searchServices = async (query: string) => {
+export const searchServices = async (query: string, categoryId: number | null = null) => {
   const services = await prisma.service.findMany({
     where: {
       OR: [
