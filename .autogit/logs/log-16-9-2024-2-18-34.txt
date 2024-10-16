@@ -1,0 +1,16 @@
+-------------------- Auto-Git Log --------------------
+Wed Oct 16 2024 02:18:34 GMT+0100 (heure normale d’Europe centrale)
+------------------------------------------------------
+
+Modified files:
+* apps/web/app/pages/header/header-auth.tsx
+* apps/web/app/pages/header/user-menu.tsx
+
+
+Created files:
+
+
+Deleted files:
+
+
+Renamed files:
