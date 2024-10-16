@@ -1,8 +1,38 @@
-import { getFeaturedServices } from "@/server.actions/services.actions";
+"use client";
+import { useEffect, useState, useMemo } from "react";
+import { getFeaturedServices, searchServices } from "@/server.actions/services.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Star, CheckCircle } from "lucide-react";
+import { CheckCircle, Search, Star } from "lucide-react";
+import { debounce } from "lodash"; // lodash for debouncing
+
+// Define the types for the Service
+interface Rating {
+  id: number;
+  rating: number;
+  review: string | null;
+  createdAt: Date;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  level: number;
+  parentId: number | null;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  description: string | null;
+  price: string;
+  ratings: Rating[];
+  category: Category;
+}
 
 const popularCategories = [
   { name: "Web Development", icon: "💻" },
@@ -14,13 +44,58 @@ const popularCategories = [
 ];
 
 const topFreelancers = [
-  { name: "John Doe", expertise: "Full Stack Developer", rating: 4.9 },
-  { name: "Jane Smith", expertise: "Graphic Designer", rating: 4.8 },
-  { name: "Mike Johnson", expertise: "Digital Marketer", rating: 4.7 },
+  { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
+  { name: "John Smith", expertise: "Graphic Designer", rating: 4.7 },
+  { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
 ];
 
-const Hero = async () => {
-  const featuredServices = await getFeaturedServices();
+const Hero = () => {
+  const [featuredServices, setFeaturedServices] = useState<Service[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Error state for search
+
+  // Fetch featured services on component mount
+  useEffect(() => {
+    const fetchFeaturedServices = async () => {
+      setLoading(true);
+      try {
+        const services = await getFeaturedServices();
+        setFeaturedServices(services);
+      } catch (error) {
+        console.error("Error fetching featured services:", error);
+        setError("Failed to load featured services.");
+      }
+      setLoading(false);
+    };
+
+    fetchFeaturedServices();
+  }, []);
+
+  // Debounced search function to minimize API calls
+  const debouncedSearch = useMemo(() => {
+    return debounce(async (query: string) => {
+      setLoading(true);
+      setError(null); // Reset error on new search
+      try {
+        const services = await searchServices(query);
+        setFeaturedServices(services);
+      } catch (error) {
+        console.error("Error searching services:", error);
+        setError("Failed to search services.");
+      }
+      setLoading(false);
+    }, 300);
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query); // Perform debounced search
+  };
+
+
+
 
   return (
     <section className="bg-background text-foreground">
@@ -52,6 +127,8 @@ const Hero = async () => {
               type="text"
               placeholder="Rechercher des services..."
               className="pl-12 pr-4 py-6 rounded-full text-lg shadow-lg"
+              value={searchQuery}
+              onChange={handleSearchChange} // Update state and trigger debounced search
             />
             <Search
               className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"
@@ -60,12 +137,21 @@ const Hero = async () => {
             <Button
               className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
               size="lg"
+              onClick={() => debouncedSearch(searchQuery)} // Trigger search on button click
             >
               Rechercher
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="text-center text-red-500">
+          <p>{error}</p>
+        </div>
+      )}
+
 
       {/* Popular Categories */}
       <div className="py-16">
