@@ -3402,26 +3402,28 @@ export const seedCategory = async () => {
     "----- The categoryHierarchy table has been successfully cleared.",
   );
 
-  console.log("----- Seeding Categories: process is starting...");
+  // Sort categories by level
+  const sortedCategories = allCategories.sort((a, b) => a.level - b.level);
 
-  const batchSize = 100; // Adjust this value based on your needs
-  for (let i = 0; i < allCategories.length; i += batchSize) {
-    const batch = allCategories.slice(i, i + batchSize);
-    await Promise.all(
-      batch.map((category) =>
-        prisma.categoryHierarchy.create({
-          data: {
-            name: category.name,
-            level: category.level,
-            description: category.description,
-            parentId: category.parent_id,
-          },
-        }),
-      ),
-    );
-    console.log(
-      `----- Processed ${Math.min(i + batchSize, allCategories.length)} out of ${allCategories.length} categories`,
-    );
+  const categoryMap = new Map();
+
+  for (const category of sortedCategories) {
+    try {
+      const createdCategory = await prisma.categoryHierarchy.create({
+        data: {
+          name: category.name,
+          level: category.level,
+          description: category.description,
+          parentId: category.parent_id
+            ? categoryMap.get(category.parent_id)
+            : null,
+        },
+      });
+      categoryMap.set(category.id, createdCategory.id);
+      console.log(`----- Created category: ${category.name}`);
+    } catch (error) {
+      console.error(`Error creating category ${category.name}:`, error);
+    }
   }
 
   console.log("----- Seeding Categories: process completed successfully.");

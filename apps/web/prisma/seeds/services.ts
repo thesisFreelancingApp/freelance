@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 // Sample service data
 const allServices = [
   {
-    id: 1,
     name: "Logo Design",
     price: "Starting at $50",
     description: "Professional logo design services.",
@@ -20,7 +19,6 @@ const allServices = [
     tags: ["logo", "branding", "design"],
   },
   {
-    id: 2,
     name: "Content Writing",
     price: "Starting at $30",
     description: "High-quality content writing for various needs.",
@@ -35,7 +33,6 @@ const allServices = [
     tags: ["writing", "content", "seo"],
   },
   {
-    id: 3,
     name: "Web Development",
     price: "Starting at $100",
     description: "Custom web development services.",
@@ -50,12 +47,11 @@ const allServices = [
     tags: ["web", "development", "coding"],
   },
   {
-    id: 4,
     name: "Social Media Marketing",
     price: "Starting at $80",
     description: "Effective social media marketing strategies.",
     categoryId: 4,
-    userId: "4",
+    userId: "3",
     deliveryTime: 5,
     revisions: 2,
     features: ["3 platforms", "Content calendar", "Analytics report"],
