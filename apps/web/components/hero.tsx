@@ -1,4 +1,4 @@
-import { getFeaturedGigs } from "@/server.actions/services.actions";
+import { getFeaturedServices } from "@/server.actions/services.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ const topFreelancers = [
 ];
 
 const Hero = async () => {
-  const featuredGigs = await getFeaturedGigs();
+  const featuredServices = await getFeaturedServices();
 
   return (
     <section className="bg-background text-foreground">
@@ -94,14 +94,14 @@ const Hero = async () => {
             Gigs en vedette
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredGigs.map((gig) => (
+            {featuredServices.map((service) => (
               <div
-                key={gig.id}
+                key={service.id}
                 className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
-                <h3 className="font-bold mb-2">{gig.name}</h3>
+                <h3 className="font-bold mb-2">{service.name}</h3>
                 <p className="text-sm text-muted-foreground mb-2">
-                  {gig.description}
+                  {service.description}
                 </p>
                 <div className="flex items-center mb-2">
                   <Star
@@ -109,18 +109,20 @@ const Hero = async () => {
                     size={16}
                   />
                   <span>
-                    {gig.ratings && gig.ratings.length > 0
+                    {service.ratings && service.ratings.length > 0
                       ? (
-                          gig.ratings.reduce(
+                          service.ratings.reduce(
                             (acc, rating) => acc + rating.rating,
                             0,
-                          ) / gig.ratings.length
+                          ) / service.ratings.length
                         ).toFixed(1)
                       : "N/A"}
                   </span>
                 </div>
-                <p className="font-bold text-primary">{gig.price}</p>
-                <Button className="mt-4 w-full">Voir les détails</Button>
+                <p className="font-bold text-primary">{service.price}</p>
+                <Link href={`/service/${service.id}`}>
+                  <Button className="mt-4 w-full">View Details</Button>
+                </Link>
               </div>
             ))}
           </div>

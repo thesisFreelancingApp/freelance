@@ -4,7 +4,7 @@
     "dev": "next dev --experimental-https",
     "build": "next build",
     "start": "next start",
-    "seed": "npx tsx --env-file=.env.local ./prisma/seeds.ts"
+    "seed": "npx tsx --env-file=.env ./prisma/seeds.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
