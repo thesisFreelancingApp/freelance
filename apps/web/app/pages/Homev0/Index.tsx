@@ -15,7 +15,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main>
-        <Hero />
+        {/* <Hero />
         <PopularCategories />
         <FreelancerCard/>
         <FeaturedFreelancers />
@@ -26,7 +26,7 @@ const Index = () => {
         <PromotionalBanner />
         <RecentProjects />
         <NewsletterSignUp />
-        <MobileAppPromo />
+        <MobileAppPromo /> */}
       </main>
       <Footer />
     </div>
