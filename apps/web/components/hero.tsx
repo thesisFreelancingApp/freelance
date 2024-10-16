@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Star, CheckCircle } from "lucide-react";
+import Image from "next/image";
 
 const popularCategories = [
   { name: "Web Development", icon: "💻" },
@@ -87,7 +88,7 @@ const Hero = async () => {
         </div>
       </div>
 
-      {/* Featured Gigs */}
+      {/* Featured Gigs .. image to be fixed to use next/image Important !!! */}
       <div className="bg-secondary/10 py-16">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">
@@ -97,10 +98,15 @@ const Hero = async () => {
             {featuredServices.map((service) => (
               <div
                 key={service.id}
-                className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                className="bg-card rounded-lg shadow-md p-4 flex flex-col h-full"
               >
-                <h3 className="font-bold mb-2">{service.name}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <img
+                  src={service.images?.[0] || "/placeholder.svg"}
+                  alt={service.name}
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+                <h3 className="text-lg font-semibold mb-2">{service.name}</h3>
+                <p className="text-sm text-muted-foreground mb-2 flex-grow">
                   {service.description}
                 </p>
                 <div className="flex items-center mb-2">
@@ -119,9 +125,9 @@ const Hero = async () => {
                       : "N/A"}
                   </span>
                 </div>
-                <p className="font-bold text-primary">{service.price}</p>
-                <Link href={`/service/${service.id}`}>
-                  <Button className="mt-4 w-full">View Details</Button>
+                <p className="font-bold text-primary mb-4">{service.price}</p>
+                <Link href={`/service/${service.id}`} className="mt-auto">
+                  <Button className="w-full">View Details</Button>
                 </Link>
               </div>
             ))}
