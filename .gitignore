@@ -220,3 +220,6 @@ package-lock.json
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+
+
+autogit.zsh

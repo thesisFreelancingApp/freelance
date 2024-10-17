@@ -1,9 +1,0 @@
-{
-    "runOnStart": true,
-    "updateInterval": 1800,
-    "logging": true,
-    "silent": false,
-    "commitMessage": "--- Azyz Kabada ---",
-    "locale": "en-US",
-    "timeZone": "Europe/Berlin"
-}
