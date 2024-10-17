@@ -1,4 +1,4 @@
-import CategoriesBar from "../pages/HomePage/CategoriesBar";
+import CategoriesBar from "../pages/Home/CategoriesBar";
 
 export default function HomePage() {
     return (

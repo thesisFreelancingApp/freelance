@@ -7,6 +7,99 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id             String   @id @default(uuid())
+  first_name     String?
+  last_name      String?
+  username       String?  @unique
+  display_name   String?
+  bio            String?
+  email          String?  @unique
+  password       String?
+  phone_number   String?
+  profile_pic    String?
+  role           Role?
+  is_seller      Boolean?
+  is_buyer       Boolean?
+  level          Level?
+  plan           Plan?
+  skills         String?  @db.LongText
+  languages      String?  @db.LongText
+  education      String?  @db.LongText
+  certifications String?  @db.LongText
+  jobs           Jobs?
+  category_id    Int?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  providerId     String?
+  provider       String?
+  emailVerified  Boolean?
+
+  // Relations
+  category   CategoryHierarchy?  @relation(fields: [category_id], references: [id])
+  categories CategoryHierarchy[] @relation("CategoryUsers")
+  services   Service[]           @relation("UserServices")
+
+  // Ratings as a buyer and freelancer
+  buyer_ratings      Rating[] @relation("BuyerRatings") // Relation for ratings given by buyers
+  freelancer_ratings Rating[] @relation("FreelancerRatings") // Relation for ratings given to freelancers
+
+  rated_services Service[] @relation("ServiceRatings") // Ratings on services by user
+
+  @@index([category_id], map: "User_category_id_fkey")
+}
+
+model CategoryHierarchy {
+  id          Int                 @id @default(autoincrement())
+  name        String
+  description String?
+  level       Int
+  parent_id   Int?
+  created_at  DateTime            @default(now())
+  updated_at  DateTime            @updatedAt
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
+  children    CategoryHierarchy[] @relation("Hierarchy")
+  services    Service[]           @relation("CategoryServices")
+  users       User[]              @relation("CategoryUsers") // This defines the relation with User
+  User        User[]
+}
+
+model Service {
+  id          Int               @id @default(autoincrement())
+  name        String
+  price       String
+  description String?
+  category_id Int
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+  category    CategoryHierarchy @relation("CategoryServices", fields: [category_id], references: [id])
+
+  // Relationship with ratings
+  ratings Rating[] @relation("ServiceRatings")
+
+  // Relation to User who offers the service
+  user   User?   @relation("UserServices", fields: [userId], references: [id])
+  userId String?
+
+  // Add the reverse relation field
+  rated_by User[] @relation("ServiceRatings") // Opposite relation field
+}
+
+model Rating {
+  id         Int      @id @default(autoincrement())
+  buyer_id   String // ID of the buyer rating the freelancer
+  seller_id  String // ID of the freelancer being rated
+  service_id Int // ID of the service being rated
+  rating     Int // Rating value (1-5)
+  review     String? // Optional review text
+  created_at DateTime @default(now())
+
+  // Relations to buyer, seller, and service
+  buyer   User    @relation("BuyerRatings", fields: [buyer_id], references: [id])
+  seller  User    @relation("FreelancerRatings", fields: [seller_id], references: [id])
+  service Service @relation("ServiceRatings", fields: [service_id], references: [id])
+}
+
 enum Role {
   user
   admin
@@ -37,47 +130,4 @@ enum Jobs {
   Croissance_personnelle
   Consultations
   Photographie
-}
-
-model User {
-id             String         @id @default(uuid())
-  first_name     String?
-  last_name      String?
-  username       String?         @unique
-  display_name   String?
-  bio            String?
-  email          String?         @unique
-  password       String?
-  phone_number   String?
-  profile_pic    String?
-  role           Role?
-  is_seller      Boolean?
-  is_buyer       Boolean?
-  level          Level?
-  plan           Plan?
-  skills         Json?
-  languages      Json?
-  education      Json?
-  certifications Json?
-  jobs           Jobs?
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
-  providerId     String?
-  provider       String?
-  emailVerified  Boolean?
-}
-
-model CategoryHierarchy {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  level       Int
-  parent_id   Int?
-  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
-  children    CategoryHierarchy[] @relation("Hierarchy")
-
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@index([parent_id])
 }
