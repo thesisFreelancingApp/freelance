@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { getFeaturedServices, searchServices } from "@/server.actions/services.actions";
+import {
+  getFeaturedServices,
+  searchServices,
+} from "@/server.actions/services.actions";
 import { getCategories } from "@/server.actions/category.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, Router, Search, Star } from "lucide-react";
-import { debounce } from "lodash"; // lodash for debouncing
-import { log } from "console";
+import { CheckCircle, Search, Star } from "lucide-react";
 
 // Define the types for the Service
 interface Rating {
@@ -35,6 +36,7 @@ interface Service {
   price: string;
   ratings: Rating[];
   category: Category;
+  images: string[];
 }
 
 // const popularCategories = [
@@ -45,8 +47,6 @@ interface Service {
 //   { name: "Video & Animation", icon: "🎥", id: "" },
 //   { name: "Music & Audio", icon: "🎵", id: "" },
 // ];
-
-
 
 const topFreelancers = [
   { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
@@ -117,18 +117,18 @@ const Hero = () => {
     const query = e.target.value;
     setSearchQuery(query);
     // debouncedSearch(query); // Perform debounced search
-    
   };
 
   const handleSearch = () => {
-    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}`)
-  }
+    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}`);
+  };
 
-
- const handleCategory = (id: any) =>{
-  console.log(id);
-    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}&category_id=${id}`)
- }
+  const handleCategory = (id: any) => {
+    console.log(id);
+    router.push(
+      `/gigs/?query=${encodeURIComponent(searchQuery)}&category_id=${id}`,
+    );
+  };
 
   return (
     <section className="bg-background text-foreground">
@@ -185,31 +185,28 @@ const Hero = () => {
         </div>
       )}
 
-
       {/* Popular Categories */}
       <div className="py-16">
-    <div className="container mx-auto px-6">
-      <h2 className="text-3xl font-bold mb-8 text-center">Catégories populaires</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 select-none">
-        {popularCategories.map((category, index) => (
-          <div
-            key={index}
-            className="text-center hover:scale-105 transition duration-300"
-            onClick={() => handleCategory(category.id)} 
-          >
-            <div className="text-4xl mb-2">💻</div>
-            <p
-              className="font-medium"
-            >
-              {category.name}
-            </p>
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Catégories populaires
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 select-none">
+            {popularCategories.map((category, index) => (
+              <div
+                key={index}
+                className="text-center hover:scale-105 transition duration-300"
+                onClick={() => handleCategory(category.id)}
+              >
+                <div className="text-4xl mb-2">💻</div>
+                <p className="font-medium">{category.name}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  </div>
 
-      {/* Featured Gigs */}
+      {/* Featured Gigs .. image to be fixed to use next/image Important !!! */}
       <div className="bg-secondary/10 py-16">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">
@@ -219,10 +216,15 @@ const Hero = () => {
             {featuredServices.map((service) => (
               <div
                 key={service.id}
-                className="bg-background p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                className="bg-card rounded-lg shadow-md p-4 flex flex-col h-full"
               >
-                <h3 className="font-bold mb-2">{service.name}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
+                <img
+                  src={service.images?.[0] || "/placeholder.svg"}
+                  alt={service.name}
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+                <h3 className="text-lg font-semibold mb-2">{service.name}</h3>
+                <p className="text-sm text-muted-foreground mb-2 flex-grow">
                   {service.description}
                 </p>
                 <div className="flex items-center mb-2">
@@ -241,9 +243,9 @@ const Hero = () => {
                       : "N/A"}
                   </span>
                 </div>
-                <p className="font-bold text-primary">{service.price}</p>
-                <Link href={`/service/${service.id}`}>
-                  <Button className="mt-4 w-full">View Details</Button>
+                <p className="font-bold text-primary mb-4">{service.price}</p>
+                <Link href={`/service/${service.id}`} className="mt-auto">
+                  <Button className="w-full">View Details</Button>
                 </Link>
               </div>
             ))}

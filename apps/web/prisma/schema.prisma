@@ -4,7 +4,7 @@
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -63,6 +63,11 @@ model Profile {
   // One-to-one relations with Seller and Buyer
   seller         Seller?
   buyer          Buyer?
+
+  // Chat relations
+  clientChatRooms    ChatRoom[] @relation("ClientChatRooms")
+  freelancerChatRooms ChatRoom[] @relation("FreelancerChatRooms")
+  sentMessages       Message[]
 }
 
 // Seller model (profile for sellers)
@@ -202,4 +207,31 @@ enum Jobs {
   Croissance_personnelle
   Consultations
   Photographie
+}
+
+// ChatRoom model for managing conversations
+model ChatRoom {
+  id           Int      @id @default(autoincrement())
+  clientId     String
+  freelancerId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  client       Profile  @relation("ClientChatRooms", fields: [clientId], references: [id])
+  freelancer   Profile  @relation("FreelancerChatRooms", fields: [freelancerId], references: [id])
+  messages     Message[]
+}
+
+// Message model for individual chat messages
+model Message {
+  id         Int      @id @default(autoincrement())
+  chatRoomId Int
+  senderId   String
+  content    String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender     Profile  @relation(fields: [senderId], references: [id])
 }

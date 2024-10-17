@@ -77,7 +77,7 @@ export const getFeaturedServices = async (limit = 3) => {
   });
   console.log(
     "services",
-    services.map((service) => service.ratings),
+    services.map((service) => service),
   );
   return services;
 };
@@ -91,7 +91,10 @@ export const getAllServices = async () => {
 };
 
 // Search services
-export const searchServices = async (query: string, categoryId: number | null = null) => {
+export const searchServices = async (
+  query: string,
+  categoryId: number | null = null,
+) => {
   const services = await prisma.service.findMany({
     where: {
       OR: [

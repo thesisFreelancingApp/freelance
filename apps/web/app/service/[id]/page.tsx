@@ -1,13 +1,7 @@
 import { getServiceById } from "@/server.actions/services.actions";
 import { Button } from "@/components/ui/button";
-import {
-  Star,
-  Clock,
-  RefreshCcw,
-  MessageSquare,
-  Video,
-  Check,
-} from "lucide-react";
+import { MessageBox } from "@/components/MessageBox";
+import { Star, Clock, RefreshCcw, Check } from "lucide-react";
 
 export default async function ServiceDetailPage({
   params,
@@ -15,6 +9,7 @@ export default async function ServiceDetailPage({
   params: { id: string };
 }) {
   const service = await getServiceById(parseInt(params.id));
+  console.log("service==================>", service);
 
   if (!service) {
     return <div>Service not found</div>;
@@ -29,7 +24,7 @@ export default async function ServiceDetailPage({
       : "N/A";
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 relative">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
@@ -150,19 +145,15 @@ export default async function ServiceDetailPage({
             <Button className="w-full bg-primary text-primary-foreground font-bold py-2 px-4 rounded-lg hover:bg-primary/90 transition duration-300 mb-4">
               Continue ({service.price})
             </Button>
-            <div className="space-y-2">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" /> Contact Seller
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-center"
-              >
-                <Video className="w-4 h-4 mr-2" /> Book a consultation
-              </Button>
+            <div className="space-y-4">
+              <MessageBox
+                receiverId={service.userId}
+                receiverName={`${service.user?.firstName} ${service.user?.lastName}`}
+                receiverProfilePic={
+                  service.user?.profilePic ||
+                  "/placeholder.svg?height=40&width=40"
+                }
+              />
             </div>
           </div>
         </div>
