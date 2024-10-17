@@ -11,16 +11,16 @@ export const getProfileById = async (id: string) => {
 };
 
 // Créer un nouveau profil
-export const createProfile = async (data: {
-  firstName: string;
-  lastName: string;
-  userEmail: string;
-}) => {
-  const profile = await prisma.profile.create({
-    data,
-  });
-  return profile;
-};
+// export const createProfile = async (data: {
+//   firstName: string;
+//   lastName: string;
+//   userEmail: string;
+// }) => {
+//   const profile = await prisma.profile.create({
+//     data,
+//   });
+//   return profile;
+// };
 
 // Mettre à jour un profil
 export const updateProfile = async (
