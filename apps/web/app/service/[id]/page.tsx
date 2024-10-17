@@ -9,7 +9,7 @@ export default async function ServiceDetailPage({
   params: { id: string };
 }) {
   const service = await getServiceById(parseInt(params.id));
-  console.log("service==================>", service);
+  console.log("service==================>", typeof service?.userId);
 
   if (!service) {
     return <div>Service not found</div>;
@@ -147,7 +147,7 @@ export default async function ServiceDetailPage({
             </Button>
             <div className="space-y-4">
               <MessageBox
-                receiverId={service.userId}
+                receiverId={service.user?.id || ""} // Assuming service.user is the AuthUser
                 receiverName={`${service.user?.firstName} ${service.user?.lastName}`}
                 receiverProfilePic={
                   service.user?.profilePic ||
