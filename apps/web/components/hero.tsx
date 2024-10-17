@@ -98,25 +98,25 @@ const Hero = () => {
   }, []);
 
   // Debounced search function to minimize API calls
-  const debouncedSearch = useMemo(() => {
-    return debounce(async (query: string) => {
-      setLoading(true);
-      setError(null); // Reset error on new search
-      try {
-        const services = await searchServices(query);
-        setFeaturedServices(services);
-      } catch (error) {
-        console.error("Error searching services:", error);
-        setError("Failed to search services.");
-      }
-      setLoading(false);
-    }, 300);
-  }, []);
+  // const debouncedSearch = useMemo(() => {
+  //   return debounce(async (query: string) => {
+  //     setLoading(true);
+  //     setError(null); // Reset error on new search
+  //     try {
+  //       const services = await searchServices(query);
+  //       setFeaturedServices(services);
+  //     } catch (error) {
+  //       console.error("Error searching services:", error);
+  //       setError("Failed to search services.");
+  //     }
+  //     setLoading(false);
+  //   }, 300);
+  // }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    debouncedSearch(query); // Perform debounced search
+    // debouncedSearch(query); // Perform debounced search
     
   };
 
