@@ -38,3 +38,37 @@ export const deleteCategory = async (id: number) => {
   });
   return category;
 };
+
+
+// Get a category by its name (if needed)
+export const searchServices = async (query: string, categoryId: number | null = null) => {
+  const services = await prisma.service.findMany({
+    where: {
+      AND: [
+        {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { description: { contains: query, mode: "insensitive" } },
+          ],
+        },
+        categoryId ? { categoryId: categoryId } : {},
+      ],
+    },
+    include: { ratings: true, category: true },
+  });
+  return services;
+};
+
+export const getCategories = async (takeNum: number|null = null) => {
+  const categories = await prisma.categoryHierarchy.findMany({
+    where: { level: 1 },  // You can adjust this depending on your structure (e.g., fetch only top-level categories)
+    include: {
+      children: true,  // Include subcategories in the result
+    },
+    take: takeNum || undefined,
+  });
+  return categories;
+};
+
+// Récupérer une catégorie par ID
+

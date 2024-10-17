@@ -1,27 +1,134 @@
-import { getFeaturedServices } from "@/server.actions/services.actions";
+"use client";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import {
+  getFeaturedServices,
+  searchServices,
+} from "@/server.actions/services.actions";
+import { getCategories } from "@/server.actions/category.actions";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Star, CheckCircle } from "lucide-react";
-import Image from "next/image";
+import { CheckCircle, Search, Star } from "lucide-react";
 
-const popularCategories = [
-  { name: "Web Development", icon: "💻" },
-  { name: "Graphic Design", icon: "🎨" },
-  { name: "Digital Marketing", icon: "📱" },
-  { name: "Writing & Translation", icon: "✍️" },
-  { name: "Video & Animation", icon: "🎥" },
-  { name: "Music & Audio", icon: "🎵" },
-];
+// Define the types for the Service
+interface Rating {
+  id: number;
+  rating: number;
+  review: string | null;
+  createdAt: Date;
+}
+
+interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  level: number;
+  parentId: number | null;
+}
+
+interface Service {
+  id: number;
+  name: string;
+  description: string | null;
+  price: string;
+  ratings: Rating[];
+  category: Category;
+  images: string[];
+}
+
+// const popularCategories = [
+//   { name: "Web Development", icon: "💻", id: "" },
+//   { name: "Graphic Design", icon: "🎨", id: "" },
+//   { name: "Digital Marketing", icon: "📱", id: "" },
+//   { name: "Writing & Translation", icon: "✍️", id: "" },
+//   { name: "Video & Animation", icon: "🎥", id: "" },
+//   { name: "Music & Audio", icon: "🎵", id: "" },
+// ];
 
 const topFreelancers = [
-  { name: "John Doe", expertise: "Full Stack Developer", rating: 4.9 },
-  { name: "Jane Smith", expertise: "Graphic Designer", rating: 4.8 },
-  { name: "Mike Johnson", expertise: "Digital Marketer", rating: 4.7 },
+  { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
+  { name: "John Smith", expertise: "Graphic Designer", rating: 4.7 },
+  { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
 ];
 
-const Hero = async () => {
-  const featuredServices = await getFeaturedServices();
+const Hero = () => {
+  const router = useRouter();
+  const [featuredServices, setFeaturedServices] = useState<Service[]>([]);
+  const [popularCategories, setPopularCategories] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Error state for search
+
+  // Fetch featured services on component mount
+  useEffect(() => {
+    const fetchFeaturedServices = async () => {
+      setLoading(true);
+      try {
+        const services = await getFeaturedServices();
+        /* @ts-ignore */
+        setFeaturedServices(services);
+      } catch (error) {
+        console.error("Error fetching featured services:", error);
+        setError("Failed to load featured services.");
+      }
+      setLoading(false);
+    };
+
+    fetchFeaturedServices();
+  }, []);
+
+  useEffect(() => {
+    const fetchPopularCatgs = async () => {
+      setLoading(true);
+      try {
+        const categories = await getCategories(6);
+        /* @ts-ignore */
+        setPopularCategories(categories);
+      } catch (error) {
+        console.error("Error fetching catgs:", error);
+        setError("Failed to load catgs.");
+      }
+      setLoading(false);
+    };
+
+    fetchPopularCatgs();
+  }, []);
+
+  // Debounced search function to minimize API calls
+  // const debouncedSearch = useMemo(() => {
+  //   return debounce(async (query: string) => {
+  //     setLoading(true);
+  //     setError(null); // Reset error on new search
+  //     try {
+  //       const services = await searchServices(query);
+  //       setFeaturedServices(services);
+  //     } catch (error) {
+  //       console.error("Error searching services:", error);
+  //       setError("Failed to search services.");
+  //     }
+  //     setLoading(false);
+  //   }, 300);
+  // }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    // debouncedSearch(query); // Perform debounced search
+  };
+
+  const handleSearch = () => {
+    router.push(`/gigs/?query=${encodeURIComponent(searchQuery)}`);
+  };
+
+  const handleCategory = (id: any) => {
+    console.log(id);
+    router.push(
+      `/gigs/?query=${encodeURIComponent(searchQuery)}&category_id=${id}`,
+    );
+  };
 
   return (
     <section className="bg-background text-foreground">
@@ -38,7 +145,7 @@ const Hero = async () => {
           </p>
           <Link
             className="bg-primary font-bold hover:bg-primary-foreground text-background py-3 px-8 rounded-lg shadow-md transition duration-300"
-            href="/signup"
+            href="/sign-up"
           >
             Inscrivez-vous
           </Link>
@@ -53,6 +160,8 @@ const Hero = async () => {
               type="text"
               placeholder="Rechercher des services..."
               className="pl-12 pr-4 py-6 rounded-full text-lg shadow-lg"
+              value={searchQuery}
+              onChange={handleSearchChange} // Update state and trigger debounced search
             />
             <Search
               className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"
@@ -61,6 +170,7 @@ const Hero = async () => {
             <Button
               className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
               size="lg"
+              onClick={() => handleSearch()} // Trigger search on button click
             >
               Rechercher
             </Button>
@@ -68,19 +178,27 @@ const Hero = async () => {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="text-center text-red-500">
+          <p>{error}</p>
+        </div>
+      )}
+
       {/* Popular Categories */}
       <div className="py-16">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">
             Catégories populaires
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 select-none">
             {popularCategories.map((category, index) => (
               <div
                 key={index}
                 className="text-center hover:scale-105 transition duration-300"
+                onClick={() => handleCategory(category.id)}
               >
-                <div className="text-4xl mb-2">{category.icon}</div>
+                <div className="text-4xl mb-2">💻</div>
                 <p className="font-medium">{category.name}</p>
               </div>
             ))}
