@@ -11,13 +11,14 @@ import Footer from "./Footer";
 import FeaturedFreelancers from "./FeaturedFreelancers";
 import FreelancerCard from "./FreelancerCard";
 import SupportPalestine from "./supportPalestine";
-import HowItWorks from "./comment-ça-marche";
+import HowItWorks from "./comment-ça-marche";import FreelancerCard from "./FreelancerCard";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main>
         <Hero />
         <CategoriesIcon />
+        <FreelancerCard/>
         {/* <FreelancerCard/> */}
         {/* <FeaturedFreelancers /> */}
         {/* <HowItWorks /> */}

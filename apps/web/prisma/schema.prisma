@@ -1,105 +1,170 @@
+// Prisma schema file: https://pris.ly/d/prisma-schema
+// Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+//
+// Models
+//
+
+// AuthUser model (user)
+model AuthUser {
+  email     String   @id // Primary key
+  name      String?
+  id        String?  @unique // Manually linked ID
+  account   Account? // One-to-one with OAuth account
+  profile   Profile? // Optional relation with Profile
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model User {
-  id             String   @id @default(uuid())
-  first_name     String?
-  last_name      String?
-  username       String?  @unique
-  display_name   String?
-  bio            String?
-  email          String?  @unique
-  password       String?
-  phone_number   String?
-  profile_pic    String?
-  role           Role?
-  is_seller      Boolean?
-  is_buyer       Boolean?
-  level          Level?
-  plan           Plan?
-  skills         String?  @db.LongText
-  languages      String?  @db.LongText
-  education      String?  @db.LongText
-  certifications String?  @db.LongText
-  jobs           Jobs?
-  category_id    Int?
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-  providerId     String?
-  provider       String?
-  emailVerified  Boolean?
+// Profile model (user profile)
+model Profile {
+  id            String   @id
+  firstName     String?
+  lastName      String?
+  profilePic    String?
+  role          Role?
+  level         Level?
+  plan          Plan?
+  skills        String?
+  languages     String?
+  education     String?
+  certifications String?
+  jobs          Jobs?
+  phoneNumber   String?
+  address       String?
+  bio           String?
+  birthDate     DateTime?
+  userEmail     String    @unique // Foreign key for AuthUser
+  user          AuthUser  @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  // Relations
-  category   CategoryHierarchy?  @relation(fields: [category_id], references: [id])
-  categories CategoryHierarchy[] @relation("CategoryUsers")
-  services   Service[]           @relation("UserServices")
+  // Many-to-many relation with CategoryHierarchy
+  categories    CategoryHierarchy[] @relation("ProfileCategories")
 
-  // Ratings as a buyer and freelancer
-  buyer_ratings      Rating[] @relation("BuyerRatings") // Relation for ratings given by buyers
-  freelancer_ratings Rating[] @relation("FreelancerRatings") // Relation for ratings given to freelancers
+  // Service relations
+  services      Service[]           @relation("UserServices")
 
-  rated_services Service[] @relation("ServiceRatings") // Ratings on services by user
+  // Rating relations
+  buyerRatings      Rating[] @relation("BuyerRatings")
+  freelancerRatings Rating[] @relation("FreelancerRatings")
+  ratedServices     Service[] @relation("ServiceRatings")
 
-  @@index([category_id], map: "User_category_id_fkey")
+  // One-to-one relations with Seller and Buyer
+  seller         Seller?
+  buyer          Buyer?
 }
 
+// Seller model (profile for sellers)
+model Seller {
+  id            String   @id @default(uuid())
+  sellerProfile Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId     String    @unique
+  rating        Int       // Seller rating (e.g., average of all ratings)
+  totalEarnings Float     @default(0.0) // Total earnings for the seller
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relation with services offered by the seller
+  services      Service[] @relation("SellerServices")
+}
+
+// Buyer model (profile for buyers)
+model Buyer {
+  id            String   @id @default(uuid())
+  buyerProfile  Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId     String    @unique
+  totalSpent    Float     @default(0.0) // Total amount spent by the buyer
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relation with services bought by the buyer
+  purchases     Service[] @relation("BuyerPurchases")
+}
+
+// Account model (OAuth account)
+model Account {
+  id                Int       @id @default(autoincrement())
+  lastProvider      String?   // Last provider used
+  providers         String[]  // List of providers
+  providerAccountId String?   // Provider-specific account ID
+  userEmail         String    @unique // Links to AuthUser email
+  user              AuthUser  @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  accessToken       String?   // OAuth access token
+  refreshToken      String?   // OAuth refresh token
+  expiresAt         Int?      // Token expiration timestamp
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// CategoryHierarchy model
 model CategoryHierarchy {
   id          Int                 @id @default(autoincrement())
   name        String
   description String?
   level       Int
-  parent_id   Int?
-  created_at  DateTime            @default(now())
-  updated_at  DateTime            @updatedAt
-  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parent_id], references: [id])
+  parentId    Int?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parentId], references: [id])
   children    CategoryHierarchy[] @relation("Hierarchy")
   services    Service[]           @relation("CategoryServices")
-  users       User[]              @relation("CategoryUsers") // This defines the relation with User
-  User        User[]
+
+  // Many-to-many relation with Profile
+  profiles    Profile[]           @relation("ProfileCategories")
 }
 
+// Service model
 model Service {
   id          Int               @id @default(autoincrement())
   name        String
   price       String
   description String?
-  category_id Int
-  created_at  DateTime          @default(now())
-  updated_at  DateTime          @updatedAt
-  category    CategoryHierarchy @relation("CategoryServices", fields: [category_id], references: [id])
+  categoryId  Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now())
+  category    CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id])
 
-  // Relationship with ratings
-  ratings Rating[] @relation("ServiceRatings")
+  // Relation with ratings and users
+  ratings     Rating[]          @relation("ServiceRatings")
+  user        Profile?          @relation("UserServices", fields: [userId], references: [id])
+  userId      String?
+  ratedBy     Profile[]         @relation("ServiceRatings")
 
-  // Relation to User who offers the service
-  user   User?   @relation("UserServices", fields: [userId], references: [id])
-  userId String?
-
-  // Add the reverse relation field
-  rated_by User[] @relation("ServiceRatings") // Opposite relation field
+  // Relations for Seller and Buyer
+  seller      Seller?           @relation("SellerServices", fields: [sellerId], references: [id])
+  sellerId    String?
+  buyer       Buyer?            @relation("BuyerPurchases", fields: [buyerId], references: [id])
+  buyerId     String?
 }
 
+// Rating model
 model Rating {
   id         Int      @id @default(autoincrement())
-  buyer_id   String // ID of the buyer rating the freelancer
-  seller_id  String // ID of the freelancer being rated
-  service_id Int // ID of the service being rated
-  rating     Int // Rating value (1-5)
-  review     String? // Optional review text
-  created_at DateTime @default(now())
+  buyerId    String    // ID of the buyer
+  sellerId   String    // ID of the freelancer
+  serviceId  Int       // ID of the service
+  rating     Int       // Rating value (1-5)
+  review     String?   // Optional review
+  createdAt  DateTime  @default(now())
 
-  // Relations to buyer, seller, and service
-  buyer   User    @relation("BuyerRatings", fields: [buyer_id], references: [id])
-  seller  User    @relation("FreelancerRatings", fields: [seller_id], references: [id])
-  service Service @relation("ServiceRatings", fields: [service_id], references: [id])
+  // Relations
+  buyer   Profile    @relation("BuyerRatings", fields: [buyerId], references: [id])
+  seller  Profile    @relation("FreelancerRatings", fields: [sellerId], references: [id])
+  service Service    @relation("ServiceRatings", fields: [serviceId], references: [id])
 }
 
+// Enums
 enum Role {
   user
   admin

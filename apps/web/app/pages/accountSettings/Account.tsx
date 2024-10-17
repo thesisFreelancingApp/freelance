@@ -1,38 +1,48 @@
-"use client"
-
-import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Bell, Mail, Shield, User } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Bell, Mail, Shield, User } from "lucide-react";
+import Link from "next/link";
 
 export default function Account() {
-  const router = useRouter();
   return (
     <div className="min-h-screen bg-gray-100">
-
-
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex space-x-8">
             <div className="w-1/4">
               <nav className="space-y-2">
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="mr-2 h-4 w-4" />
+                <Button variant="ghost" className="justify-start w-full">
+                  <User className="w-4 h-4 mr-2" />
                   Account
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => router.push('/security')}>
-                  <Shield className="mr-2 h-4 w-4" /> Security
+                <Button variant="ghost" className="justify-start w-full">
+                  <Link href="/security" className="flex items-center">
+                    <Shield className="w-4 h-4 mr-2" /> Security
+                  </Link>
                 </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  <Bell className="mr-2 h-4 w-4" />
+                <Button variant="ghost" className="justify-start w-full">
+                  <Bell className="w-4 h-4 mr-2" />
                   Notifications
                 </Button>
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="mr-2 h-4 w-4" />
+                <Button variant="ghost" className="justify-start w-full">
+                  <User className="w-4 h-4 mr-2" />
                   Business Information
                 </Button>
               </nav>
@@ -43,7 +53,10 @@ export default function Account() {
                 <CardHeader>
                   <CardTitle>Account</CardTitle>
                   <CardDescription>
-                    Need to update your public profile? <a href="#" className="text-green-500 hover:underline">Go to My Profile</a>
+                    Need to update your public profile?{" "}
+                    <a href="#" className="text-green-500 hover:underline">
+                      Go to My Profile
+                    </a>
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -67,7 +80,10 @@ export default function Account() {
                         <SelectItem value="offline">Offline</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-sm text-gray-500">When online, your Gigs are visible under the Online search filter.</p>
+                    <p className="text-sm text-gray-500">
+                      When online, your Gigs are visible under the Online search
+                      filter.
+                    </p>
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -78,14 +94,22 @@ export default function Account() {
               <Card className="mt-8">
                 <CardHeader>
                   <CardTitle>ACCOUNT DEACTIVATION</CardTitle>
-                  <CardDescription>What happens when you deactivate your account?</CardDescription>
+                  <CardDescription>
+                    What happens when you deactivate your account?
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="text-sm">• Your profile and Gigs won't be shown on Fiverr anymore.</p>
+                  <p className="text-sm">
+                    • Your profile and Gigs won't be shown on Fiverr anymore.
+                  </p>
                   <p className="text-sm">• Active orders will be cancelled.</p>
-                  <p className="text-sm">• You won't be able to re-activate your Gigs.</p>
-                  <div className="space-y-2 mt-4">
-                    <Label htmlFor="deactivationReason">I'm leaving because...</Label>
+                  <p className="text-sm">
+                    • You won't be able to re-activate your Gigs.
+                  </p>
+                  <div className="mt-4 space-y-2">
+                    <Label htmlFor="deactivationReason">
+                      I'm leaving because...
+                    </Label>
                     <Select>
                       <SelectTrigger>
                         <SelectValue placeholder="Choose a reason" />
@@ -107,5 +131,5 @@ export default function Account() {
         </div>
       </main>
     </div>
-  )
+  );
 }
