@@ -1,5 +1,6 @@
 import Hero from "./Hero";
-import CategoriesIcon from "./CategoriesIcon";
+import PopularCategories from "./PopularCategories";
+import HowItWorks from "./HowItWorks";
 import Testimonials from "./Testimonials";
 import ExploreServices from "./ExploreServices";
 import WhyChooseUs from "./WhyChooseUs";
@@ -10,27 +11,22 @@ import MobileAppPromo from "./MobileAppPromo";
 import Footer from "./Footer";
 import FeaturedFreelancers from "./FeaturedFreelancers";
 import FreelancerCard from "./FreelancerCard";
-import SupportPalestine from "./supportPalestine";
-import HowItWorks from "./comment-ça-marche";import FreelancerCard from "./FreelancerCard";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main>
-        <Hero />
-        <CategoriesIcon />
+        {/* <Hero />
+        <PopularCategories />
         <FreelancerCard/>
-        {/* <FreelancerCard/> */}
-        {/* <FeaturedFreelancers /> */}
-        {/* <HowItWorks /> */}
-        <SupportPalestine />
-        <HowItWorks/>
-        {/* <ExploreServices /> */}
-        {/* <WhyChooseUs /> */}
-        {/* <Testimonials /> */}
+        <FeaturedFreelancers />
+        <HowItWorks />
+        <ExploreServices />
+        <WhyChooseUs />
+        <Testimonials />
         <PromotionalBanner />
-        {/* <RecentProjects /> */}
-        {/* <NewsletterSignUp /> */}
-        {/* <MobileAppPromo /> */}
+        <RecentProjects />
+        <NewsletterSignUp />
+        <MobileAppPromo /> */}
       </main>
       <Footer />
     </div>
