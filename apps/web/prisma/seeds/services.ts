@@ -73,9 +73,25 @@ export const seedServices = async () => {
 
   // Seeding services and linking them to categories
   for (const service of allServices) {
-    await prisma.service.create({
-      data: service,
-    });
+    try {
+      await prisma.service.create({
+        data: {
+          name: service.name,
+          price: service.price,
+          description: service.description,
+          deliveryTime: service.deliveryTime,
+          revisions: service.revisions,
+          features: service.features,
+          images: service.images,
+          tags: service.tags,
+          user: { connect: { id: service.userId } },
+          category: { connect: { id: service.categoryId } },
+        },
+      });
+      console.log(`Created service: ${service.name}`);
+    } catch (error) {
+      console.error(`Error creating service ${service.name}:`, error);
+    }
   }
 
   console.log("----- Seeding Services: process completed successfully.");

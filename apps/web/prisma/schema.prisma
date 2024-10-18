@@ -4,7 +4,7 @@
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -17,11 +17,12 @@ generator client {
 
 // AuthUser model (user)
 model AuthUser {
-  email     String   @id // Primary key
+  id        String   @id // Primary key, coming from Supabase
+  email     String   @unique
   name      String?
-  id        String?  @unique // Manually linked ID
   account   Account? // One-to-one with OAuth account
-  profile   Profile? // Optional relation with Profile
+  profile   Profile? @relation("ProfileAuthUser")
+  profileByEmail Profile? @relation("ProfileUser")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,6 +30,7 @@ model AuthUser {
 // Profile model (user profile)
 model Profile {
   id            String   @id
+  authUser      AuthUser @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
   firstName     String?
   lastName      String?
   profilePic    String?
@@ -44,8 +46,8 @@ model Profile {
   address       String?
   bio           String?
   birthDate     DateTime?
-  userEmail     String    @unique // Foreign key for AuthUser
-  user          AuthUser  @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  userEmail     String   @unique // Foreign key for AuthUser
+  user          AuthUser @relation("ProfileUser", fields: [userEmail], references: [email], onDelete: Cascade)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
