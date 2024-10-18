@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prismaClient";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const getSession = async () => {
   // Initialize Supabase client
@@ -17,4 +17,13 @@ export const getUserDB = async () => {
     include: { profile: true },
   });
   return user;
+};
+
+export const getUser = async () => {
+  // Initialize Supabase client
+  const supabase = createClient();
+
+  const { data: user, error } = await supabase.auth.getUser();
+
+  return user.user;
 };

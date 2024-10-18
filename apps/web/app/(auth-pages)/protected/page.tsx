@@ -1,35 +1,80 @@
-import prisma from "@/lib/prismaClient";
-import { createClient } from "@/utils/supabase/server";
-import { encodedRedirect } from "@/utils/utils";
 import { welcome, welcomeBack } from "@/config/routes";
+import prisma from "@/lib/prismaClient";
+import { createClient } from "@/lib/supabase/server";
+import { encodedRedirect } from "@/lib/utils-encodedRedirect";
+import { redirect } from "next/navigation";
+
+// Journalisation avancée des erreurs
+function logError(errorMessage: string, details?: any) {
+  console.error(
+    `[${new Date().toISOString()}] ERROR: ${errorMessage}`,
+    details,
+  );
+}
+
+// Fonction utilitaire pour récupérer la session et l'utilisateur
+async function fetchSessionAndUser(supabase: any) {
+  const [
+    { data: sessionData, error: sessionError },
+    { data: userData, error: userError },
+  ] = await Promise.all([supabase.auth.getSession(), supabase.auth.getUser()]);
+
+  if (sessionError) logError("Session retrieval failed", sessionError);
+  if (userError) logError("User retrieval failed", userError);
+
+  return { sessionData, userData, sessionError, userError };
+}
+
+// Met à jour le compte uniquement si les données ont changé
+async function updateAccountIfNeeded(
+  existingUser: any,
+  provider: string,
+  providers: string[],
+  accessToken: string | null,
+  refreshToken: string | null,
+  expiresAt: number | null,
+) {
+  const account = existingUser.account;
+
+  const shouldUpdate =
+    account.lastProvider !== provider ||
+    JSON.stringify(account.providers) !== JSON.stringify(providers) ||
+    account.accessToken !== accessToken ||
+    account.refreshToken !== refreshToken ||
+    account.expiresAt !== expiresAt;
+
+  if (shouldUpdate) {
+    const updatedUser = await prisma.account.update({
+      where: { userEmail: existingUser.email },
+      data: {
+        lastProvider: provider,
+        providers,
+        accessToken,
+        refreshToken,
+        expiresAt,
+      },
+    });
+
+    console.log("Account updated for user:", existingUser.email);
+  } else {
+    console.log("No updates needed for user:", existingUser.email);
+  }
+}
+
 export default async function ProtectedPage() {
   const supabase = createClient();
   let isNewUser = false;
 
-  // Récupération de la session avec gestion d'erreurs
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.getSession();
+  const { sessionData, userData, sessionError, userError } =
+    await fetchSessionAndUser(supabase);
   const session = sessionError ? null : sessionData?.session;
-
-  if (!sessionData) {
-    console.error("session error", sessionError);
-    return encodedRedirect(
-      "error",
-      "/sign-in",
-      "Session : An unexpected error occurred.",
-    );
-  }
-
-  // Récupération de l'utilisateur même en cas d'erreur de session
-  const { data: userData, error: userError } = await supabase.auth.getUser();
   const user = userData?.user;
 
-  if (!user) {
-    console.error("user error", userError);
+  if (!session || !user) {
     return encodedRedirect(
       "error",
       "/sign-in",
-      "User : An unexpected error occurred.",
+      "An unexpected error occurred. Please try again.",
     );
   }
 
@@ -39,17 +84,29 @@ export default async function ProtectedPage() {
   const providerAccountId = user.id || user.user_metadata?.provider_id;
   const accessToken = session?.access_token || null;
   const refreshToken = session?.refresh_token || null;
+  const expiresAt = session?.expires_at || null;
   const email = user.email;
 
   const existingUser = await prisma.authUser.findUnique({
     where: { email },
-    include: { account: true },
+    select: {
+      email: true,
+      account: {
+        select: {
+          lastProvider: true,
+          providers: true,
+          accessToken: true,
+          refreshToken: true,
+          expiresAt: true,
+        },
+      },
+    },
   });
 
   if (!existingUser) {
     const newUser = await prisma.authUser.create({
       data: {
-        email: email as string,
+        email,
         name: fullName,
         id: user.id,
         account: {
@@ -57,34 +114,36 @@ export default async function ProtectedPage() {
             providerAccountId,
             lastProvider: provider,
             providers,
-            accessToken: accessToken,
-            refreshToken: refreshToken,
-            expiresAt: session?.expires_at || null,
+            accessToken,
+            refreshToken,
+            expiresAt,
+          },
+        },
+        profile: {
+          create: {
+            username: "user" + user.id,
+            userEmail: email,
+            role: "user",
           },
         },
       },
     });
     if (newUser) {
-      console.log(newUser);
+      // console.log("New user created:", newUser);
       isNewUser = true;
     }
   } else {
-    await prisma.account.update({
-      where: { userEmail: existingUser.email },
-      data: {
-        lastProvider: provider,
-        providers,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        expiresAt: session?.expires_at || null,
-      },
-    });
+    await updateAccountIfNeeded(
+      existingUser,
+      provider,
+      providers,
+      accessToken,
+      refreshToken,
+      expiresAt,
+    );
   }
 
-  // Redirection selon si l'utilisateur est nouveau ou ancien
-  if (isNewUser) {
-    return encodedRedirect("success", welcome, "Welcome to WaiahuB");
-  } else {
-    return encodedRedirect("success", welcomeBack, "Welcome Back");
-  }
+  return isNewUser
+    ? redirect(welcome + `?email=${email}`)
+    : encodedRedirect("success", welcomeBack, "Welcome Back");
 }

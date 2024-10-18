@@ -1,7 +1,7 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
-import { encodedRedirect } from "@/utils/utils";
+import { createClient } from "@/lib/supabase/server";
+import { encodedRedirect } from "@/lib/utils-encodedRedirect";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -55,10 +55,6 @@ export const googleSignUpAction = async () => {
     provider: "google",
     options: {
       redirectTo: `${origin}/auth/callback`,
-      // queryParams: {
-      //   access_type: "offline",
-      //   prompt: "consent",
-      // },
     },
   });
 
@@ -163,4 +159,27 @@ export const signOutAction = async () => {
   const supabase = createClient();
   await supabase.auth.signOut();
   return redirect("/sign-in");
+};
+
+export const getUserEmail = async () => {
+  // Initialize Supabase client
+  const supabase = createClient();
+
+  // Get the current user from Supabase
+  const { data, error } = await supabase.auth.getUser();
+  console.log(data.user?.email);
+  // Handle any potential error
+  if (error) {
+    console.error("Error retrieving user:", error.message);
+    return { error: "Unable to retrieve user" };
+  }
+
+  // Check if the user exists and extract the user's email
+  if (data) {
+    const email = data.user?.email;
+    console.log(email);
+    return { email };
+  } else {
+    return { error: "No user is currently signed in" };
+  }
 };

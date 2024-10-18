@@ -16,6 +16,7 @@ export const createUser = async (email: string, name?: string) => {
   const user = await prisma.authUser.create({
     data: { email, name },
   });
+  console.log("houni", createUser);
   return user;
 };
 

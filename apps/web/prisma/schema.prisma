@@ -46,7 +46,8 @@ model Profile {
   address       String?
   bio           String?
   birthDate     DateTime?
-  userEmail     String   @unique // Foreign key for AuthUser
+  username      String   @unique
+  userEmail     String   @unique 
   user          AuthUser @relation("ProfileUser", fields: [userEmail], references: [email], onDelete: Cascade)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

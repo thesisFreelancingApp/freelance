@@ -29,7 +29,7 @@ export const getServiceById = async (id: number) => {
       },
     },
   });
-  console.log("service", service);
+  // console.log("service", service);
   return service;
 };
 
@@ -75,10 +75,10 @@ export const getFeaturedServices = async (limit = 3) => {
     include: { ratings: true },
     orderBy: { id: "desc" },
   });
-  console.log(
-    "services",
-    services.map((service) => service),
-  );
+  // console.log(
+  //   "services",
+  //   services.map((service) => service),
+  // );
   return services;
 };
 
