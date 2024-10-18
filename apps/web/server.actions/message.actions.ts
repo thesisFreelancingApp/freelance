@@ -15,7 +15,8 @@ export async function sendMessage(receiverId: string, content: string) {
   }
   console.log(
     "here ya lhoooooooooo ==================================================",
-    typeof user.id,
+    user.id,
+    receiverId,
   );
 
   // Find or create a chat room
