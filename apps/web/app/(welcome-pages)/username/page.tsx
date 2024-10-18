@@ -58,7 +58,9 @@ export default () => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Utilisation de useSearchParams pour obtenir les paramètres de l'URL
   const email = searchParams.get("email"); // Récupération de l'email depuis l'URL
-
+  if (!email) {
+    router.push("/");
+  }
   // Validation du nom d'utilisateur
   const isValidUsername = (username: string) => {
     const regex = /^[a-z0-9]{4,}$/;
@@ -145,7 +147,10 @@ export default () => {
             <Input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setErrorMessages([]);
+                setUsername(e.target.value);
+              }}
               placeholder="Nom d'utilisateur"
               className="w-full p-2 pl-10 pr-10 border rounded"
             />

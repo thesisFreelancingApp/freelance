@@ -46,7 +46,9 @@ export default () => {
   const router = useRouter();
   const searchParams = useSearchParams(); // Pour récupérer les paramètres de l'URL
   const email = searchParams.get("email"); // Récupère l'email depuis les paramètres
-
+  if (!email) {
+    router.push("/");
+  }
   // Fonction pour mettre à jour le profil
   const handleUpdateProfile = async () => {
     setErrorMessages([]);

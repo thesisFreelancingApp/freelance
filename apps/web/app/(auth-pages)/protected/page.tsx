@@ -129,7 +129,7 @@ export default async function ProtectedPage() {
       },
     });
     if (newUser) {
-      console.log("New user created:", newUser);
+      // console.log("New user created:", newUser);
       isNewUser = true;
     }
   } else {
