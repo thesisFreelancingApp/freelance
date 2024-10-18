@@ -14,6 +14,7 @@ export async function updateUsernameByEmail(
   newUsername: string,
 ): Promise<boolean> {
   try {
+    console.log(email);
     await prisma.profile.update({
       where: { userEmail: email },
       data: { username: newUsername }, // Met à jour le nom d'utilisateur

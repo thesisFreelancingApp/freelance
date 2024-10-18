@@ -12,12 +12,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { getUserEmail } from "@/server.actions/auth.actions";
 import {
   checkUsername,
   updateUsernameByEmail,
 } from "@/server.actions/welcome/username.actions";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
@@ -57,6 +56,8 @@ export default () => {
   const [updateSuccess, setUpdateSuccess] = useState<boolean | null>(null);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams(); // Utilisation de useSearchParams pour obtenir les paramètres de l'URL
+  const email = searchParams.get("email"); // Récupération de l'email depuis l'URL
 
   // Validation du nom d'utilisateur
   const isValidUsername = (username: string) => {
@@ -93,19 +94,14 @@ export default () => {
   const handleUpdateUsername = async () => {
     setErrorMessages([]);
     try {
-      const data = await getUserEmail();
-      const { email } = data || "";
       if (email) {
         const result = await updateUsernameByEmail(email, username);
         setUpdateSuccess(result);
         if (result) {
-          router.push("/profil");
+          router.push("/complete-profile?email=" + email);
         }
       } else {
-        setErrorMessages((prev) => [
-          ...prev,
-          "L'email de l'utilisateur n'a pas pu être récupéré.",
-        ]);
+        setErrorMessages((prev) => [...prev, "Email non trouvé dans l'URL."]);
       }
     } catch (error) {
       setUpdateSuccess(false);

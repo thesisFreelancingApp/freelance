@@ -60,7 +60,7 @@ const OneTapComponent = () => {
               // console.log("Successfully logged in with Google One Tap");
 
               // redirect to protected page
-              location.reload();
+              router.push("/protected");
             } catch (error) {
               console.error("Error logging in with Google One Tap", error);
             }

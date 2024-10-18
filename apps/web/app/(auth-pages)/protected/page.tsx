@@ -2,6 +2,7 @@ import { welcome, welcomeBack } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
+import { redirect } from "next/navigation";
 
 // Journalisation avancée des erreurs
 function logError(errorMessage: string, details?: any) {
@@ -122,6 +123,7 @@ export default async function ProtectedPage() {
           create: {
             username: "user" + user.id,
             userEmail: email,
+            role: "user",
           },
         },
       },
@@ -142,6 +144,6 @@ export default async function ProtectedPage() {
   }
 
   return isNewUser
-    ? encodedRedirect("success", welcome, "Welcome to WaiaHub")
+    ? redirect(welcome + `?email=${email}`)
     : encodedRedirect("success", welcomeBack, "Welcome Back");
 }
