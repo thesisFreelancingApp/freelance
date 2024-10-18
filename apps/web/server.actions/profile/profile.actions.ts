@@ -73,3 +73,50 @@ export async function updateUserPicUrl(url, email) {
     });
   }
 }
+
+// import {
+//   getUserProfile,
+//   updateUserProfile as serverUpdateProfile,
+//   updateUserPicUrl,
+// } from "@/server/actions/profile.actions";
+import { uploadProfilePicture as serverUploadPicture } from "@/server/actions/uploaderCloudinary.actions";
+import { revalidatePath } from "next/cache";
+
+// Fetch user profile on the server
+export async function fetchUserProfile(userEmail) {
+  return await getUserProfile(userEmail);
+}
+
+// Handle profile picture upload on the server
+export async function uploadProfilePic(formData, userEmail) {
+  const file = formData.get("profilePic") as File;
+  if (file && file.size > 0) {
+    const uploadedImageUrl = await serverUploadPicture(file);
+    if (uploadedImageUrl) {
+      await updateUserPicUrl(uploadedImageUrl, userEmail);
+      revalidatePath("/profile");
+    }
+  }
+}
+
+// Handle profile update on the server
+export async function updateUserProfile(formData) {
+  const profileId = formData.get("profileId");
+  const firstName = formData.get("firstName");
+  const lastName = formData.get("lastName");
+  const phoneNumber = formData.get("phoneNumber");
+  const location = formData.get("location");
+  const dob = formData.get("dob");
+
+  if (profileId && firstName && lastName && phoneNumber && location && dob) {
+    await serverUpdateProfile({
+      profileId,
+      firstName,
+      lastName,
+      phoneNumber,
+      location,
+      dob,
+    });
+    revalidatePath("/profile");
+  }
+}

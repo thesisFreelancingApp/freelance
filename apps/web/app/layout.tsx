@@ -7,6 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -58,7 +59,7 @@ export default function RootLayout({
                         src={Logo.src}
                         alt="description"
                       />
-                      <p className="text-3xl"> Waiahub</p>
+                      <p> Waiahub</p>
                       {/* <div className="flex items-center gap-2">
                                             <DeployButton />
                                         </div> */}
@@ -71,7 +72,7 @@ export default function RootLayout({
                 {children}
               </div>
 
-              <footer className="flex items-center justify-center w-full gap-8 py-8 mx-auto text-xs text-center border-t">
+              <footer className="flex items-center justify-center w-full gap-8 py-16 mx-auto text-xs text-center border-t">
                 <p>
                   Powered by{" "}
                   <a
