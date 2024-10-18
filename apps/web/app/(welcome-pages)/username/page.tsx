@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
-// Fonction pour afficher des alertes unifiées avec une classe pour limiter la largeur
+// Fonction pour afficher des alertes unifiées avec possibilité d'inclure le nom d'utilisateur
 const renderAlert = (
   type: "success" | "error" | "info",
   message: string,
@@ -35,18 +35,17 @@ const renderAlert = (
   } else if (type === "info") {
     alertClass = "text-blue-500";
   }
-  if (!username) {
-    return <Alert className={`${alertClass} mt-2 max-w-md`}>{message}</Alert>; //
-  }
+
   return (
     <Alert className={`${alertClass} mt-2 max-w-md`}>
-      {
+      {username ? (
         <p>
-          {" "}
-          {message} + <br />
-          <p className="font-bold">{username}</p>
+          {message} <br />
+          <span className="font-bold">{username}</span>
         </p>
-      }
+      ) : (
+        <p>{message}</p>
+      )}
     </Alert>
   );
 };
@@ -170,15 +169,15 @@ export default () => {
             {isAvailable === true &&
               renderAlert(
                 "success",
-                `Nom d'utilisateur disponible : ${username}`,
-                null,
+                `Nom d'utilisateur disponible :`,
+                username,
               )}
             {isAvailable === false &&
               !(errorMessages.length > 0) &&
               renderAlert(
                 "error",
                 "Ce nom d'utilisateur est déjà pris ou n'est pas valide. Merci de réessayer...",
-                null,
+                username,
               )}
             {updateSuccess === true &&
               renderAlert(
