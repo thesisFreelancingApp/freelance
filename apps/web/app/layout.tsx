@@ -1,4 +1,4 @@
-import GenerateNonce from "@/app/(auth-pages)/google_onetap";
+import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Logo from "@/public/WaiaHub-LogoIcon.svg";
@@ -7,7 +7,6 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -15,7 +14,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "WaiaHub",
+  title: "WaiaHub - The fastest way to Freelance",
   description: "The fastest way to Freelance",
 };
 const geistSans = localFont({
@@ -40,7 +39,7 @@ export default function RootLayout({
         className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {" "}
-        <GenerateNonce />
+        <GoogleAuthDirect />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

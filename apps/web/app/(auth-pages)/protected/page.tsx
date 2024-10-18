@@ -118,6 +118,12 @@ export default async function ProtectedPage() {
             expiresAt,
           },
         },
+        profile: {
+          create: {
+            username: "user" + user.id,
+            userEmail: email,
+          },
+        },
       },
     });
     if (newUser) {
