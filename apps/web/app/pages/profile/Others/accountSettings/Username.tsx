@@ -1,19 +1,17 @@
 "use client"; // Ensure this runs as a client component
 
-import React, { useEffect, useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
-import axios from "axios";
+import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
+  FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Dispatch, SetStateAction } from "react";
+import axios from "axios";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 
 interface UsernameFormProps {
   setStep: Dispatch<SetStateAction<number>>;
@@ -42,7 +40,7 @@ const UsernameForm: React.FC<UsernameFormProps> = ({
         setLoading(true);
         try {
           const response = await axios.get(
-            `/api/check-username?username=${username}`
+            `/api/check-username?username=${username}`,
           );
           setIsAvailable(response.data.isAvailable);
         } catch (error) {
@@ -78,12 +76,12 @@ const UsernameForm: React.FC<UsernameFormProps> = ({
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col items-center justify-center w-96 p-8 bg-white rounded-lg shadow-lg transition-transform transform hover:scale-105"
+          className="flex flex-col items-center justify-center p-8 transition-transform transform bg-white rounded-lg shadow-lg w-96 hover:scale-105"
         >
           <FormItem className="mb-6">
             <FormLabel
               htmlFor="username"
-              className="block text-xl font-semibold mb-2"
+              className="block mb-2 text-xl font-semibold"
             >
               Username
             </FormLabel>
@@ -97,23 +95,23 @@ const UsernameForm: React.FC<UsernameFormProps> = ({
               />
             </FormControl>
             {errors.username && (
-              <FormMessage className="text-red-500 text-sm mt-1">
+              <FormMessage className="mt-1 text-sm text-red-500">
                 {errors.username.message}
               </FormMessage>
             )}
             {isAvailable === false && username && (
-              <span className="text-red-500 mt-2">
+              <span className="mt-2 text-red-500">
                 Username is already taken
               </span>
             )}
             {loading && (
-              <span className="text-gray-500 mt-2">
+              <span className="mt-2 text-gray-500">
                 Checking availability...
               </span>
             )}
           </FormItem>
 
-          <FormDescription className="text-gray-600 text-sm mb-4">
+          <FormDescription className="mb-4 text-sm text-gray-600">
             Enter your desired username.
           </FormDescription>
 

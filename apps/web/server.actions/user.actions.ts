@@ -18,3 +18,12 @@ export const getUserDB = async () => {
   });
   return user;
 };
+
+export const getUser = async () => {
+  // Initialize Supabase client
+  const supabase = createClient();
+
+  const { data: user, error } = await supabase.auth.getUser();
+
+  return user.user;
+};

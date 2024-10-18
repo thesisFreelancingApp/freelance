@@ -1,3 +1,4 @@
+import GenerateNonce from "@/app/(auth-pages)/google_onetap";
 import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Logo from "@/public/WaiaHub-LogoIcon.svg";
@@ -6,6 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
+
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -36,6 +38,8 @@ export default function RootLayout({
       <body
         className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {" "}
+        <GenerateNonce />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

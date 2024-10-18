@@ -81,46 +81,59 @@ const ProfessionalInfoForm: React.FC = () => {
           ...prevSkills,
           { skill: newSkill, level: proficiencyLevel },
         ]);
-        console.log("Added Skill:", newSkill, "Level:", proficiencyLevel); // Debugging line
+        // console.log("Added Skill:", newSkill, "Level:", proficiencyLevel); // Debugging line
       } else {
-        console.log("Skill already exists:", newSkill); // Debugging line
+        // console.log("Skill already exists:", newSkill); // Debugging line
       }
 
       // Clear the input fields
       setNewSkill("");
       setProficiencyLevel("");
     } else {
-      console.log("Please enter both skill and proficiency level."); // Debugging line
+      // console.log("Please enter both skill and proficiency level."); // Debugging line
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      occupation,
-      skills,
-      education: {
-        country,
-        collegeOrUniversity,
-        degree,
-        graduationYear,
-      },
-    });
+    // console.log({
+    //   occupation,
+    //   skills,
+    //   education: {
+    //     country,
+    //     collegeOrUniversity,
+    //     degree,
+    //     graduationYear,
+    //   },
+    // });
   };
 
   return (
-    <form className="flex flex-col max-w-xl p-8 mx-auto bg-white rounded-lg shadow-lg" onSubmit={handleSubmit}>
-      <h2 className="text-3xl font-semibold text-gray-800 mb-4">Professional Info</h2>
-      <p className="text-gray-600 mb-6">This is your time to shine. Let potential buyers know what you do best and how you gained your skills, certifications, and experience.</p>
+    <form
+      className="flex flex-col max-w-xl p-8 mx-auto bg-white rounded-lg shadow-lg"
+      onSubmit={handleSubmit}
+    >
+      <h2 className="mb-4 text-3xl font-semibold text-gray-800">
+        Professional Info
+      </h2>
+      <p className="mb-6 text-gray-600">
+        This is your time to shine. Let potential buyers know what you do best
+        and how you gained your skills, certifications, and experience.
+      </p>
 
       {/* Your Occupation Section */}
       <div className="mb-4">
-        <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 mb-1">Your Occupation*</label>
+        <label
+          htmlFor="occupation"
+          className="block mb-1 text-sm font-medium text-gray-700"
+        >
+          Your Occupation*
+        </label>
         <select
           id="occupation"
           value={occupation}
           onChange={(e) => setOccupation(e.target.value)}
-          className="border-gray-300 rounded-md shadow-sm w-full p-2"
+          className="w-full p-2 border-gray-300 rounded-md shadow-sm"
           required
         >
           <option value="">Select your occupation</option>
@@ -133,11 +146,13 @@ const ProfessionalInfoForm: React.FC = () => {
 
       {/* Skills Section */}
       <div className="mb-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-1">Skills*</h3>
-        <p className="text-gray-500 mb-2">Choose <strong>two to five</strong> of your best skills.</p>
+        <h3 className="mb-1 text-sm font-medium text-gray-700">Skills*</h3>
+        <p className="mb-2 text-gray-500">
+          Choose <strong>two to five</strong> of your best skills.
+        </p>
         <div className="flex flex-wrap">
           {allSkills.map((skill) => (
-            <label key={skill} className="flex items-center mr-4 mb-2">
+            <label key={skill} className="flex items-center mb-2 mr-4">
               <input
                 type="checkbox"
                 checked={skills.some((s) => s.skill === skill)}
@@ -149,10 +164,14 @@ const ProfessionalInfoForm: React.FC = () => {
           ))}
         </div>
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-1">Added Skills:</h4>
+          <h4 className="mb-1 text-sm font-medium text-gray-700">
+            Added Skills:
+          </h4>
           <ul>
             {skills.map((s, index) => (
-              <li key={index} className="text-gray-600">{s.skill} - {s.level}</li>
+              <li key={index} className="text-gray-600">
+                {s.skill} - {s.level}
+              </li>
             ))}
           </ul>
         </div>
@@ -160,7 +179,9 @@ const ProfessionalInfoForm: React.FC = () => {
 
       {/* Add New Skill Section */}
       <div className="mb-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-1">Add New Skill</h3>
+        <h3 className="mb-1 text-sm font-medium text-gray-700">
+          Add New Skill
+        </h3>
         <div className="flex">
           <Input
             value={newSkill}
@@ -190,12 +211,12 @@ const ProfessionalInfoForm: React.FC = () => {
 
       {/* Education Section */}
       <div className="mb-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-1">Education</h3>
-        
+        <h3 className="mb-1 text-sm font-medium text-gray-700">Education</h3>
+
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="border-gray-300 rounded-md shadow-sm w-full p-2 mb-2"
+          className="w-full p-2 mb-2 border-gray-300 rounded-md shadow-sm"
           required
         >
           <option value="">Select Country</option>
@@ -223,7 +244,7 @@ const ProfessionalInfoForm: React.FC = () => {
         <select
           value={graduationYear}
           onChange={(e) => setGraduationYear(e.target.value)}
-          className="border-gray-300 rounded-md shadow-sm w-full p-2"
+          className="w-full p-2 border-gray-300 rounded-md shadow-sm"
           required
         >
           <option value="">Graduation Year</option>
@@ -235,7 +256,9 @@ const ProfessionalInfoForm: React.FC = () => {
         </select>
       </div>
 
-      <Button type="submit" className="bg-[#EAB308] text-white font-semibold">Submit</Button>
+      <Button type="submit" className="bg-[#EAB308] text-white font-semibold">
+        Submit
+      </Button>
     </form>
   );
 };

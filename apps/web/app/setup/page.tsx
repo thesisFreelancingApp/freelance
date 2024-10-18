@@ -1,11 +1,11 @@
 "use client"; // This directive is necessary for client-side code.
 
 import { useState } from "react";
-import UsernameForm from "@/app/pages/profile/Username";
-import UserProfileForm from "@/app/pages/profile/professionalInfo";
-import UserBioPage from "@/app/pages/profile/UserBio";
-import SellerBuyerCards from "@/app/pages/profile/Cards";
-import { useRouter } from 'next/navigation'
+import UsernameForm from "@/app/pages/profile/Others/accountSettings/Username";
+import UserProfileForm from "@/app/pages/profile/Others/accountSettings/professionalInfo";
+import UserBioPage from "@/app/pages/profile/Others/accountSettings/UserBio";
+import SellerBuyerCards from "@/app/pages/profile/Others/accountSettings/Cards";
+import { useRouter } from "next/navigation";
 
 const SetupPage = () => {
   const [formData, setFormData] = useState({});

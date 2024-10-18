@@ -222,4 +222,5 @@ yarn-debug.*
 yarn-error.*
 
 
-autogit.zsh
+autoPush_git.sh
+autoCommit_git.sh

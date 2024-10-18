@@ -27,7 +27,7 @@ const UserBioPage: React.FC<UserBioPageProps> = ({ setStep, setFormData }) => {
     }
     setFormData((prevData: any) => ({ ...prevData, bio }));
     // Here you can handle the bio submission, e.g., send it to an API
-    console.log("Bio Submitted:", bio);
+    // console.log("Bio Submitted:", bio);
     // Redirect or navigate to the next page
     setStep(4);
   };
@@ -38,10 +38,10 @@ const UserBioPage: React.FC<UserBioPageProps> = ({ setStep, setFormData }) => {
         onSubmit={handleSubmit}
         className="flex flex-col w-full max-w-md p-8 bg-white rounded-lg shadow-lg"
       >
-        <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+        <h2 className="mb-4 text-3xl font-semibold text-gray-800">
           Tell Us About Yourself
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="mb-6 text-gray-600">
           Your bio is your chance to make a great first impression! Share your
           interests, experiences, or anything else that represents you. This
           will help potential buyers get to know you better.
@@ -57,7 +57,7 @@ const UserBioPage: React.FC<UserBioPageProps> = ({ setStep, setFormData }) => {
             error ? "border-red-500" : ""
           }`}
         />
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
 
         <Button
           type="submit"

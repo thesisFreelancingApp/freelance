@@ -43,11 +43,11 @@ const SellerBuyerCards: React.FC<SellerBuyerCardsProps> = ({
 
       if (response.status === 200) {
         // Handle successful submission
-        console.log("Profile setup successful!");
+        // console.log("Profile setup successful!");
         router.push("/");
       } else {
         // Handle error response
-        console.error("Profile setup failed.");
+        // console.error("Profile setup failed.");
       }
     } catch (error) {
       console.error("An error occurred while submitting the form:", error);
@@ -57,9 +57,9 @@ const SellerBuyerCards: React.FC<SellerBuyerCardsProps> = ({
   };
 
   return (
-    <div className="flex justify-center space-x-4 max-w-4xl mx-auto">
+    <div className="flex justify-center max-w-4xl mx-auto space-x-4">
       {/* Seller Card */}
-      <Card className="border rounded-lg shadow-lg p-6 bg-white transition-transform transform hover:scale-105">
+      <Card className="p-6 transition-transform transform bg-white border rounded-lg shadow-lg hover:scale-105">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-800">
             Seller
@@ -81,7 +81,7 @@ const SellerBuyerCards: React.FC<SellerBuyerCardsProps> = ({
       </Card>
 
       {/* Buyer Card */}
-      <Card className="border rounded-lg shadow-lg p-6 bg-white transition-transform transform hover:scale-105">
+      <Card className="p-6 transition-transform transform bg-white border rounded-lg shadow-lg hover:scale-105">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-800">
             Buyer
