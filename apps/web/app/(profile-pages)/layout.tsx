@@ -1,36 +1,26 @@
-import { SidebarNav } from "@/app/pages/profile/Sidebar";
-import { Separator } from "@/components/ui/separator";
-
-const sidebarNavItems = [
-  { title: "Profile", href: "/profile" },
-  { title: "Settings", href: "/settings" },
+"use client";
+import Sidebar from "../pages/profile/Sidebar";
+const items = [
+  { path: "/profile", title: "Profile" },
+  { path: "/settings", title: "Settings" },
 ];
 
-interface NewLayoutProps {
+interface ProfileLayoutProps {
   children: React.ReactNode;
 }
 
-export default function NewLayout({ children }: NewLayoutProps) {
+export default function ProfileLayout({ children }: ProfileLayoutProps) {
   return (
-    <div className="w-full mx-auto space-y-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <header className="space-y-2 ">
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account settings and set e-mail preferences.
-        </p>
-      </header>
-      <Separator className="my-6" />
+    <div className="flex flex-col w-screen h-screen max-w-screen-lg mx-auto lg:flex-row">
+      {/* Section Sidebar avec les boutons pour chaque lien */}
+      <Sidebar items={items} />
 
-      {/* Layout for sidebar and content */}
-      <div className="flex flex-col w-full lg:flex-row lg:space-x-12 lg:space-y-0">
-        {/* Sidebar navigation */}
-        <aside className="w-full lg:w-1/4">
-          <SidebarNav items={sidebarNavItems} />
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1 py-8">{children}</main>
+      {/* Section contenu principal */}
+      <div className="flex-grow w-full">
+        <div className="h-full overflow-auto">
+          {/* Section 1 */}
+          <div className="h-full px-8 rounded shadow-lg">{children}</div>
+        </div>
       </div>
     </div>
   );

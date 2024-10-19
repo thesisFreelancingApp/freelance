@@ -54,12 +54,12 @@ export default function ForgotPassword({
         </form>
       </CardContent>
       <CardFooter>
-        <div className="relative">
+        {/* <div className="relative">
           <Separator className="mt-6" />
           <span className="absolute px-2 text-xs -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-background text-muted-foreground">
             or
           </span>
-        </div>
+        </div> */}
       </CardFooter>
     </Card>
   );
