@@ -1,5 +1,10 @@
 // List of protected routes
-export const protectedRoutes = ["/protected", "/hello", "/settings"];
+export const protectedRoutes = [
+  "/protected",
+  "/hello",
+  "/settings",
+  "/profile",
+];
 
 // List of non-auth routes
 export const nonAuthRoutes = ["/sign-in", "/sign-up"];

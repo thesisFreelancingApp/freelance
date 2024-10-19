@@ -1,14 +1,17 @@
-import Sidebar from "@/app/pages/profile/Sidebar";
-import UserInfo from "@/app/pages/profile/UserInfo";
+import { ProfileForm } from "@/app/pages/profile/profil-form";
+import { Separator } from "@/components/ui/separator";
 
-export default function ProfilePage() {
-  const activeTab = "user-info";
+export default function SettingsProfilePage() {
   return (
-    <div className="flex">
-      <Sidebar activeTab={activeTab} />
-      <main className="flex-1 p-4">
-        <UserInfo />
-      </main>
+    <div className="items-center justify-center space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Profile</h3>
+        <p className="text-sm text-muted-foreground">
+          This is how others will see you on the site.
+        </p>
+      </div>
+      <Separator />
+      <ProfileForm />
     </div>
   );
 }

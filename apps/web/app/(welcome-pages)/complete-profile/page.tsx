@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { updateProfileWithEmail } from "@/server.actions/welcome/profile.actions";
+import { updateProfileWithEmail } from "@/server.actions/welcome/createProfile.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 

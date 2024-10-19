@@ -17,6 +17,7 @@ export const metadata = {
   title: "WaiaHub - The fastest way to Freelance",
   description: "The fastest way to Freelance",
 };
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -36,9 +37,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={GeistSans.className} suppressHydrationWarning>
       <body
-        className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={` bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {" "}
         <GoogleAuthDirect />
         <ThemeProvider
           attribute="class"
@@ -47,31 +47,31 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main className="flex flex-col items-center min-h-screen">
-            <div className="flex flex-col items-center flex-1 w-full gap-20">
+            <div className="flex flex-col items-center flex-1 w-full gap-10 md:gap-20">
+              {/* Navbar */}
               <nav className="flex justify-center w-full h-16 border-b border-b-foreground/6">
-                <div className="flex items-center justify-between w-full max-w-5xl text-xl">
+                <div className="flex items-center justify-between w-full px-4 text-lg max-w-7xl md:px-8 md:text-xl">
                   <Link href={"/"}>
-                    {" "}
                     <div className="flex items-center gap-2 font-semibold">
                       <img
-                        className="size-16"
+                        className="w-12 h-12 md:w-16 md:h-16"
                         src={Logo.src}
-                        alt="description"
+                        alt="WaiaHub Logo"
                       />
-                      <p> Waiahub</p>
-                      {/* <div className="flex items-center gap-2">
-                                            <DeployButton />
-                                        </div> */}
+                      <p className="text-3xl">Waiahub</p>
                     </div>
                   </Link>
                   <HeaderAuth />
                 </div>
               </nav>
-              <div className="flex flex-col max-w-5xl gap-20 p-5">
+
+              {/* Main content */}
+              <div className="flex flex-col gap-10 p-4 max-w-7xl md:gap-20 md:p-8">
                 {children}
               </div>
 
-              <footer className="flex items-center justify-center w-full gap-8 py-16 mx-auto text-xs text-center border-t">
+              {/* Footer */}
+              <footer className="flex flex-col items-center justify-center w-full gap-4 py-8 mx-auto text-xs text-center border-t md:flex-row md:gap-8 md:py-16 md:text-sm">
                 <p>
                   Powered by{" "}
                   <a

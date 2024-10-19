@@ -55,9 +55,9 @@ async function updateAccountIfNeeded(
       },
     });
 
-    console.log("Account updated for user:", existingUser.email);
+    // console.log("Account updated for user:", existingUser.email);
   } else {
-    console.log("No updates needed for user:", existingUser.email);
+    // console.log("No updates needed for user:", existingUser.email);
   }
 }
 

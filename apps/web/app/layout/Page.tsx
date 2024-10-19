@@ -5,5 +5,9 @@ interface WrapperProps {
 }
 
 export default function Page({ children }: WrapperProps) {
-  return <div className="min-h-[60vh]">{children}</div>;
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      {children}
+    </div>
+  );
 }
