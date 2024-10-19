@@ -72,7 +72,7 @@ export default () => {
       const result = await updateProfileWithEmail(email, updatedProfile); // Envoi du profil mis à jour avec birthDate en tant que Date
       setUpdateSuccess(result);
       if (result) {
-        router.push("/profil"); // Redirige vers la page profil après succès
+        router.push("/profile"); // Redirige vers la page profil après succès
       }
     } catch (error) {
       setUpdateSuccess(false);
