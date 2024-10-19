@@ -1,4 +1,4 @@
-import { PrismaClient, Jobs, Plan, Role, Level } from "@prisma/client";
+import { Jobs, Level, Plan, PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -76,6 +76,7 @@ export const seedUsers = async () => {
             skills: user.skills,
             languages: user.languages,
             userEmail: user.email,
+            username: user.firstName + user.lastName,
           },
         },
       },
