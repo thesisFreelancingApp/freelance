@@ -10,14 +10,14 @@ import { checkUsername } from "@/server.actions/welcome/username.actions";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
-// Define UserProfile interface
+// Définir l'interface UserProfile
 interface UserProfile {
   firstName?: string;
   lastName?: string;
   username?: string;
   userEmail?: string;
   address?: string;
-  birthDate?: string; // Use string for input value
+  birthDate?: string; // Utiliser string pour la valeur de l'input
   phoneNumber?: string;
   bio?: string;
 }
@@ -97,7 +97,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     }
     if (isUsernameAvailable === false) {
       toast({
-        title: "Username Unavailable",
+        title: "Nom d'utilisateur indisponible",
         description: "Ce nom d'utilisateur n'est pas disponible.",
       });
       return;
@@ -111,13 +111,14 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
       await updateUserProfile(updatedProfile);
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been updated successfully.",
+        title: "Profil mis à jour",
+        description: "Votre profil a été mis à jour avec succès.",
       });
     } catch (error) {
       toast({
-        title: "Update Error",
-        description: "An error occurred while updating the profile.",
+        title: "Erreur de mise à jour",
+        description:
+          "Une erreur s'est produite lors de la mise à jour du profil.",
       });
     } finally {
       setIsLoading(false);
@@ -127,9 +128,9 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   return (
     <>
       <div className="space-y-0.5">
-        <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Paramètres</h2>
         <p className="text-muted-foreground">
-          Personalize your account and adjust your profile preferences.
+          Ajustez votre compte en utilisant votre email ou nom d'utilisateur.
         </p>
       </div>
       <Separator className="my-6" />
@@ -140,13 +141,13 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
             name="userEmail"
             value={profile.userEmail}
             onChange={handleChange}
-            placeholder="Enter your email"
+            placeholder="Entrez votre email"
             className="w-full"
             disabled
           />
         </div>{" "}
         <div className="flex flex-col w-full ">
-          <Label>Username</Label>
+          <Label>Nom d'utilisateur</Label>
 
           <div className="relative flex items-center w-full mt-1">
             <span className="absolute text-gray-500 left-3">@</span>{" "}
@@ -159,7 +160,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
 
                 handleChange(e);
               }}
-              placeholder="Enter your username"
+              placeholder="Entrez votre nom d'utilisateur"
               className="w-full h-10 pl-10 pr-10 border rounded"
             />
             {/* Icône de disponibilité */}
@@ -182,7 +183,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
           disabled={isLoading || isUsernameAvailable === false}
           className="w-full"
         >
-          {isLoading ? "Updating..." : "Update"}
+          {isLoading ? "Mise à jour..." : "Mettre à jour"}
         </Button>
       </form>
       {errorMessages && (

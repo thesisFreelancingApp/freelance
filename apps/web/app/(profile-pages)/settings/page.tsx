@@ -29,8 +29,9 @@ export default async function ProfilePage() {
 
     // Afficher un message d'erreur convivial à l'utilisateur
     return (
-      <div className="text-red-600 font-semibold">
-        Unable to load user profile. Please try again later.
+      <div className="font-semibold text-red-600">
+        Impossible de charger le profil utilisateur. Veuillez réessayer plus
+        tard.
       </div>
     );
   }

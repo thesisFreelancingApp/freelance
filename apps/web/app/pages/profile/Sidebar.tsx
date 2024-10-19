@@ -9,7 +9,7 @@ interface SidebarProps {
 export default function SidebarProfile({ items }: SidebarProps) {
   const pathname = usePathname();
   return (
-    <div className="flex flex-wrap justify-center w-full px-6 space-x-1 lg:justify-start sm:px-6 sm:space-x-2 md:space-x-6 lg:px8 lg:flex-col lg:w-2/5 lg:space-x-0 lg:space-y-1">
+    <div className="flex flex-wrap justify-center w-full px-6 space-x-1 lg:mt-5 lg:justify-start sm:px-6 sm:space-x-2 md:space-x-6 lg:px8 lg:flex-col lg:w-2/5 lg:space-x-0 lg:space-y-1">
       {items.map((item, index) => (
         <Link
           key={index + 1}
