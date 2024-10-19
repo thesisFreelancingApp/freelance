@@ -32,14 +32,14 @@ export default async function ServiceDetailPage({
             <div className="flex items-center mb-4">
               <img
                 src={
-                  service.user?.profilePic ||
+                  service.creator?.profilePic ||
                   "/placeholder.svg?height=50&width=50"
                 }
                 alt="Seller"
                 className="w-12 h-12 mr-4 rounded-full"
               />
               <div>
-                <h2 className="font-semibold">{`${service.user?.firstName} ${service.user?.lastName}`}</h2>
+                <h2 className="font-semibold">{`${service.creator?.firstName} ${service.creator?.lastName}`}</h2>
                 <div className="flex items-center">
                   <Star className="w-4 h-4 mr-1 text-yellow-400" />
                   <span>
@@ -147,10 +147,10 @@ export default async function ServiceDetailPage({
             </Button>
             <div className="space-y-4">
               <MessageBox
-                receiverId={service.user?.id || ""} // Assuming service.user is the AuthUser
-                receiverName={`${service.user?.firstName} ${service.user?.lastName}`}
+                receiverId={service.creator.id || ""} // Assuming service.user is the AuthUser
+                receiverName={`${service.creator.firstName} ${service.creator.lastName}`}
                 receiverProfilePic={
-                  service.user?.profilePic ||
+                  service.creator.profilePic ||
                   "/placeholder.svg?height=40&width=40"
                 }
               />
