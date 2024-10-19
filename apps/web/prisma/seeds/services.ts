@@ -84,7 +84,7 @@ export const seedServices = async () => {
           features: service.features,
           images: service.images,
           tags: service.tags,
-          user: { connect: { id: service.userId } },
+          creator: { connect: { id: service.userId } },
           category: { connect: { id: service.categoryId } },
         },
       });

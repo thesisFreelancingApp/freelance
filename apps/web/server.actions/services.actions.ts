@@ -19,12 +19,20 @@ export const getServiceById = async (id: number) => {
         },
       },
       category: true,
-      user: {
+      creator: {
         select: {
           id: true,
           firstName: true,
           lastName: true,
           profilePic: true,
+          sellerRating: true,
+        },
+      },
+      buyers: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
         },
       },
     },
@@ -37,10 +45,14 @@ export const getServiceById = async (id: number) => {
 export const createService = async (data: {
   name: string;
   price: string;
+  description: string;
   categoryId: number;
-  userId: string;
+  creatorId: string;
   deliveryTime: number;
   revisions: number;
+  features: string[];
+  images: string[];
+  tags: string[];
 }) => {
   const service = await prisma.service.create({
     data,
@@ -72,20 +84,40 @@ export const deleteService = async (id: number) => {
 export const getFeaturedServices = async (limit = 3) => {
   const services = await prisma.service.findMany({
     take: limit,
-    include: { ratings: true },
+    include: {
+      ratings: true,
+      creator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+      category: true,
+    },
     orderBy: { id: "desc" },
   });
-  // console.log(
-  //   "services",
-  //   services.map((service) => service),
-  // );
   return services;
 };
 
 // Get all services (gigs)
 export const getAllServices = async () => {
   const services = await prisma.service.findMany({
-    include: { ratings: true, category: true },
+    include: {
+      ratings: true,
+      category: true,
+      creator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+    },
   });
   return services;
 };
@@ -101,8 +133,21 @@ export const searchServices = async (
         { name: { contains: query, mode: "insensitive" } },
         { description: { contains: query, mode: "insensitive" } },
       ],
+      ...(categoryId && { categoryId }),
     },
-    include: { ratings: true, category: true },
+    include: {
+      ratings: true,
+      category: true,
+      creator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+    },
   });
   return services;
 };
@@ -111,7 +156,19 @@ export const searchServices = async (
 export const getServicesByCategory = async (categoryId: number) => {
   const services = await prisma.service.findMany({
     where: { categoryId },
-    include: { ratings: true, category: true },
+    include: {
+      ratings: true,
+      category: true,
+      creator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+    },
   });
   return services;
 };
