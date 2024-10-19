@@ -47,6 +47,8 @@ export function ProfileForm() {
       firstName: "",
       lastName: "",
       address: "",
+      birthDate: "",
+      phoneNumber: "",
       bio: "",
       username: "",
       userEmail: "",
