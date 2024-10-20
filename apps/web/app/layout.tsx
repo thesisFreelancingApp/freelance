@@ -1,13 +1,15 @@
 import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
+import { Toaster } from "@/components/ui/toaster";
+import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
 import Logo from "@/public/WaiaHub-LogoIcon.svg";
 import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
-
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -15,6 +17,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "WaiaHub - The fastest way to Freelance",
+
   description: "The fastest way to Freelance",
 };
 
@@ -40,12 +43,14 @@ export default function RootLayout({
         className={` bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GoogleAuthDirect />
+        <Toaster />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <TailwindIndicator />
           <main className="flex flex-col items-center min-h-screen">
             <div className="flex flex-col items-center flex-1 w-full gap-10 md:gap-20">
               {/* Navbar */}
@@ -87,7 +92,10 @@ export default function RootLayout({
               </footer>
             </div>
           </main>
+          <TailwindIndicator />
         </ThemeProvider>
+        {/* Script Tawk.to */}
+        <UseTawkToScript />
       </body>
     </html>
   );

@@ -14,18 +14,18 @@ import { toast } from "@/hooks/use-toast";
 import {
   getUserProfile,
   updateUserProfile,
-} from "@/server.actions/profile/profile.actions"; // Assume these are exported from your server
+} from "@/server.actions/profile/profile.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-// Validation schema for the form
+// Validation schema
 const profileFormSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required." }),
   lastName: z.string().min(1, { message: "Last name is required." }),
   address: z.string().min(1, { message: "Address is required." }),
-  birthDate: z.string().optional(), // Ensure birthDate is handled as a string
+  birthDate: z.string().optional(),
   phoneNumber: z.string().optional(),
   bio: z.string().max(160).min(4),
   username: z
@@ -54,11 +54,10 @@ export function ProfileForm() {
   });
 
   useEffect(() => {
-    async function fetchProfile() {
+    const fetchProfile = async () => {
       setIsLoading(true);
       try {
         const profile = await getUserProfile();
-        // Handle null values, convert birthDate to a string format (if it's a Date)
         const formattedProfile = {
           firstName: profile.firstName || "",
           lastName: profile.lastName || "",
@@ -69,9 +68,9 @@ export function ProfileForm() {
           phoneNumber: profile.phoneNumber || "",
           birthDate: profile.birthDate
             ? new Date(profile.birthDate).toISOString().slice(0, 10)
-            : "", // Formatting date as a string in YYYY-MM-DD
+            : "",
         };
-        form.reset(formattedProfile); // Pre-fill the form with profile data
+        form.reset(formattedProfile);
       } catch (error) {
         toast({
           title: "Error fetching profile",
@@ -80,20 +79,19 @@ export function ProfileForm() {
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     fetchProfile();
   }, [form]);
 
   const onSubmit = async (data: ProfileFormValues) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      // Convert birthDate from string to Date
       const formattedData = {
         ...data,
         birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
       };
-      await updateUserProfile(formattedData); // Pass formatted data
+      await updateUserProfile(formattedData);
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -108,39 +106,47 @@ export function ProfileForm() {
     }
   };
 
+  // Reusable form input component
+  const FormInput = ({
+    name,
+    label,
+    placeholder,
+  }: {
+    name: keyof ProfileFormValues;
+    label: string;
+    placeholder?: string;
+  }) => (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Input placeholder={placeholder} {...field} className="w-full" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+
   return (
-    <div className="container w-full">
+    <div className="">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Username */}
-          <FormField
-            control={form.control}
+          <FormInput
             name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Username"
+            placeholder="Enter your username"
           />
-          {/* Email */}
-          <FormField
-            control={form.control}
+          <FormInput
             name="userEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Email"
+            placeholder="Enter your email"
           />
-          <Button className="mx:w-full" type="submit" disabled={isLoading}>
+
+          <Button className="w-full" type="submit" disabled={isLoading}>
             {isLoading ? "Updating..." : "Update Profile"}
           </Button>
         </form>
