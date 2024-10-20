@@ -7,7 +7,9 @@ import {
   MessageSquare,
   Video,
   Check,
+  Trash2,
 } from "lucide-react";
+import ServiceReviews from "@/app/pages/review/ServiceReviews";
 
 export default async function ServiceDetailPage({
   params,
@@ -15,7 +17,7 @@ export default async function ServiceDetailPage({
   params: { id: string };
 }) {
   const service = await getServiceById(parseInt(params.id));
-
+  console.log("service -----------------------------------", service);
   if (!service) {
     return <div>Service not found</div>;
   }
@@ -131,6 +133,19 @@ export default async function ServiceDetailPage({
               ) : (
                 <p>No reviews yet.</p>
               )}
+            </div>
+
+            {/* Review Form */}
+
+            <div>
+              {/* Use the ServiceReviews component here */}
+
+              {/* @ts-ignore */}
+
+              <ServiceReviews
+                ratings={service.ratings}
+                serviceId={service.id}
+              />
             </div>
           </div>
 
