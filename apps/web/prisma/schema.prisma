@@ -104,27 +104,40 @@ model CategoryHierarchy {
 
 // Service model represents a service offered by a freelancer
 model Service {
-  id            Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  name          String   // Name of the service
-  price         String   // Price of the service
-  description   String?  // Optional description of the service
-  categoryId    Int      // Foreign key to CategoryHierarchy
-  createdAt     DateTime @default(now()) // Timestamp when service was created
-  updatedAt     DateTime @updatedAt // Timestamp when service was last updated
-  category      CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id]) // Relation to the service category
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  categoryId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  category      CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id])
 
-  // Service details
-  deliveryTime  Int      // Estimated delivery time for the service
-  revisions     Int      // Number of revisions allowed
-  features      String[] // List of service features
-  images        String[] // Images associated with the service
-  tags          String[] // Tags to describe the service
+  images        String[]
+  tags          String[]
 
   // Relations
-  creator       Profile  @relation("CreatedServices", fields: [creatorId], references: [id]) // Creator of the service (freelancer)
-  creatorId     String   // Foreign key to Profile (creator)
-  buyers        Profile[] @relation("PurchasedServices") // List of buyers for this service
-  ratings       Rating[]  @relation("ServiceRatings") // Ratings given for this service
+  creator       Profile  @relation("CreatedServices", fields: [creatorId], references: [id])
+  creatorId     String
+  buyers        Profile[] @relation("PurchasedServices")
+  ratings       Rating[]  @relation("ServiceRatings")
+  
+  //  relation to GigPackage
+  packages      GigPackage[]
+}
+
+// New GigPackage model
+model GigPackage {
+  id          Int      @id @default(autoincrement())
+  serviceId   Int
+  name        String   // e.g., "Basic", "Standard", "Premium"
+  description String   // Add this line
+  price       Decimal  @db.Decimal(10, 2)
+  deliveryTime Int     // in days
+  revisions   Int
+  features    String[]
+
+  // Relation to Service
+  service     Service  @relation(fields: [serviceId], references: [id])
 }
 
 // Rating model for feedback on services

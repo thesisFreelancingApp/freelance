@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={GeistSans.className} suppressHydrationWarning>
       <body
-        className={` bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GoogleAuthDirect />
         <ThemeProvider
@@ -68,7 +68,8 @@ export default function RootLayout({
                 </nav>
 
                 {/* Main content */}
-                <div className="flex flex-col gap-10 p-4 max-w-7xl md:gap-20 md:p-8">
+                {/* <div className="flex flex-col gap-10 p-4 max-w-7xl md:gap-20 md:p-8"> */}
+                <div className="flex flex-col w-full max-w-[84rem] gap-20 p-5">
                   {children}
                 </div>
 

@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prismaClient";
+import { createClient } from "@/lib/supabase/server";
 
 // Récupérer un service par ID
 export const getServiceById = async (id: number) => {
@@ -35,27 +36,75 @@ export const getServiceById = async (id: number) => {
           lastName: true,
         },
       },
+      packages: true,
     },
   });
-  // console.log("service", service);
   return service;
 };
 
 // Créer un nouveau service
 export const createService = async (data: {
   name: string;
-  price: string;
   description: string;
   categoryId: number;
-  creatorId: string;
-  deliveryTime: number;
-  revisions: number;
-  features: string[];
   images: string[];
   tags: string[];
+  packages: {
+    basic: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+    standard: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+    premium: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+  };
 }) => {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("You must be logged in to create a service");
+  }
+
   const service = await prisma.service.create({
-    data,
+    data: {
+      name: data.name,
+      description: data.description,
+      categoryId: data.categoryId,
+      creatorId: user.id,
+      images: data.images,
+      tags: data.tags,
+      packages: {
+        create: [
+          { ...data.packages.basic },
+          { ...data.packages.standard },
+          { ...data.packages.premium },
+        ],
+      },
+    },
+    include: {
+      packages: true,
+    },
   });
   return service;
 };
@@ -63,7 +112,13 @@ export const createService = async (data: {
 // Mettre à jour un service
 export const updateService = async (
   id: number,
-  data: Partial<{ name: string; price: string }>,
+  data: Partial<{
+    name: string;
+    description: string;
+    categoryId: number;
+    images: string[];
+    tags: string[];
+  }>,
 ) => {
   const service = await prisma.service.update({
     where: { id },
@@ -96,10 +151,19 @@ export const getFeaturedServices = async (limit = 3) => {
         },
       },
       category: true,
+      packages: true,
     },
     orderBy: { id: "desc" },
   });
-  return services;
+
+  // Convert Decimal to string for each package price
+  return services.map((service) => ({
+    ...service,
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(), // Convert Decimal to string
+    })),
+  }));
 };
 
 // Get all services (gigs)
@@ -117,6 +181,7 @@ export const getAllServices = async () => {
           sellerRating: true,
         },
       },
+      packages: true,
     },
   });
   return services;
@@ -147,6 +212,7 @@ export const searchServices = async (
           sellerRating: true,
         },
       },
+      packages: true,
     },
   });
   return services;
@@ -168,6 +234,7 @@ export const getServicesByCategory = async (categoryId: number) => {
           sellerRating: true,
         },
       },
+      packages: true,
     },
   });
   return services;
