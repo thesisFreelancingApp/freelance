@@ -3,7 +3,7 @@ import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
-import UseTawkToScript from "@/hooks/user-Tawk-liveChat";
+import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
 import Logo from "@/public/WaiaHub-LogoIcon.svg";
 import "@/styles/globals.css";
 import { GeistSans } from "geist/font/sans";

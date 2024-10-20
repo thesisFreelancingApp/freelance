@@ -186,6 +186,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
+                          captionLayout="dropdown-buttons"
                           mode="single"
                           selected={field.value}
                           onSelect={(date) => {
@@ -198,7 +199,8 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-02")
                           }
-                          initialFocus
+                          fromYear={1960}
+                          toYear={2030}
                         />
                       </PopoverContent>
                     </Popover>

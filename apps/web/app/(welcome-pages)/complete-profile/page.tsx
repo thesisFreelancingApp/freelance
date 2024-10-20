@@ -1,8 +1,9 @@
-"use client";
+import { fr } from "date-fns/locale";
 
 import Page from "@/app/layout/Page";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendarFR";
 import {
   Card,
   CardContent,
@@ -12,11 +13,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { updateProfileWithEmail } from "@/server.actions/welcome/createProfile.actions";
-import { useRouter, useSearchParams } from "next/navigation";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// Fonction pour afficher des alertes unifiées avec les détails du profil
 const renderAlert = (type: "success" | "error" | "info", message: string) => {
   let alertClass = "";
   if (type === "success") {
@@ -29,50 +38,58 @@ const renderAlert = (type: "success" | "error" | "info", message: string) => {
 
   return <Alert className={`${alertClass} mt-2 max-w-md`}>{message}</Alert>;
 };
-
 export default () => {
-  const [profile, setProfile] = useState({
+  const [profile, setProfile] = useState<{
+    firstName: string;
+    lastName: string;
+    address: string;
+    birthDate: Date | undefined;
+    phoneNumber: string;
+    bio: string;
+  }>({
     firstName: "",
     lastName: "",
     address: "",
-    birthDate: "",
+    birthDate: undefined, // Set initial value as undefined
     phoneNumber: "",
     bio: "",
   });
+
   const [loading, setLoading] = useState<boolean>(false);
   const [updateSuccess, setUpdateSuccess] = useState<boolean | null>(null);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
   const router = useRouter();
-  const searchParams = useSearchParams(); // Pour récupérer les paramètres de l'URL
-  const email = searchParams.get("email"); // Récupère l'email depuis les paramètres
-  if (!email) {
-    router.push("/");
-  }
-  // Fonction pour mettre à jour le profil
+
   const handleUpdateProfile = async () => {
     setErrorMessages([]);
-    if (!email) {
+    setLoading(true);
+    // Validation for required fields
+    if (
+      !profile.firstName ||
+      !profile.lastName ||
+      !profile.address ||
+      !profile.birthDate ||
+      !profile.phoneNumber ||
+      !profile.bio
+    ) {
+      setLoading(false);
       setErrorMessages((prev) => [
         ...prev,
-        "Email non fourni, impossible de mettre à jour le profil.",
+        "Tous les champs sont obligatoires.",
       ]);
       return;
     }
-
-    setLoading(true);
-
-    // Conversion de birthDate en Date avant de l'envoyer à l'API
     const updatedProfile = {
       ...profile,
-      birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined, // Conversion en Date
+      birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined,
     };
 
     try {
-      const result = await updateProfileWithEmail(email, updatedProfile); // Envoi du profil mis à jour avec birthDate en tant que Date
+      const result = await updateProfileWithEmail(updatedProfile);
       setUpdateSuccess(result);
       if (result) {
-        router.push("/profil"); // Redirige vers la page profil après succès
+        router.push("/profil");
       }
     } catch (error) {
       setUpdateSuccess(false);
@@ -85,7 +102,6 @@ export default () => {
     }
   };
 
-  // Gérer les changements d'input
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -97,65 +113,109 @@ export default () => {
     <Page>
       <Card className="max-w-md">
         <CardHeader>
-          <CardTitle>Mettre à jour le profil</CardTitle>
+          <CardTitle>Créer votre profil</CardTitle>
           <CardDescription>
-            Modifiez vos informations personnelles ci-dessous.
+            Renseignez vos informations personnelles pour compléter votre profil
+            et accéder à une expérience sur mesure.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <div className="space-y-4">
-            <Input
-              type="text"
-              name="firstName"
-              value={profile.firstName}
-              onChange={handleInputChange}
-              placeholder="Prénom"
-              className="w-full"
-            />
-            <Input
-              type="text"
-              name="lastName"
-              value={profile.lastName}
-              onChange={handleInputChange}
-              placeholder="Nom de famille"
-              className="w-full"
-            />
-            <Input
-              type="text"
-              name="address"
-              value={profile.address}
-              onChange={handleInputChange}
-              placeholder="Adresse"
-              className="w-full"
-            />
-            <Input
-              type="date"
-              name="birthDate"
-              value={profile.birthDate}
-              onChange={handleInputChange}
-              placeholder="Date de naissance"
-              className="w-full"
-            />
-            <Input
-              type="text"
-              name="phoneNumber"
-              value={profile.phoneNumber}
-              onChange={handleInputChange}
-              placeholder="Numéro de téléphone"
-              className="w-full"
-            />
-            <textarea
-              name="bio"
-              value={profile.bio}
-              onChange={handleInputChange}
-              placeholder="Biographie"
-              className="w-full p-2 border rounded"
-              rows={4}
-            />
+            <div>
+              {" "}
+              <Label>Prénom</Label>
+              <Input
+                type="text"
+                name="firstName"
+                value={profile.firstName}
+                onChange={handleInputChange}
+                placeholder="Foulen(a)"
+                className="w-full"
+              />
+            </div>
+            <div>
+              {" "}
+              <Label>Nom de famille</Label>
+              <Input
+                type="text"
+                name="lastName"
+                value={profile.lastName}
+                onChange={handleInputChange}
+                placeholder="Ben Falten"
+                className="w-full"
+              />
+            </div>
+            <div>
+              {" "}
+              <Label>Adresse</Label>
+              <Input
+                type="text"
+                name="address"
+                value={profile.address}
+                onChange={handleInputChange}
+                placeholder="216 rue tounes, Tunis"
+                className="w-full"
+              />
+            </div>
+
+            {/* Calendar Date Picker */}
+            <div className="w-full">
+              <Label>Date de Naissence</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full pl-3 text-left">
+                    {profile.birthDate
+                      ? format(new Date(profile.birthDate), "PPP", {
+                          locale: fr,
+                        })
+                      : "Sélectionner une date"}
+                    <CalendarIcon className="w-4 h-4 ml-auto opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-auto p-0">
+                  <Calendar
+                    captionLayout="dropdown-buttons"
+                    mode="single"
+                    selected={profile.birthDate || undefined} // Ensure selected is either Date or undefined
+                    onSelect={(date) =>
+                      setProfile({ ...profile, birthDate: date || undefined })
+                    } // Handle date selection with undefined fallback
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-02")
+                    }
+                    fromYear={1960}
+                    toYear={2030}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="w-full">
+              <Label>Numéro de téléphone</Label>
+              <Input
+                type="text"
+                name="phoneNumber"
+                value={profile.phoneNumber}
+                onChange={handleInputChange}
+                placeholder="99552244"
+                className="w-full"
+              />
+            </div>
+            <div className="w-full">
+              <Label>Biographie</Label>
+              <Textarea
+                name="bio"
+                value={profile.bio}
+                onChange={handleInputChange}
+                placeholder="
+Parlez nous de vous :) ..."
+                className="w-full p-2 border rounded"
+                rows={4}
+              />
+            </div>
           </div>
 
-          {/* Zone d'alerte */}
+          {/* Alert Section */}
           <div className="max-w-md mx-auto mt-4">
             {loading &&
               renderAlert("info", "Mise à jour du profil en cours...")}
@@ -167,7 +227,7 @@ export default () => {
               renderAlert("error", errorMessages.join(" "))}
           </div>
 
-          {/* Bouton Sauvegarder */}
+          {/* Save Button */}
           <Button
             className="w-full mt-3"
             onClick={handleUpdateProfile}

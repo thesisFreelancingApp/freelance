@@ -48,6 +48,9 @@
     --ring: 40.8 91.74% 57.25%;
   }
 }
+.rdp-vhidden {
+  @apply hidden;
+}
 
 @layer base {
   * {

@@ -1,18 +1,23 @@
 "use server";
 import prisma from "@/lib/prismaClient";
-
-export async function updateProfileWithEmail(
-  email: string,
-  profileData: {
-    firstName?: string;
-    lastName?: string;
-    address?: string;
-    birthDate?: Date;
-    phoneNumber?: string;
-    bio?: string;
-  },
-): Promise<boolean> {
+import { createClient } from "@/lib/supabase/server";
+export async function updateProfileWithEmail(profileData: {
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  birthDate?: Date;
+  phoneNumber?: string;
+  bio?: string;
+}): Promise<boolean> {
   try {
+    // Initialiser le client Supabase
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return false;
+    }
+    const email = user.user.email;
     await prisma.profile.update({
       where: { userEmail: email },
       data: {
