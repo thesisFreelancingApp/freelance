@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Decimal } from "@prisma/client/runtime/library";
-
+import ServiceReviews from "@/app/pages/review/ServiceReviews";
 export default async function ServiceDetailPage({
   params,
 }: {
@@ -161,6 +161,18 @@ export default async function ServiceDetailPage({
                   <p>No reviews yet.</p>
                 )}
               </CardContent>
+
+              <div>
+              {/* Use the ServiceReviews component here */}
+
+              {/* @ts-ignore */}
+
+              <ServiceReviews
+                ratings={service.ratings}
+                serviceId={service.id}
+              />
+            </div>
+
             </Card>
           </div>
 

@@ -1,8 +1,8 @@
-"use client"
-import { DollarSign, Package, CreditCard, Star } from "lucide-react"
-import { Bar, BarChart, ResponsiveContainer } from "recharts"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {getSellerTotalEarnings} from "@/server.actions/seller-dashboard.actions"
+"use client";
+import { DollarSign, Package, CreditCard, Star } from "lucide-react";
+import { Bar, BarChart, ResponsiveContainer } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSellerTotalEarnings } from "@/server.actions/seller-dashboard.actions";
 
 import {
   Table,
@@ -11,13 +11,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useState, useEffect } from "react"
+} from "@/components/ui/table";
+import { useState, useEffect } from "react";
+
 const recentOrders = [
   { id: 1, client: "Alice Johnson", service: "Logo Design", status: "In Progress", amount: 150 },
   { id: 2, client: "Bob Smith", service: "Web Development", status: "Completed", amount: 500 },
   { id: 3, client: "Charlie Brown", service: "SEO Optimization", status: "Pending", amount: 300 },
-]
+];
 
 const earningsData = [
   { month: "Jan", earnings: 1000 },
@@ -26,36 +27,37 @@ const earningsData = [
   { month: "Apr", earnings: 1800 },
   { month: "May", earnings: 2000 },
   { month: "Jun", earnings: 2400 },
-]
+];
+
+type FreelancerRating = {
+  id: number;
+  createdAt: Date;
+  rating: number;
+  buyerId: string;
+  sellerId: string;
+  serviceId: number;
+  review: string | null;
+};
 
 
+type SellerData = {
+  username: string | null;
+  totalEarnings: number | null;
+  freelancerRatings: FreelancerRating[] | null; // Allow it to be an array or null
+};
 
-export function Overview() {
+interface OverviewProps {
+  sellerData: SellerData | null; // Accept sellerData as a prop
+}
 
-  const [earnings, setEarnings] = useState<number | null>(null); // Allow number or null
-  const [error, setError] = useState<string | null>(null); // Allow string or null
-
-
-
-    useEffect(() => {
-        const fetchEarnings = async () => {
-            try {
-                const data = await getSellerTotalEarnings();
-                setEarnings(data.totalEarnings);
-            } catch (err) {
-              setError((err as Error).message); // Handle error appropriately
-
-              }
-        };
-
-        fetchEarnings();
-    }, []); 
-
+export function Overview({ sellerData }: OverviewProps) {
   
+  console.log(sellerData);
 
-
-  console.log(earnings)
-
+  // Calculate average rating
+  const averageRating = sellerData?.freelancerRatings && sellerData.freelancerRatings.length > 0
+    ? (sellerData.freelancerRatings.reduce((acc, rating) => acc + rating.rating, 0) / sellerData.freelancerRatings.length).toFixed(1) // Calculate average rating
+    : null;
 
   return (
     <div className="space-y-4">
@@ -66,7 +68,7 @@ export function Overview() {
             <DollarSign className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
+            <div className="text-2xl font-bold">{sellerData?.totalEarnings !== null ? `$${sellerData?.totalEarnings}` : "Loading..."}</div>
             <p className="text-xs text-gray-600">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -96,7 +98,7 @@ export function Overview() {
             <Star className="h-4 w-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4.9</div>
+            <div className="text-2xl font-bold">{averageRating !== null ? averageRating : "N/A"}</div>
             <p className="text-xs text-gray-600">+0.1 from last month</p>
           </CardContent>
         </Card>
@@ -145,5 +147,5 @@ export function Overview() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

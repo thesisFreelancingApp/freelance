@@ -51,7 +51,7 @@ const ServiceReviews = ({ ratings, serviceId, buyerId }: ServiceReviewsProps) =>
   }, [ratings, buyerId, serviceId]);
 
   const handleSubmitReview = async () => {
-    const sellerId = "2"; // Replace with actual seller ID
+    const sellerId = "8592af9f-c51a-4c07-88e4-9d0c5f7d68e4"; // Replace with actual seller ID
     const buyerId = "3";    // Replace with actual buyer ID
 
     try {
