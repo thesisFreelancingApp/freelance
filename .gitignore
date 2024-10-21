@@ -220,3 +220,7 @@ package-lock.json
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+
+
+autoPush_git.sh
+autoCommit_git.sh

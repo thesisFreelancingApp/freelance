@@ -1,12 +1,7 @@
-
-import SecuritySettings from "../pages/accountSettings/SecuritySettings";
+import SecuritySettings from "../pages/profile/Others/accountSettings/SecuritySettings";
 
 const LoginCard: React.FC = () => {
-    return (
-        <SecuritySettings/>
-    );
+  return <SecuritySettings />;
 };
 
 export default LoginCard;
-
-
