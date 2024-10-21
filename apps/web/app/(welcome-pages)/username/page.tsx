@@ -16,7 +16,7 @@ import {
   checkUsername,
   updateUsernameByEmail,
 } from "@/server.actions/welcome/username.actions";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
@@ -56,11 +56,7 @@ export default () => {
   const [updateSuccess, setUpdateSuccess] = useState<boolean | null>(null);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const router = useRouter();
-  const searchParams = useSearchParams(); // Utilisation de useSearchParams pour obtenir les paramètres de l'URL
-  const email = searchParams.get("email"); // Récupération de l'email depuis l'URL
-  if (!email) {
-    router.push("/");
-  }
+
   // Validation du nom d'utilisateur
   const isValidUsername = (username: string) => {
     const regex = /^[a-z0-9]{4,}$/;
@@ -96,12 +92,12 @@ export default () => {
   const handleUpdateUsername = async () => {
     setErrorMessages([]);
     try {
-      if (email) {
-        const result = await updateUsernameByEmail(email, username);
-        setUpdateSuccess(result);
-        if (result) {
-          router.push("/complete-profile?email=" + email);
-        }
+      // Initialiser le client Supabase
+
+      const result = await updateUsernameByEmail(username);
+      setUpdateSuccess(result);
+      if (result) {
+        router.push("/complete-profile");
       } else {
         setErrorMessages((prev) => [...prev, "Email non trouvé dans l'URL."]);
       }
@@ -192,6 +188,7 @@ export default () => {
                 "Erreur lors de la mise à jour du nom d'utilisateur.",
                 null,
               )}
+
             {errorMessages.length > 0 &&
               renderAlert("error", errorMessages.join(" "), null)}
           </div>

@@ -1,15 +1,13 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import {
-  getFeaturedServices,
-  searchServices,
-} from "@/server.actions/services.actions";
-import { getCategories } from "@/server.actions/category.actions";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils-cn";
+import { getCategories } from "@/server.actions/category.actions";
+import { getFeaturedServices } from "@/server.actions/services.actions";
 import { CheckCircle, Search, Star } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // Define the types for the Service
 interface Rating {
@@ -134,7 +132,7 @@ const Hero = () => {
   return (
     <section className="bg-background text-foreground">
       {/* Hero Section */}
-      <div className="container flex flex-col items-center justify-between px-6 py-16 mx-auto md:flex-row">
+      <div className="container flex flex-col items-center justify-between mx-auto md:flex-row">
         <div className="text-center md:text-left md:w-1/2">
           <h1 className="mb-4 text-4xl font-bold leading-tight md:text-6xl">
             Bienvenue sur <span className="text-primary">Waia!</span> <br />
@@ -145,7 +143,10 @@ const Hero = () => {
             des projets ambitieux.
           </p>
           <Link
-            className="px-8 py-3 font-bold transition duration-300 rounded-lg shadow-md bg-primary hover:bg-primary-foreground text-background"
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              `px-8 py-3 font-bold transition duration-300 `,
+            )}
             href="/sign-up"
           >
             Inscrivez-vous
@@ -154,13 +155,13 @@ const Hero = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="py-12 bg-primary/10">
+      <div className="mt-12">
         <div className="container px-6 mx-auto">
           <div className="relative max-w-3xl mx-auto">
             <Input
               type="text"
               placeholder="Rechercher des services..."
-              className="py-6 pl-12 pr-4 text-lg rounded-full shadow-lg"
+              className="py-6 pl-12 pr-4 text-lg rounded-full "
               value={searchQuery}
               onChange={handleSearchChange} // Update state and trigger debounced search
             />

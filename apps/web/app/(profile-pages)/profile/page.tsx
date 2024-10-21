@@ -1,17 +1,30 @@
-import { ProfileForm } from "@/app/pages/profile/profil-form";
-import { Separator } from "@/components/ui/separator";
+import { getUserProfile } from "@/server.actions/profile/profile.actions";
+import ProfileForm from "./profile";
 
-export default function SettingsProfilePage() {
-  return (
-    <div className="items-center justify-center space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Profile</h3>
-        <p className="text-sm text-muted-foreground">
-          This is how others will see you on the site.
-        </p>
-      </div>
-      <Separator />
-      <ProfileForm />
-    </div>
-  );
+export default async function ProfilePage() {
+  try {
+    const userProfile = await getUserProfile();
+
+    if (!userProfile) {
+      throw new Error("User profile not found");
+    }
+
+    const profileData = {
+      firstName: userProfile.firstName || "",
+      lastName: userProfile.lastName || "",
+      address: userProfile.address || "",
+      bio: userProfile.bio || "",
+      username: userProfile.username || "",
+      userEmail: userProfile.userEmail || "",
+      phoneNumber: userProfile.phoneNumber || "",
+      birthDate: userProfile.birthDate
+        ? new Date(userProfile.birthDate)
+        : undefined,
+    };
+
+    return <ProfileForm initialProfile={profileData} />;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    return <div>Error loading user profile.</div>;
+  }
 }

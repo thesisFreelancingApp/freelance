@@ -1,17 +1,38 @@
-import { ProfileForm } from "@/app/pages/profile/settings-form";
-import { Separator } from "@/components/ui/separator";
+import { getUserProfile } from "@/server.actions/profile/profile.actions";
+import ProfileForm from "./settings";
 
-export default function SettingsProfilePage() {
-  return (
-    <div className="items-center justify-center space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          This is how others will see you on the site.
-        </p>
+export default async function ProfilePage() {
+  try {
+    const userProfile = await getUserProfile();
+
+    if (!userProfile) {
+      throw new Error("User profile not found");
+    }
+
+    // Préparer les données du profil avec des valeurs par défaut si elles sont manquantes
+    const profileData = {
+      firstName: userProfile.firstName || "",
+      lastName: userProfile.lastName || "",
+      address: userProfile.address || "",
+      bio: userProfile.bio || "",
+      username: userProfile.username || "",
+      userEmail: userProfile.userEmail || "",
+      phoneNumber: userProfile.phoneNumber || "",
+      birthDate: userProfile.birthDate
+        ? new Date(userProfile.birthDate).toISOString().split("T")[0]
+        : "", // Formatage de la date de naissance en chaîne (YYYY-MM-DD)
+    };
+
+    return <ProfileForm initialProfile={profileData} />;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+
+    // Afficher un message d'erreur convivial à l'utilisateur
+    return (
+      <div className="font-semibold text-red-600">
+        Impossible de charger le profil utilisateur. Veuillez réessayer plus
+        tard.
       </div>
-      <Separator />
-      <ProfileForm />
-    </div>
-  );
+    );
+  }
 }

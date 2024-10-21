@@ -33,7 +33,7 @@ const renderAlert = (type: "success" | "error" | "info", message: string) => {
   } else if (type === "error") {
     alertClass = "text-red-500";
   } else if (type === "info") {
-    alertClass = "text-blue-500";
+    alertClass = "text-blue-500 ";
   }
 
   return <Alert className={`${alertClass} mt-2 max-w-md`}>{message}</Alert>;
@@ -50,7 +50,7 @@ export default () => {
     firstName: "",
     lastName: "",
     address: "",
-    birthDate: undefined,
+    birthDate: undefined, // Set initial value as undefined
     phoneNumber: "",
     bio: "",
   });
@@ -58,43 +58,21 @@ export default () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [updateSuccess, setUpdateSuccess] = useState<boolean | null>(null);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
-  const [fieldErrors, setFieldErrors] = useState<{
-    firstName: boolean;
-    lastName: boolean;
-    address: boolean;
-    birthDate: boolean;
-    phoneNumber: boolean;
-    bio: boolean;
-  }>({
-    firstName: false,
-    lastName: false,
-    address: false,
-    birthDate: false,
-    phoneNumber: false,
-    bio: false,
-  });
 
   const router = useRouter();
 
   const handleUpdateProfile = async () => {
     setErrorMessages([]);
     setLoading(true);
-
-    const newFieldErrors = {
-      firstName: !profile.firstName,
-      lastName: !profile.lastName,
-      address: !profile.address,
-      birthDate: !profile.birthDate,
-      phoneNumber: !profile.phoneNumber,
-      bio: !profile.bio,
-    };
-
-    setFieldErrors(newFieldErrors);
-
-    // Validation: si un champ est vide, on affiche les erreurs
-    const hasErrors = Object.values(newFieldErrors).some((error) => error);
-
-    if (hasErrors) {
+    // Validation for required fields
+    if (
+      !profile.firstName ||
+      !profile.lastName ||
+      !profile.address ||
+      !profile.birthDate ||
+      !profile.phoneNumber ||
+      !profile.bio
+    ) {
       setLoading(false);
       setErrorMessages((prev) => [
         ...prev,
@@ -102,7 +80,6 @@ export default () => {
       ]);
       return;
     }
-
     const updatedProfile = {
       ...profile,
       birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined,
@@ -112,11 +89,7 @@ export default () => {
       const result = await updateProfileWithEmail(updatedProfile);
       setUpdateSuccess(result);
       if (result) {
-<<<<<<< HEAD
-        router.push("/profile"); // Redirige vers la page profil après succès
-=======
         router.push("/profil");
->>>>>>> f14d11dae128ccc7729b468d54cca9168be77a4b
       }
     } catch (error) {
       setUpdateSuccess(false);
@@ -134,7 +107,6 @@ export default () => {
   ) => {
     const { name, value } = e.target;
     setProfile({ ...profile, [name]: value });
-    setFieldErrors({ ...fieldErrors, [name]: false }); // Efface les erreurs lorsque l'utilisateur tape
   };
 
   return (
@@ -151,6 +123,7 @@ export default () => {
         <CardContent>
           <div className="space-y-4">
             <div>
+              {" "}
               <Label>Prénom</Label>
               <Input
                 type="text"
@@ -158,10 +131,11 @@ export default () => {
                 value={profile.firstName}
                 onChange={handleInputChange}
                 placeholder="Foulen(a)"
-                className={`w-full ${fieldErrors.firstName ? "border-red-500" : ""}`}
+                className="w-full"
               />
             </div>
             <div>
+              {" "}
               <Label>Nom de famille</Label>
               <Input
                 type="text"
@@ -169,10 +143,11 @@ export default () => {
                 value={profile.lastName}
                 onChange={handleInputChange}
                 placeholder="Ben Falten"
-                className={`w-full ${fieldErrors.lastName ? "border-red-500" : ""}`}
+                className="w-full "
               />
             </div>
             <div>
+              {" "}
               <Label>Adresse</Label>
               <Input
                 type="text"
@@ -180,7 +155,7 @@ export default () => {
                 value={profile.address}
                 onChange={handleInputChange}
                 placeholder="216 rue tounes, Tunis"
-                className={`w-full ${fieldErrors.address ? "border-red-500" : ""}`}
+                className="w-full"
               />
             </div>
 
@@ -189,10 +164,7 @@ export default () => {
               <Label>Date de Naissence</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`w-full pl-3 text-left ${fieldErrors.birthDate ? "border-red-500" : ""}`}
-                  >
+                  <Button variant="outline" className="w-full pl-3 text-left">
                     {profile.birthDate
                       ? format(new Date(profile.birthDate), "PPP", {
                           locale: fr,
@@ -205,10 +177,10 @@ export default () => {
                   <Calendar
                     captionLayout="dropdown-buttons"
                     mode="single"
-                    selected={profile.birthDate || undefined}
+                    selected={profile.birthDate || undefined} // Ensure selected is either Date or undefined
                     onSelect={(date) =>
                       setProfile({ ...profile, birthDate: date || undefined })
-                    }
+                    } // Handle date selection with undefined fallback
                     disabled={(date) =>
                       date > new Date() || date < new Date("1900-01-02")
                     }
@@ -218,7 +190,6 @@ export default () => {
                 </PopoverContent>
               </Popover>
             </div>
-
             <div className="w-full">
               <Label>Numéro de téléphone</Label>
               <Input
@@ -227,7 +198,7 @@ export default () => {
                 value={profile.phoneNumber}
                 onChange={handleInputChange}
                 placeholder="99552244"
-                className={`w-full ${fieldErrors.phoneNumber ? "border-red-500" : ""}`}
+                className="w-full"
               />
             </div>
             <div className="w-full">
@@ -236,13 +207,13 @@ export default () => {
                 name="bio"
                 value={profile.bio}
                 onChange={handleInputChange}
-                placeholder="Parlez nous de vous :) ..."
-                className={`w-full p-2 border rounded ${fieldErrors.bio ? "border-red-500" : ""}`}
+                placeholder="
+Parlez nous de vous :) ..."
+                className="w-full p-2 border rounded"
                 rows={4}
               />
             </div>
           </div>
-
           {/* Alert Section */}
           <div className="max-w-md mx-auto mt-4">
             {loading &&

@@ -1,6 +1,6 @@
 "use server";
 import prisma from "@/lib/prismaClient";
-
+import { createClient } from "@/lib/supabase/server";
 export async function checkUsername(username: string): Promise<boolean> {
   const user = await prisma.profile.findUnique({
     where: { username: username },
@@ -10,11 +10,18 @@ export async function checkUsername(username: string): Promise<boolean> {
 }
 
 export async function updateUsernameByEmail(
-  email: string,
   newUsername: string,
 ): Promise<boolean> {
   try {
-    console.log(email);
+    // console.log(email);
+    // Initialiser le client Supabase
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return false;
+    }
+    const email = user.user.email;
     await prisma.profile.update({
       where: { userEmail: email },
       data: { username: newUsername }, // Met à jour le nom d'utilisateur
