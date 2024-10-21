@@ -67,7 +67,6 @@ const Hero = () => {
       setLoading(true);
       try {
         const services = await getFeaturedServices();
-        console.log(services, "services heeeeere");
 
         setFeaturedServices(services);
       } catch (error) {

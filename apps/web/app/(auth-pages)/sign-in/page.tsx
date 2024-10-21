@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   googleSignUpAction,
   signInAction,
-} from "@/server.actions/auth.actions";
+} from "@/server.actions/auth/auth.actions";
 import Link from "next/link";
 
 export default function Login({ searchParams }: { searchParams: Message }) {

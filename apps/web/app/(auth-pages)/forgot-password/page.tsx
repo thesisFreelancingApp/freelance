@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { forgotPasswordAction } from "@/server.actions/auth.actions";
+import { forgotPasswordAction } from "@/server.actions/auth/auth.actions";
 import Link from "next/link";
 
 export default function ForgotPassword({
