@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   googleSignUpAction,
   signUpAction,
-} from "@/server.actions/auth.actions";
+} from "@/server.actions/auth/auth.actions";
 import Link from "next/link";
 export default function Signup({ searchParams }: { searchParams: Message }) {
   if ("message" in searchParams) {

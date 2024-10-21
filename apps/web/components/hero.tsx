@@ -8,7 +8,7 @@ import { CheckCircle, Search, Star } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+ 
 // Define the types for the Service
 interface Rating {
   id: number;
@@ -67,7 +67,6 @@ const Hero = () => {
       setLoading(true);
       try {
         const services = await getFeaturedServices();
-        console.log(services, "services heeeeere");
 
         setFeaturedServices(services);
       } catch (error) {
