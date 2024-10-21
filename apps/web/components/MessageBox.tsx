@@ -1,35 +1,35 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  MessageSquare,
+  X,
+  Send,
+  Paperclip,
+  Image as ImageIcon,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { createClient } from "@/lib/supabase/client";
-import {
-  getMessages,
-  getOrCreateChatRoom,
-  sendMessage,
-} from "@/server.actions/message.actions";
 import { uploadFile } from "@/server.actions/upload.actions";
 import {
-  Image as ImageIcon,
-  MessageSquare,
-  Paperclip,
-  Send,
-  X,
-} from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+  sendMessage,
+  getMessages,
+  getOrCreateChatRoom,
+} from "@/server.actions/message.actions";
 
 interface MessageBoxProps {
   receiverId: string;
@@ -161,7 +161,7 @@ export function MessageBox({
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="flex items-center justify-center w-full"
+        className="w-full flex items-center justify-center"
         variant="outline"
       >
         <MessageSquare className="w-4 h-4 mr-2" />
@@ -171,7 +171,7 @@ export function MessageBox({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
-              <Avatar className="w-8 h-8">
+              <Avatar className="h-8 w-8">
                 <AvatarImage src={receiverProfilePic} />
                 <AvatarFallback>{receiverName[0]}</AvatarFallback>
               </Avatar>
@@ -200,7 +200,7 @@ export function MessageBox({
                         key={index}
                         src={line}
                         alt="Attached image"
-                        className="h-auto max-w-full my-2 rounded-lg"
+                        className="max-w-full h-auto rounded-lg my-2"
                       />
                     ) : line.startsWith("http") ? (
                       <a
@@ -216,7 +216,7 @@ export function MessageBox({
                       <p key={index}>{line}</p>
                     ),
                   )}
-                  <p className="mt-1 text-xs opacity-70">
+                  <p className="text-xs mt-1 opacity-70">
                     {new Date(msg.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -229,7 +229,7 @@ export function MessageBox({
           </ScrollArea>
           <form onSubmit={handleSubmit} className="mt-4">
             {filePreview && (
-              <div className="flex items-center justify-between p-2 mb-2 rounded-md bg-secondary">
+              <div className="mb-2 p-2 bg-secondary rounded-md flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   {filePreview.startsWith("data:image") ? (
                     <ImageIcon className="w-5 h-5 text-primary" />
@@ -246,7 +246,7 @@ export function MessageBox({
                   size="sm"
                   onClick={() => setFilePreview(null)}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
             )}
@@ -272,7 +272,7 @@ export function MessageBox({
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isSending}
                   >
-                    <Paperclip className="w-4 h-4" />
+                    <Paperclip className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Attach file</TooltipContent>
@@ -280,7 +280,7 @@ export function MessageBox({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button type="submit" size="icon" disabled={isSending}>
-                    <Send className="w-4 h-4" />
+                    <Send className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Send message</TooltipContent>

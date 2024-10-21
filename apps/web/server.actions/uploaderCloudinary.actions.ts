@@ -1,7 +1,12 @@
 "use server";
 
 import cloudinary from "@/lib/cloudinary";
-export async function uploadProfilePicture(file) {
+
+interface CloudinaryUploadResult {
+  secure_url: string;
+}
+
+export async function uploadProfilePicture(file: File) {
   "use server";
 
   if (!file) throw new Error("No file uploaded");
@@ -29,5 +34,5 @@ export async function uploadProfilePicture(file) {
   });
   // console.log(result);
   // revalidatePath("/");
-  return result.secure_url;
+  return (result as CloudinaryUploadResult).secure_url;
 }
