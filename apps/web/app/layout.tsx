@@ -17,7 +17,6 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "WaiaHub - The fastest way to Freelance",
-
   description: "The fastest way to Freelance",
 };
 
@@ -69,12 +68,11 @@ export default function RootLayout({
                   <HeaderAuth />
                 </div>
               </nav>
-
               {/* Main content */}
               <div className="flex flex-col gap-10 p-4 max-w-7xl md:gap-20 md:p-8">
                 {children}
               </div>
-
+              {/* // TODOS */}
               {/* Footer */}
               <footer className="flex flex-col items-center justify-center w-full gap-4 py-8 mx-auto text-xs text-center border-t md:flex-row md:gap-8 md:py-16 md:text-sm">
                 <p>
