@@ -1,9 +1,13 @@
-export default async function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+import { ReactNode } from "react";
+
+interface WrapperProps {
+  children: ReactNode;
+}
+
+export default function Page({ children }: WrapperProps) {
   return (
-    <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
+    <div className="min-h-[70vh] flex flex-col items-center justify-center sm:justify-start sm:items-start p-4">
+      {children}
+    </div>
   );
 }

@@ -4,13 +4,14 @@
     "private": true,
     "scripts": {
         "dev:mobile": "cd apps/mobile && npm run dev",
-        "dev:web": "cd apps/web && npm run dev",
+        "dev:web": "cd apps/web && npx prisma generate && npm run dev",
         "install:all": "npm run clean && npm i &&  npm run install:web && npm run install:mobile",
         "install:web": "cd apps/web && npm install",
         "install:mobile": "cd apps/mobile && npm install",
-        "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && cd ../mobile && rm -rf node_modules",
-        "prismaUnix": "cd apps/web/prisma && rm -rf  prisma/migrations && npx prisma migrate dev dev init",
-        "prismaWin": "cd apps/web/prisma && rmdir /s /q   prisma/migrations && npx prisma migrate dev dev init"
+        "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && rm -rf prisma/migrations && cd ../mobile && rm -rf node_modules",
+        "prismaUnix": "cd apps/web/prisma && rm -rf  prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
+        "prismaWin": "cd apps/web/prisma && rmdir /s /q   prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
+        "seed": "cd apps/web && npm run seed"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.7",

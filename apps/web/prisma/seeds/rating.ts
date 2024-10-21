@@ -35,9 +35,23 @@ export const seedRatings = async () => {
 
   console.log("----- Seeding Ratings: process is starting...");
 
+  // Get all existing services
+  const services = await prisma.service.findMany({ select: { id: true } });
+
   // Seed ratings
   for (const rating of allRatings) {
     try {
+      // Check if the service exists
+      const serviceExists = services.some(
+        (service) => service.id === rating.serviceId,
+      );
+      if (!serviceExists) {
+        console.log(
+          `Skipping rating for non-existent service ${rating.serviceId}`,
+        );
+        continue;
+      }
+
       await prisma.rating.create({
         data: {
           rating: rating.rating,
