@@ -3,6 +3,7 @@ import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
 import Logo from "@/public/WaiaHub-LogoIcon.svg";
 import "@/styles/globals.css";
@@ -10,7 +11,6 @@ import { GeistSans } from "geist/font/sans";
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Link from "next/link";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -19,7 +19,6 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "WaiaHub - The fastest way to Freelance",
-
   description: "The fastest way to Freelance",
 };
 
@@ -72,13 +71,12 @@ export default function RootLayout({
                     <HeaderAuth />
                   </div>
                 </nav>
-
                 {/* Main content */}
                 {/* <div className="flex flex-col gap-10 p-4 max-w-7xl md:gap-20 md:p-8"> */}
                 <div className="flex flex-col w-full max-w-[84rem] gap-20 p-5">
                   {children}
                 </div>
-
+                {/* // TODOS */}
                 {/* Footer */}
                 <footer className="flex flex-col items-center justify-center w-full gap-4 py-8 mx-auto text-xs text-center border-t md:flex-row md:gap-8 md:py-16 md:text-sm">
                   <p>

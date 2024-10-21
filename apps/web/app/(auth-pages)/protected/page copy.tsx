@@ -1,8 +1,8 @@
-import { welcomeBack } from "@/config/routes";
+import { welcome, welcomeBack } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 // Journalisation avancée des erreurs
 function logError(errorMessage: string, details?: any) {
@@ -14,6 +14,7 @@ function logError(errorMessage: string, details?: any) {
 
 // Fonction utilitaire pour récupérer la session et l'utilisateur
 async function fetchSessionAndUser(supabase: any) {
+  console.log("new in");
   const [
     { data: sessionData, error: sessionError },
     { data: userData, error: userError },
@@ -44,7 +45,7 @@ async function updateAccountIfNeeded(
     account.expiresAt !== expiresAt;
 
   if (shouldUpdate) {
-    await prisma.account.update({
+    const updatedUser = await prisma.account.update({
       where: { userEmail: existingUser.email },
       data: {
         lastProvider: provider,
@@ -61,24 +62,12 @@ async function updateAccountIfNeeded(
   }
 }
 
-// La fonction principale qui traite la requête GET
-export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get("code");
-  const origin = requestUrl.origin;
-  const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
-  // console.log("here------------------------", redirectTo);
-
+export default async function ProtectedPage() {
   const supabase = createClient();
   let isNewUser = false;
 
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code);
-  }
-
   const { sessionData, userData, sessionError, userError } =
     await fetchSessionAndUser(supabase);
-
   const session = sessionError ? null : sessionData?.session;
   const user = userData?.user;
 
@@ -91,7 +80,7 @@ export async function GET(request: Request) {
   }
 
   const provider = session?.user?.app_metadata?.provider || "email";
-  const fullName = user.user_metadata?.full_name || "Anonymous";
+  const fullName = user.user_metadata?.full_name || "Waia";
   const providers = session?.user?.app_metadata?.providers || ["email"];
   const providerAccountId = user.id || user.user_metadata?.provider_id;
   const accessToken = session?.access_token || null;
@@ -141,6 +130,7 @@ export async function GET(request: Request) {
       },
     });
     if (newUser) {
+      // console.log("New user created:", newUser);
       isNewUser = true;
     }
   } else {
@@ -154,11 +144,7 @@ export async function GET(request: Request) {
     );
   }
 
-  if (redirectTo) {
-    return NextResponse.redirect(`${origin}${redirectTo}`);
-  }
-
   return isNewUser
-    ? NextResponse.redirect(`${origin}/username`)
-    : NextResponse.redirect(`${origin}${welcomeBack}`);
+    ? redirect(welcome + `?email=${email}`)
+    : encodedRedirect("success", welcomeBack, "Welcome Back");
 }

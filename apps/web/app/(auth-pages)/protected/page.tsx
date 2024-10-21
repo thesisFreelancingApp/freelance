@@ -1,92 +1,54 @@
-import { welcome, welcomeBack } from "@/config/routes";
+import { welcomeBack } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
 import { redirect } from "next/navigation";
 
-// Journalisation avancée des erreurs
-function logError(errorMessage: string, details?: any) {
-  console.error(
-    `[${new Date().toISOString()}] ERROR: ${errorMessage}`,
-    details,
-  );
-}
-
-// Fonction utilitaire pour récupérer la session et l'utilisateur
-async function fetchSessionAndUser(supabase: any) {
-  const [
-    { data: sessionData, error: sessionError },
-    { data: userData, error: userError },
-  ] = await Promise.all([supabase.auth.getSession(), supabase.auth.getUser()]);
-
-  if (sessionError) logError("Session retrieval failed", sessionError);
-  if (userError) logError("User retrieval failed", userError);
-
-  return { sessionData, userData, sessionError, userError };
+// Fonction utilitaire pour récupérer l'utilisateur uniquement
+async function fetchUser(supabase: any) {
+  console.log("[DEBUG] Attempting to fetch user");
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData?.user) {
+    console.error("[DEBUG] User retrieval failed or no user found", userError);
+    return null;
+  }
+  console.log("[DEBUG] User fetched successfully", userData.user);
+  return userData.user;
 }
 
 // Met à jour le compte uniquement si les données ont changé
-async function updateAccountIfNeeded(
-  existingUser: any,
-  provider: string,
-  providers: string[],
-  accessToken: string | null,
-  refreshToken: string | null,
-  expiresAt: number | null,
-) {
-  const account = existingUser.account;
-
-  const shouldUpdate =
-    account.lastProvider !== provider ||
-    JSON.stringify(account.providers) !== JSON.stringify(providers) ||
-    account.accessToken !== accessToken ||
-    account.refreshToken !== refreshToken ||
-    account.expiresAt !== expiresAt;
-
+async function updateAccountIfNeeded(existingUser: any, updates: any) {
+  console.log("[DEBUG] Checking if account update is needed for:", existingUser.email);
+  const shouldUpdate = Object.keys(updates).some(key => updates[key] !== existingUser.account[key]);
+  
   if (shouldUpdate) {
-    const updatedUser = await prisma.account.update({
+    console.log("[DEBUG] Account update required, performing update...");
+    await prisma.account.update({
       where: { userEmail: existingUser.email },
-      data: {
-        lastProvider: provider,
-        providers,
-        accessToken,
-        refreshToken,
-        expiresAt,
-      },
+      data: updates,
     });
-
-    // console.log("Account updated for user:", existingUser.email);
+    console.log("[DEBUG] Account updated successfully for user:", existingUser.email);
   } else {
-    // console.log("No updates needed for user:", existingUser.email);
+    console.log("[DEBUG] No account update needed for user:", existingUser.email);
   }
 }
 
 export default async function ProtectedPage() {
+  console.log("[DEBUG] Initializing ProtectedPage");
   const supabase = createClient();
-  let isNewUser = false;
+  const user = await fetchUser(supabase);
 
-  const { sessionData, userData, sessionError, userError } =
-    await fetchSessionAndUser(supabase);
-  const session = sessionError ? null : sessionData?.session;
-  const user = userData?.user;
-
-  if (!session || !user) {
-    return encodedRedirect(
-      "error",
-      "/sign-in",
-      "An unexpected error occurred. Please try again.",
-    );
+  // Si l'utilisateur n'est pas trouvé, redirige vers la page de connexion
+  if (!user) {
+    console.log("[DEBUG] User not found, redirecting to sign-in");
+    return redirect("/sign-in");
   }
 
-  const provider = session?.user?.app_metadata?.provider || "email";
-  const fullName = user.user_metadata?.full_name || "Anonymous";
-  const providers = session?.user?.app_metadata?.providers || ["email"];
-  const providerAccountId = user.id || user.user_metadata?.provider_id;
-  const accessToken = session?.access_token || null;
-  const refreshToken = session?.refresh_token || null;
-  const expiresAt = session?.expires_at || null;
+  const { provider, providers = ["email"], provider_id } = user?.app_metadata || {};
   const email = user.email;
-
+  
+  console.log("[DEBUG] Checking if user exists in the database for email:", email);
+  // Vérifie si l'utilisateur existe déjà dans la base de données
   const existingUser = await prisma.authUser.findUnique({
     where: { email },
     select: {
@@ -103,47 +65,50 @@ export default async function ProtectedPage() {
     },
   });
 
+  // Si l'utilisateur n'existe pas, le créer et rediriger vers la page "/username"
   if (!existingUser) {
+    console.log("[DEBUG] New user detected, creating new user record for email:", email);
     const newUser = await prisma.authUser.create({
       data: {
         email,
-        name: fullName,
+        name: user.user_metadata?.full_name || "Anonymous",
         id: user.id,
         account: {
           create: {
-            providerAccountId,
+            providerAccountId: provider_id,
             lastProvider: provider,
             providers,
-            accessToken,
-            refreshToken,
-            expiresAt,
           },
         },
         profile: {
           create: {
-            username: "user" + user.id,
+            username: `user${user.id}`,
             userEmail: email,
             role: "user",
           },
         },
       },
     });
+
     if (newUser) {
-      // console.log("New user created:", newUser);
-      isNewUser = true;
+      console.log("[DEBUG] New user created successfully, redirecting to /username");
+      // Forcer la redirection immédiatement après la création
+      return redirect('/username');
     }
-  } else {
-    await updateAccountIfNeeded(
-      existingUser,
-      provider,
-      providers,
-      accessToken,
-      refreshToken,
-      expiresAt,
-    );
   }
 
-  return isNewUser
-    ? redirect(welcome + `?email=${email}`)
-    : encodedRedirect("success", welcomeBack, "Welcome Back");
+  // Mise à jour du compte existant si nécessaire
+  console.log("[DEBUG] Existing user found, checking if account update is needed");
+  const accountUpdates = {
+    lastProvider: provider,
+    providers,
+    accessToken: null,
+    refreshToken: null,
+    expiresAt: null,
+  };
+  await updateAccountIfNeeded(existingUser, accountUpdates);
+
+  // Si l'utilisateur est déjà existant, rediriger vers la page d'accueil ou une autre page
+  console.log("[DEBUG] User already exists, redirecting to welcomeBack page");
+  return encodedRedirect("success", welcomeBack, "Welcome Back");
 }
