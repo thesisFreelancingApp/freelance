@@ -65,8 +65,8 @@ export default function RootLayout({
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                 </div>
               </nav>
-              <div className="flex flex-col max-w-5xl gap-20 p-5">
-                {children}
+              <div className="flex flex-col w-full max-w-[84rem] gap-20 p-5">
+              {children}
               </div>
 
               <footer className="flex items-center justify-center w-full gap-8 py-16 mx-auto text-xs text-center border-t">
