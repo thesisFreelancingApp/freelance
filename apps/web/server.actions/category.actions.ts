@@ -39,9 +39,11 @@ export const deleteCategory = async (id: number) => {
   return category;
 };
 
-
 // Get a category by its name (if needed)
-export const searchServices = async (query: string, categoryId: number | null = null) => {
+export const searchServices = async (
+  query: string,
+  categoryId: number | null = null,
+) => {
   const services = await prisma.service.findMany({
     where: {
       AND: [
@@ -59,11 +61,15 @@ export const searchServices = async (query: string, categoryId: number | null = 
   return services;
 };
 
-export const getCategories = async (takeNum: number|null = null) => {
+export const getCategories = async (takeNum: number | null = null) => {
   const categories = await prisma.categoryHierarchy.findMany({
-    where: { level: 1 },  // You can adjust this depending on your structure (e.g., fetch only top-level categories)
+    where: { level: 1 },
     include: {
-      children: true,  // Include subcategories in the result
+      children: {
+        include: {
+          children: true,
+        },
+      },
     },
     take: takeNum || undefined,
   });
@@ -71,4 +77,3 @@ export const getCategories = async (takeNum: number|null = null) => {
 };
 
 // Récupérer une catégorie par ID
-

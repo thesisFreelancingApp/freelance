@@ -31,20 +31,21 @@ interface Service {
   id: number;
   name: string;
   description: string | null;
-  price: string;
   ratings: Rating[];
   category: Category;
   images: string[];
+  packages: Package[];
 }
 
-// const popularCategories = [
-//   { name: "Web Development", icon: "💻", id: "" },
-//   { name: "Graphic Design", icon: "🎨", id: "" },
-//   { name: "Digital Marketing", icon: "📱", id: "" },
-//   { name: "Writing & Translation", icon: "✍️", id: "" },
-//   { name: "Video & Animation", icon: "🎥", id: "" },
-//   { name: "Music & Audio", icon: "🎵", id: "" },
-// ];
+interface Package {
+  id: number;
+  name: string;
+  price: string; // Changed from number to string due to Decimal conversion
+  description: string | null;
+  deliveryTime: number;
+  revisions: number;
+  features: string[];
+}
 
 const topFreelancers = [
   { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
@@ -66,7 +67,8 @@ const Hero = () => {
       setLoading(true);
       try {
         const services = await getFeaturedServices();
-        /* @ts-ignore */
+        console.log(services, "services heeeeere");
+
         setFeaturedServices(services);
       } catch (error) {
         console.error("Error fetching featured services:", error);
@@ -83,7 +85,6 @@ const Hero = () => {
       setLoading(true);
       try {
         const categories = await getCategories(6);
-        /* @ts-ignore */
         setPopularCategories(categories);
       } catch (error) {
         console.error("Error fetching catgs:", error);
@@ -207,7 +208,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Featured Gigs .. image to be fixed to use next/image Important !!! */}
+      {/* Featured Gigs */}
       <div className="py-16 bg-secondary/10">
         <div className="container px-6 mx-auto">
           <h2 className="mb-8 text-3xl font-bold text-center">
@@ -244,7 +245,12 @@ const Hero = () => {
                       : "N/A"}
                   </span>
                 </div>
-                <p className="mb-4 font-bold text-primary">{service.price}</p>
+                {service.packages && service.packages.length > 0 && (
+                  <p className="mb-2 font-bold text-primary">
+                    Starting at $
+                    {parseFloat(service.packages[0].price).toFixed(2)}
+                  </p>
+                )}
                 <Link href={`/service/${service.id}`} className="mt-auto">
                   <Button className="w-full">View Details</Button>
                 </Link>

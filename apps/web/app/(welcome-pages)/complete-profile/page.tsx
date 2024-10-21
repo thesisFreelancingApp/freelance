@@ -112,7 +112,7 @@ export default () => {
       const result = await updateProfileWithEmail(updatedProfile);
       setUpdateSuccess(result);
       if (result) {
-        router.push("/profil");
+        router.push("/profile"); // Redirige vers la page profil après succès
       }
     } catch (error) {
       setUpdateSuccess(false);
