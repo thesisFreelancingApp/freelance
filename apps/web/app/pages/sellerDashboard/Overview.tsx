@@ -1,6 +1,9 @@
+"use client"
 import { DollarSign, Package, CreditCard, Star } from "lucide-react"
 import { Bar, BarChart, ResponsiveContainer } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {getSellerTotalEarnings} from "@/server.actions/seller-dashboard.actions"
+
 import {
   Table,
   TableBody,
@@ -9,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
+import { useState, useEffect } from "react"
 const recentOrders = [
   { id: 1, client: "Alice Johnson", service: "Logo Design", status: "In Progress", amount: 150 },
   { id: 2, client: "Bob Smith", service: "Web Development", status: "Completed", amount: 500 },
@@ -25,7 +28,35 @@ const earningsData = [
   { month: "Jun", earnings: 2400 },
 ]
 
+
+
 export function Overview() {
+
+  const [earnings, setEarnings] = useState<number | null>(null); // Allow number or null
+  const [error, setError] = useState<string | null>(null); // Allow string or null
+
+
+
+    useEffect(() => {
+        const fetchEarnings = async () => {
+            try {
+                const data = await getSellerTotalEarnings();
+                setEarnings(data.totalEarnings);
+            } catch (err) {
+              setError((err as Error).message); // Handle error appropriately
+
+              }
+        };
+
+        fetchEarnings();
+    }, []); 
+
+  
+
+
+  console.log(earnings)
+
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

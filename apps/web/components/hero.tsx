@@ -255,7 +255,11 @@ const Hero = () => {
                   <Button className="w-full">View Details</Button>
                 </Link>
               </div>
+
+              
             ))}
+
+            
           </div>
         </div>
       </div>
@@ -310,6 +314,9 @@ const Hero = () => {
                     size={16}
                   />
                   <span>{freelancer.rating}</span>
+
+
+                  
                 </div>
                 <Button variant="outline" className="w-full">
                   Voir le profil
