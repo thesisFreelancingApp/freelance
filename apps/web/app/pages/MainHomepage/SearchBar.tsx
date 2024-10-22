@@ -23,7 +23,7 @@ export default function SearchBar({ placeholder }: SearchBarProps) {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto mt-4">
+    <div className="w-full max-w-3xl px-8 mx-auto mt-4">
       <div className="relative">
         <Search className="absolute w-4 h-4 -translate-y-1/2 left-3 top-1/2 text-muted-foreground" />
         <Input

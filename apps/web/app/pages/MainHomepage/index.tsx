@@ -14,17 +14,19 @@ const freelancers = [
   { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
 ];
 export default async function Index() {
-  const categories = await getCategories(6);
+  const categories = await getCategories(10);
   const authenticated = await isAuthenticated();
   const services = await getFeaturedServices();
+
   return (
     <>
-      <section className="py-4">
+      <section>
         <Hero authenticated={authenticated} />
 
         <SearchBar placeholder="Rechercher..." />
 
         <CategoryList categories={categories} />
+
         <TopFreelancers freelancers={freelancers} />
 
         <FeaturedServices services={services} />
