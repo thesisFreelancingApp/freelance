@@ -43,7 +43,7 @@ export default function RootLayout({
       <body
         className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleAuthDirect />
+        {/* <GoogleAuthDirect /> */}
         <Toaster />
         <ThemeProvider
           attribute="class"

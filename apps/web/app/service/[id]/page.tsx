@@ -1,11 +1,16 @@
 import { MessageBox } from "@/components/MessageBox";
 import { Button } from "@/components/ui/button";
-import { getServiceById } from "@/server.actions/services.actions";
+import {
+  getServiceById,
+  getRelatedServices,
+} from "@/server.actions/services.actions";
 import { Check, Clock, RefreshCcw, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Decimal } from "@prisma/client/runtime/library";
+import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export default async function ServiceDetailPage({
   params,
@@ -15,7 +20,7 @@ export default async function ServiceDetailPage({
   const service = await getServiceById(parseInt(params.id));
 
   if (!service) {
-    return <div>Service not found</div>;
+    notFound();
   }
 
   const averageRating =
@@ -60,6 +65,11 @@ export default async function ServiceDetailPage({
     </Card>
   );
 
+  const relatedServices = await getRelatedServices(
+    service.category.id,
+    service.id,
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
@@ -86,13 +96,18 @@ export default async function ServiceDetailPage({
               </div>
             </div>
             <div className="mb-8 rounded-lg overflow-hidden bg-muted">
-              <img
-                src={
-                  service.images?.[0] || "/placeholder.svg?height=400&width=600"
-                }
-                alt="Service preview"
-                className="w-full h-64 object-cover"
-              />
+              <div className="relative w-full pt-[56.25%]">
+                {" "}
+                {/* 16:9 aspect ratio */}
+                <img
+                  src={
+                    service.images?.[0] ||
+                    "/placeholder.svg?height=400&width=600"
+                  }
+                  alt="Service preview"
+                  className="absolute top-0 left-0 w-full h-full object-contain"
+                />
+              </div>
             </div>
             <Card className="mb-8">
               <CardHeader>
@@ -124,14 +139,11 @@ export default async function ServiceDetailPage({
               </CardHeader>
               <CardContent>
                 {service.ratings && service.ratings.length > 0 ? (
-                  service.ratings.map((rating, index) => (
-                    <div key={index} className="mb-6 pb-4 border-b">
+                  service.ratings.map((rating) => (
+                    <div key={rating.id} className="mb-6 pb-4 border-b">
                       <div className="flex items-center mb-2">
                         <img
-                          src={
-                            rating.buyer.profilePic ||
-                            "/placeholder.svg?height=40&width=40"
-                          }
+                          src={rating.buyer.profilePic || "/placeholder.svg"}
                           alt={`${rating.buyer.firstName} ${rating.buyer.lastName}`}
                           className="w-10 h-10 rounded-full mr-3"
                         />
@@ -162,15 +174,51 @@ export default async function ServiceDetailPage({
                 )}
               </CardContent>
             </Card>
+
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>Related Services</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {relatedServices.map((relatedService) => (
+                    <Link
+                      href={`/service/${relatedService.id}`}
+                      key={relatedService.id}
+                    >
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-sm">
+                            {relatedService.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <img
+                            src={relatedService.images[0] || "/placeholder.svg"}
+                            alt={relatedService.name}
+                            className="w-full h-32 object-cover"
+                          />
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="md:col-span-1">
             <div className="sticky top-4">
-              <Tabs defaultValue="basic" className="w-full">
+              <Tabs
+                defaultValue={service.packages[0].name.toLowerCase()}
+                className="w-full"
+              >
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="basic">Basic</TabsTrigger>
-                  <TabsTrigger value="standard">Standard</TabsTrigger>
-                  <TabsTrigger value="premium">Premium</TabsTrigger>
+                  {service.packages.map((pkg) => (
+                    <TabsTrigger key={pkg.id} value={pkg.name.toLowerCase()}>
+                      {pkg.name}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
                 {service.packages.map((pkg) => (
                   <TabsContent key={pkg.id} value={pkg.name.toLowerCase()}>
