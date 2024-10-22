@@ -61,8 +61,8 @@ export const searchServices = async (
   return services;
 };
 
-export const getCategories = async (takeNum: number | null = null) => {
-  const categories = await prisma.categoryHierarchy.findMany({
+export const getCategories = async () => {
+  return prisma.categoryHierarchy.findMany({
     where: { level: 1 },
     include: {
       children: {
@@ -71,9 +71,36 @@ export const getCategories = async (takeNum: number | null = null) => {
         },
       },
     },
-    take: takeNum || undefined,
   });
-  return categories;
+};
+
+export const getCategoryByName = async (name: string) => {
+  return prisma.categoryHierarchy.findFirst({
+    where: { name: { equals: name, mode: "insensitive" } },
+    include: { parent: true, children: true },
+  });
+};
+
+export const getServicesByCategory = async (categoryId: number) => {
+  return prisma.service.findMany({
+    where: { categoryId },
+    include: {
+      creator: {
+        select: {
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+      ratings: true,
+      packages: {
+        select: { price: true },
+        orderBy: { price: "asc" },
+        take: 1,
+      },
+    },
+  });
 };
 
 // Récupérer une catégorie par ID

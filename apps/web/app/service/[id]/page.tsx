@@ -11,6 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Decimal } from "@prisma/client/runtime/library";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import ImageCarousel from "@/components/ImageCarousel";
+import { Suspense } from "react";
+import Loading from "@/app/loading";
 
 export default async function ServiceDetailPage({
   params,
@@ -95,20 +98,11 @@ export default async function ServiceDetailPage({
                 </div>
               </div>
             </div>
-            <div className="mb-8 rounded-lg overflow-hidden bg-muted">
-              <div className="relative w-full pt-[56.25%]">
-                {" "}
-                {/* 16:9 aspect ratio */}
-                <img
-                  src={
-                    service.images?.[0] ||
-                    "/placeholder.svg?height=400&width=600"
-                  }
-                  alt="Service preview"
-                  className="absolute top-0 left-0 w-full h-full object-contain"
-                />
+            <Suspense fallback={<Loading />}>
+              <div className="mb-8">
+                <ImageCarousel images={service.images || []} />
               </div>
-            </div>
+            </Suspense>
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle>About This Service</CardTitle>
@@ -222,7 +216,41 @@ export default async function ServiceDetailPage({
                 </TabsList>
                 {service.packages.map((pkg) => (
                   <TabsContent key={pkg.id} value={pkg.name.toLowerCase()}>
-                    {renderPackage(pkg)}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{pkg.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-bold mb-4">
+                          ${formatPrice(pkg.price)}
+                        </p>
+                        <p className="text-sm mb-4">{pkg.description}</p>
+                        <div className="flex justify-between text-sm mb-4">
+                          <span className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2" />{" "}
+                            {pkg.deliveryTime} days delivery
+                          </span>
+                          <span className="flex items-center">
+                            <RefreshCcw className="w-4 h-4 mr-2" />{" "}
+                            {pkg.revisions} revisions
+                          </span>
+                        </div>
+                        <ul className="mb-4">
+                          {pkg.features.map((feature, index) => (
+                            <li
+                              key={index}
+                              className="flex items-center text-sm mb-2"
+                            >
+                              <Check className="w-4 h-4 mr-2 text-green-500" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        <Button className="w-full">
+                          Continue (${formatPrice(pkg.price)})
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 ))}
               </Tabs>
