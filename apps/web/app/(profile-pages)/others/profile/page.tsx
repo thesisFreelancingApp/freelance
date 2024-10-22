@@ -1,5 +1,5 @@
-import Sidebar from "@/app/pages/profile/Sidebar";
-import UserInfo from "@/app/pages/profile/UserInfo";
+import Sidebar from "@/app/pages/Profile/Sidebar";
+import UserInfo from "@/app/pages/Profile/UserInfo";
 
 export default function ProfilePage() {
   const activeTab = "user-info";

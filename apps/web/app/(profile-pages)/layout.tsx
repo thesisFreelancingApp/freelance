@@ -1,5 +1,5 @@
 "use client";
-import Sidebar from "../pages/profile/Sidebar";
+import Sidebar from "@/app/pages/profile/Sidebar";
 const items = [
   { path: "/profile", title: "Profil" },
   { path: "/settings", title: "Paramètres" },

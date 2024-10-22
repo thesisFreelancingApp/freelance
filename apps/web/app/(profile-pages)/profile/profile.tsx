@@ -25,10 +25,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ar, fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { revalidatePath } from "next/cache";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 // Définir l'interface UserProfile
 interface UserProfile {
   firstName?: string;
@@ -55,7 +56,7 @@ const FormSchema = z.object({
 export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [profile, setProfile] = useState<UserProfile>(initialProfile);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const router = useRouter();
   // Initialisation du formulaire
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -86,6 +87,8 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         title: "Profil mis à jour",
         description: "Votre profil a été mis à jour avec succès.",
       });
+
+      router.refresh();
     } catch (error) {
       toast({
         title: "Erreur de mise à jour",

@@ -1,9 +1,11 @@
 // List of protected routes
 export const protectedRoutes = [
-  "/protected",
+  "/username",
+  "/complete-profile",
   "/hello",
   "/settings",
   "/profile",
+  "/createGig",
 ];
 
 // List of non-auth routes
