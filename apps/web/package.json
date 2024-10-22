@@ -58,6 +58,7 @@
     "globals": "^15.11.0",
     "google-one-tap": "^1.0.6",
     "input-otp": "^1.2.4",
+    "kbar": "^0.1.0-beta.45",
     "lucide-react": "^0.436.0",
     "next": "latest",
     "next-themes": "^0.3.0",

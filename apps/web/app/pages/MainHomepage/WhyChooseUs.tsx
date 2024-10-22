@@ -1,11 +1,19 @@
 "use client";
-import { CheckCircle } from "lucide-react";
+import {
+  HelpingHandIcon,
+  LockKeyholeIcon,
+  LucideGitCompareArrows,
+  ShieldCheck,
+} from "lucide-react";
 
 const benefits = [
-  { text: "Vérification de l'identité", icon: <CheckCircle size={32} /> },
-  { text: "Support 24/7", icon: <CheckCircle size={32} /> },
-  { text: "Garantie de satisfaction", icon: <CheckCircle size={32} /> },
-  { text: "Paiements sécurisés", icon: <CheckCircle size={32} /> },
+  { text: "Vérification de l'identité", icon: <ShieldCheck size={32} /> },
+  { text: "Support 24/7", icon: <HelpingHandIcon size={32} /> },
+  {
+    text: "Garantie de satisfaction",
+    icon: <LucideGitCompareArrows size={32} />,
+  },
+  { text: "Paiements sécurisés", icon: <LockKeyholeIcon size={32} /> },
 ];
 
 export const WhyChooseUs = () => {

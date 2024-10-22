@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Composant() {
+export default function NotFoundScreen() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto text-center">
