@@ -62,8 +62,8 @@ export const searchServices = async (
   return services;
 };
 
-export const getCategories = async (takeNum: number | null = null) => {
-  const categories = await prisma.categoryHierarchy.findMany({
+export const getCategories = async () => {
+  return prisma.categoryHierarchy.findMany({
     where: { level: 1 },
     include: {
       children: {
@@ -72,7 +72,13 @@ export const getCategories = async (takeNum: number | null = null) => {
         },
       },
     },
-    take: takeNum || undefined,
+  });
+};
+
+export const getCategoryByName = async (name: string) => {
+  return prisma.categoryHierarchy.findFirst({
+    where: { name: { equals: name, mode: "insensitive" } },
+    include: { parent: true, children: true },
   });
 };
 
