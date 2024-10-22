@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prismaClient";
+import { Prisma } from "@prisma/client";
 
 // Récupérer une catégorie par ID
 export const getCategoryById = async (id: number) => {
@@ -81,26 +82,84 @@ export const getCategoryByName = async (name: string) => {
   });
 };
 
-export const getServicesByCategory = async (categoryId: number) => {
-  return prisma.service.findMany({
-    where: { categoryId },
-    include: {
-      creator: {
-        select: {
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-          sellerRating: true,
+export const getServicesByCategory = async (
+  categoryId: number,
+  page: number = 1,
+  sort?: string,
+  priceRange?: string,
+) => {
+  const pageSize = 12;
+  const skip = (page - 1) * pageSize;
+
+  // Define sorting logic
+  const orderBy: Prisma.ServiceOrderByWithRelationInput =
+    sort === "rating_desc"
+      ? { creator: { sellerRating: "desc" } }
+      : { createdAt: "desc" };
+
+  // Define price filter if priceRange is provided
+  const priceFilter: Prisma.ServiceWhereInput = priceRange
+    ? {
+        packages: {
+          some: {
+            price: {
+              gte: new Prisma.Decimal(priceRange.split("-")[0] || 0),
+              lte: new Prisma.Decimal(
+                priceRange.split("-")[1] || Number.MAX_SAFE_INTEGER,
+              ),
+            },
+          },
+        },
+      }
+    : {};
+
+  // Fetch services and total count concurrently
+  const [services, totalCount] = await Promise.all([
+    prisma.service.findMany({
+      where: { categoryId, ...priceFilter },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePic: true,
+            sellerRating: true,
+          },
+        },
+        packages: {
+          orderBy: { price: "asc" },
         },
       },
-      ratings: true,
-      packages: {
-        select: { price: true },
-        orderBy: { price: "asc" },
-        take: 1,
-      },
-    },
-  });
+      orderBy,
+      skip,
+      take: pageSize,
+    }),
+    prisma.service.count({ where: { categoryId, ...priceFilter } }),
+  ]);
+
+  // Handle sorting by price if requested
+  const sortedServices = sort?.includes("price")
+    ? services.sort((a, b) =>
+        sort === "price_asc"
+          ? a.packages[0]?.price.comparedTo(b.packages[0]?.price)
+          : b.packages[0]?.price.comparedTo(a.packages[0]?.price),
+      )
+    : services;
+
+  // Convert Decimal prices to strings for serialization
+  const serializedServices = sortedServices.map((service) => ({
+    ...service,
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(),
+    })),
+  }));
+
+  return {
+    services: serializedServices,
+    totalPages: Math.ceil(totalCount / pageSize),
+  };
 };
 
 // Récupérer une catégorie par ID

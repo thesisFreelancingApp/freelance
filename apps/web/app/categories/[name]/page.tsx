@@ -4,7 +4,14 @@ import {
   getServicesByCategory,
 } from "@/server.actions/category.actions";
 import Link from "next/link";
-import { Star } from "lucide-react";
+import ServiceCard from "@/components/ServiceCard";
+import FilterSortBar from "@/components/FilterSortBar";
+import Pagination from "@/components/Pagination";
+import { ChevronRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 export async function generateMetadata({
   params,
@@ -12,7 +19,6 @@ export async function generateMetadata({
   params: { name: string };
 }) {
   const decodedName = decodeURIComponent(params.name);
-
   const category = await getCategoryByName(decodedName);
   if (!category) return { title: "Category Not Found" };
   return { title: `${category.name} Services | WAIAHUB` };
@@ -20,72 +26,115 @@ export async function generateMetadata({
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: { name: string };
+  searchParams: { page?: string; sort?: string; priceRange?: string };
 }) {
   const decodedName = decodeURIComponent(params.name);
   const category = await getCategoryByName(decodedName);
   if (!category) notFound();
 
-  const services = await getServicesByCategory(category.id);
+  const page = parseInt(searchParams.page || "1");
+  const { services, totalPages } = await getServicesByCategory(
+    category.id,
+    page,
+    searchParams.sort,
+    searchParams.priceRange,
+  );
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <nav className="text-sm mb-4">
-        <ol className="list-none p-0 inline-flex">
-          <li className="flex items-center">
-            <Link href="/" className="text-blue-500 hover:text-blue-600">
-              Home
-            </Link>
-            <span className="mx-2">/</span>
-          </li>
-          <li className="flex items-center">
-            <span className="text-gray-500">{category.name}</span>
-          </li>
-        </ol>
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center space-x-2 text-sm mb-6"
+      >
+        <Link
+          href="/"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Home
+        </Link>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <span className="font-medium">{category.name}</span>
       </nav>
-      <h1 className="text-3xl font-bold mb-6">{category.name} Services</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {services.map((service) => (
-          <Link
-            href={`/service/${service.id}`}
-            key={service.id}
-            className="block"
-          >
-            <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <img
-                src={service.images[0] || "/placeholder.jpg"}
-                alt={service.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
-                <div className="flex items-center mb-2">
-                  <img
-                    src={
-                      service.creator.profilePic || "/avatar-placeholder.jpg"
-                    }
-                    alt={`${service.creator.firstName} ${service.creator.lastName}`}
-                    className="w-6 h-6 rounded-full mr-2"
-                  />
-                  <span className="text-sm text-gray-600">
-                    {service.creator.firstName} {service.creator.lastName}
-                  </span>
-                </div>
-                <div className="flex items-center mb-2">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                  <span className="text-sm font-medium">
-                    {service.creator.sellerRating?.toFixed(1) || "New"}
-                  </span>
-                </div>
-                <p className="text-sm font-semibold">
-                  From ${service.packages[0]?.price.toFixed(2) || "N/A"}
-                </p>
-              </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-3xl">{category.name} Services</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {category.description && (
+            <p className="text-muted-foreground">{category.description}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {category.children && category.children.length > 0 && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Explore Subcategories</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {category.children.map((subcat) => (
+                <Link
+                  key={subcat.id}
+                  href={`/categories/${encodeURIComponent(subcat.name)}`}
+                >
+                  <Badge
+                    variant="secondary"
+                    className="hover:bg-secondary/80 cursor-pointer"
+                  >
+                    {subcat.name}
+                  </Badge>
+                </Link>
+              ))}
             </div>
-          </Link>
-        ))}
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <p className="text-muted-foreground font-medium">
+          {services.length} services available
+        </p>
+        <FilterSortBar />
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {services.length > 0 ? (
+          services.map((service) => (
+            <ServiceCard key={service.id} service={service} />
+          ))
+        ) : (
+          <Card className="col-span-full">
+            <CardContent className="text-center py-12">
+              <p className="text-2xl font-semibold text-muted-foreground mb-4">
+                No services found
+              </p>
+              <p className="text-muted-foreground mb-6">
+                Try adjusting your filters or check back later for new services.
+              </p>
+              <Button
+                onClick={() =>
+                  (window.location.href = window.location.pathname)
+                }
+              >
+                Clear Filters
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-12">
+          <Pagination currentPage={page} totalPages={totalPages} />
+        </div>
+      )}
+
+      <Separator className="my-8" />
     </div>
   );
 }
