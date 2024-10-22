@@ -5,9 +5,32 @@ import { cn } from "@/lib/utils-cn";
 import { getCategories } from "@/server.actions/category.actions";
 import { getFeaturedServices } from "@/server.actions/services.actions";
 import { CheckCircle, Search, Star } from "lucide-react";
+import Photographie from '@/assets/categoriesIcon/Photographie.webp'
+import Graphisme_Design from '@/assets/categoriesIcon/Graphisme_Design.webp'
+import Marketing_digital from '@/assets/categoriesIcon/Marketing_digital.webp'
+import Redaction_Traduction from '@/assets/categoriesIcon/Redaction_Traduction.webp'
+import Video_Animation from '@/assets/categoriesIcon/Video_Animation.webp'
+import Musique_Audio from '@/assets/categoriesIcon/Musique_Audio.webp'
+import Programmation_Tech from '@/assets/categoriesIcon/Programmation_Tech.webp'
+import Business from '@/assets/categoriesIcon/Business.webp'
+import Loisirs from '@/assets/categoriesIcon/Loisirs.webp'
+import Data from '@/assets/categoriesIcon/Data.webp'
+import Image from 'next/image';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+const categories = [
+  { name: 'Graphisme & Design', icon: Graphisme_Design },
+  { name: 'Marketing digital', icon: Marketing_digital },
+  { name: 'Rédaction & Traduction', icon: Redaction_Traduction },
+  { name: 'Vidéo & Animation', icon: Video_Animation },
+  { name: 'Musique & Audio', icon: Musique_Audio },
+  { name: 'Programmation & Tech', icon: Programmation_Tech },
+  { name: 'Business', icon: Business },
+  { name: 'Loisirs', icon: Loisirs },
+  { name: 'Data', icon: Data },
+  { name: 'Photographie', icon: Photographie },
+];
  
 // Define the types for the Service
 interface Rating {
@@ -188,24 +211,35 @@ const Hero = () => {
 
       {/* Popular Categories */}
       <div className="py-16">
-        <div className="container px-6 mx-auto">
-          <h2 className="mb-8 text-3xl font-bold text-center">
-            Catégories populaires
-          </h2>
-          <div className="grid grid-cols-2 gap-6 select-none md:grid-cols-3 lg:grid-cols-6">
-            {popularCategories.map((category, index) => (
-              <div
-                key={index}
-                className="text-center transition duration-300 hover:scale-105"
-                onClick={() => handleCategory(category.id)}
-              >
-                <div className="mb-2 text-4xl">💻</div>
-                <p className="font-medium">{category.name}</p>
-              </div>
-            ))}
-          </div>
+      <div className="container px-6 mx-auto">
+        {/* Title and underline */}
+        <div className="inline-block mb-8 text-center">
+          <h2 className="text-3xl font-bold mb-2">Découvrez aussi</h2>
+          <div className="h-px bg-gray-300 mb-6"></div>
+        </div>
+
+        {/* Grid layout */}
+        <div className="grid grid-cols-2 gap-6 select-none md:grid-cols-3 lg:grid-cols-6">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="flex flex-col items-center text-center transition duration-300 hover:scale-105 cursor-pointer"
+              onClick={() => handleCategory(category.id)}
+            >
+              <Image
+                src={category.icon}
+                alt={category.name}
+                width={48}
+                height={48}
+                className="object-contain mb-2"
+              />
+              <div className="w-12 h-px bg-gray-300 group-hover:bg-yellow-500 transition-colors duration-300 mb-2"></div>
+              <p className="font-medium">{category.name}</p>
+            </div>
+          ))}
         </div>
       </div>
+    </div>
 
       {/* Featured Gigs */}
       <div className="py-16 bg-secondary/10">

@@ -1,4 +1,4 @@
-import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
+// import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import HeaderAuth from "@/app/pages/header/header-auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
@@ -43,7 +43,7 @@ export default function RootLayout({
       <body
         className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <GoogleAuthDirect />
+        {/* <GoogleAuthDirect /> */}
         <Toaster />
         <ThemeProvider
           attribute="class"

@@ -82,7 +82,19 @@ export const getUsers= async () => {
             freelancerRatings:true,
             userEmail:true,
             phoneNumber:true,
-            createdServices:true
+            createdServices: {
+                select: {
+                    id:true,
+                    category:true,
+                    description:true,
+                    name:true,
+                    images:true,
+                    packages:true,
+                    createdAt:true,
+                    ratings:true,
+                    creator:true,
+                }
+            }
             
             
         },
