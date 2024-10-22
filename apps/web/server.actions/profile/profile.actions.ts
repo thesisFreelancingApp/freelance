@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 interface UserProfile {
   firstName?: string | null;
@@ -86,7 +87,7 @@ export async function updateUserProfile(data: UserProfile) {
         bio: true,
       },
     });
-
+    revalidatePath(`/profile`);
     return updatedProfile; // Retourner les données mises à jour du profil
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profil:", error);

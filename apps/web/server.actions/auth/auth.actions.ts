@@ -175,3 +175,20 @@ export const getUserEmail = async () => {
     return { error: "No user is currently signed in" };
   }
 };
+
+export const isAuthenticated = async () => {
+  // Initialize Supabase client
+  const supabase = createClient();
+
+  // Get the current session from Supabase
+  const { data, error } = await supabase.auth.getSession();
+
+  // Handle any potential error
+  if (error) {
+    console.error("Error checking authentication:", error.message);
+    return false;
+  }
+
+  // Check if a session exists, meaning the user is authenticated
+  return !!data.session;
+};

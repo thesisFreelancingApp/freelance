@@ -1,17 +1,25 @@
+// Imports - UI Components and Layout
 import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
-import HeaderAuth from "@/app/pages/header/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import Footer from "@/app/pages/__footer";
+import Header from "@/app/pages/__header";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
-import Logo from "@/public/WaiaHub-LogoIcon.svg";
-import "@/styles/globals.css";
-import { GeistSans } from "geist/font/sans";
-import { ThemeProvider } from "next-themes";
-import localFont from "next/font/local";
-import Link from "next/link";
 import React from "react";
+
+// Imports - Hooks and Utilities
+import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
+import { ThemeProvider } from "next-themes";
+
+// Imports - Styles and Fonts
+import "@/styles/globals.css";
+// Font Configuration
+import localFont from "next/font/local";
+
+const outfit = localFont({
+  src: "./fonts/Outfit.ttf",
+});
+// Site Configuration
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -22,80 +30,50 @@ export const metadata = {
   description: "The fastest way to Freelance",
 };
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
+// Root Layout Component
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={GeistSans.className} suppressHydrationWarning>
-      <body
-        className={`bg-background text-foreground ${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <GoogleAuthDirect />
-        <Toaster />
+    <html lang="fr" className={outfit.className}>
+      <body className={`bg-background text-foreground  antialiased`}>
+        {/* Theme Provider for Light/Dark Modes */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <TailwindIndicator />
+          {/* Google OneTap Authentication */}
+          <GoogleAuthDirect />
+
+          {/* Toaster for Notifications */}
+          <Toaster />
+
+          {/* Tooltip and Tailwind Indicator */}
           <TooltipProvider>
-            <main className="flex flex-col items-center min-h-screen">
-              <div className="flex flex-col items-center flex-1 w-full gap-10 md:gap-20">
-                {/* Navbar */}
-                <nav className="flex justify-center w-full h-16 border-b border-b-foreground/6">
-                  <div className="flex items-center justify-between w-full px-4 text-lg max-w-7xl md:px-8 md:text-xl">
-                    <Link href={"/"}>
-                      <div className="flex items-center gap-2 font-semibold">
-                        <img
-                          className="w-12 h-12 md:w-16 md:h-16"
-                          src={Logo.src}
-                          alt="WaiaHub Logo"
-                        />
-                        <p className="text-3xl">Waiahub</p>
-                      </div>
-                    </Link>
-                    <HeaderAuth />
-                  </div>
-                </nav>
-                {/* Main content */}
-                <main className="flex flex-col items-center justify-center w-full gap-20 p-5">
-                  {children}
-                </main>
-                {/* Footer */}
-                <footer className="flex flex-col items-center justify-center w-full gap-4 py-8 mx-auto text-xs text-center border-t md:flex-row md:gap-8 md:py-16 md:text-sm">
-                  <p>
-                    Powered by{" "}
-                    <a
-                      href="https://www.rbktunisia.com/"
-                      target="_blank"
-                      className="font-bold hover:underline"
-                      rel="noreferrer"
-                    >
-                      RBK
-                    </a>
-                  </p>
-                  <ThemeSwitcher />
-                </footer>
-              </div>
+            <TailwindIndicator />
+
+            {/* Main Page Layout */}
+
+            {/* Navbar/Header */}
+            <Header />
+
+            {/* Main Content Area */}
+            <main className="flex flex-col items-center justify-center flex-1 w-full min-h-[90vh] gap-10 md:gap-20">
+              {children}
             </main>
+
+            {/* Footer */}
+
+            <Footer />
+
+            {/* ------------------- */}
           </TooltipProvider>
-          <TailwindIndicator />
         </ThemeProvider>
-        {/* Script Tawk.to */}
+        {/* Tawk.to Live Chat Integration */}
         <UseTawkToScript />
       </body>
     </html>

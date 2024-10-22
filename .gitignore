@@ -224,3 +224,4 @@ yarn-error.*
 
 autoPush_git.sh
 autoCommit_git.sh
+autoPull_git.sh
