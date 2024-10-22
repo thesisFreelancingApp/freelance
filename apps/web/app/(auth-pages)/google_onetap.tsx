@@ -102,7 +102,7 @@ const OneTapComponent = () => {
         src="https://accounts.google.com/gsi/client"
         onLoad={() => setGoogleScriptLoaded(true)} // Set the state when the script is loaded
       />
-      <div id="oneTap" className="fixed top-0 right-0 z-[100]" />
+      <div id="oneTap" className="fixed top-20  right-0 z-[100]" />
     </>
   );
 };

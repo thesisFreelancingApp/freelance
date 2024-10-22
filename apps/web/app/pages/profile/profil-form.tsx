@@ -62,15 +62,15 @@ export default function ProfileForm() {
       try {
         const profile = await getUserProfile();
         const formattedProfile = {
-          firstName: profile.firstName || "",
-          lastName: profile.lastName || "",
-          address: profile.address || "",
-          bio: profile.bio || "",
-          username: profile.username || "",
-          userEmail: profile.userEmail || "",
-          phoneNumber: profile.phoneNumber || "",
-          birthDate: profile.birthDate
-            ? new Date(profile.birthDate).toISOString().slice(0, 10)
+          firstName: profile?.firstName || "",
+          lastName: profile?.lastName || "",
+          address: profile?.address || "",
+          bio: profile?.bio || "",
+          username: profile?.username || "",
+          userEmail: profile?.userEmail || "",
+          phoneNumber: profile?.phoneNumber || "",
+          birthDate: profile?.birthDate
+            ? new Date(profile?.birthDate).toISOString().slice(0, 10)
             : "",
         };
         form.reset(formattedProfile);
