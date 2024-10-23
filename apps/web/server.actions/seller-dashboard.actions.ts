@@ -101,3 +101,34 @@ export const getUsers= async () => {
     });
     return users;
   }
+
+
+
+  export const getFreelancer= async () => {
+    const users = await prisma.profile.findMany({
+        where: {
+            role: "user"
+        },
+        select: {
+            firstName: true,
+            lastName: true,
+            profilePic:true,
+            // bio:true,
+            // address:true,
+            // skills:true,
+            // languages:true,
+            // freelancerRatings:true,
+            userEmail:true,
+            phoneNumber:true,
+            createdServices: {
+                select: {
+                    id:true,
+                    category:true,
+                }
+            }
+            
+            
+        },
+    });
+    return users;
+  }

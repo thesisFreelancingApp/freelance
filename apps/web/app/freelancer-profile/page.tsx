@@ -76,7 +76,7 @@ export default function FreelancerProfile() {
 
   if (loading) {
     return <div>Loading...</div>;
-  }d
+  }
 
   if (error) {
     return <div>Error: {error}</div>;
