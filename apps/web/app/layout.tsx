@@ -1,5 +1,5 @@
 // Imports - UI Components and Layout
-import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
+// import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import Footer from "@/app/pages/__footer";
 import Header from "@/app/pages/__header";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
@@ -47,7 +47,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* Google OneTap Authentication */}
-          <GoogleAuthDirect />
+          {/* <GoogleAuthDirect /> */}
 
           {/* Toaster for Notifications */}
           <Toaster />
