@@ -14,7 +14,7 @@ const freelancers = [
   { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
 ];
 export default async function Index() {
-  const categories = await getCategories();
+  const categories = await getCategories(10);
   const authenticated = await isAuthenticated();
   const services = await getFeaturedServices();
   const freelancer = await getFreelancer(3);
