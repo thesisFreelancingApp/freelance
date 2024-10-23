@@ -11,7 +11,7 @@ import { ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import ClearFiltersButton from "@/components/ClearFiltersButton";
 
 export async function generateMetadata({
   params,
@@ -116,13 +116,7 @@ export default async function CategoryPage({
               <p className="text-muted-foreground mb-6">
                 Try adjusting your filters or check back later for new services.
               </p>
-              <Button
-                onClick={() =>
-                  (window.location.href = window.location.pathname)
-                }
-              >
-                Clear Filters
-              </Button>
+              <ClearFiltersButton />
             </CardContent>
           </Card>
         )}
