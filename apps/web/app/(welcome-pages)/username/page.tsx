@@ -1,9 +1,8 @@
-import { NextPage } from 'next'
-import Username from './username'
+import { NextPage } from "next";
+import Steps from "./steps";
 
+const Page: NextPage = () => {
+  return <Steps />;
+};
 
-const Page: NextPage= () => {
-  return <Username/>
-}
-
-export default Page
+export default Page;

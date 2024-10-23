@@ -1,5 +1,5 @@
 // Imports - UI Components and Layout
-// import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
+import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import Footer from "@/app/pages/__footer";
 import Header from "@/app/pages/__header";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
@@ -22,7 +22,7 @@ const outfit = localFont({
 // Site Configuration
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+  : "https://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
@@ -56,7 +56,7 @@ export default function RootLayout({
           <TooltipProvider>
             <TailwindIndicator />
 
-            {/* Main Page Layout */}
+            {/* ---Main Page Layout----------------  */}
 
             {/* Navbar/Header */}
             <Header />
@@ -67,10 +67,9 @@ export default function RootLayout({
             </main>
 
             {/* Footer */}
-
             <Footer />
 
-            {/* ------------------- */}
+            {/* ---Main Page Layout---------------- */}
           </TooltipProvider>
         </ThemeProvider>
         {/* Tawk.to Live Chat Integration */}

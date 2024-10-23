@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 const OneTapComponent = () => {
   const supabase = createClient();
   const router = useRouter();
-  const [googleScriptLoaded, setGoogleScriptLoaded] = useState(false); // State to track if the Google script is loaded
+  const [googleScriptLoaded, setGoogleScriptLoaded] = useState(false);
 
   const generateNonce = async (): Promise<[string, string]> => {
     const nonce = btoa(
@@ -34,26 +34,22 @@ const OneTapComponent = () => {
 
       if (result.success) {
         console.log(result.message);
-        const href = result.path || "/";
+        const href = result.path || window.location.href; // Keep the user on the same page if no path is provided
         router.push(href);
       } else {
         console.error("Erreur lors de la connexion :", result.error);
       }
     } catch (error) {
-      // Log any errors that occur during authentication
       console.error("Error logging in:", error);
-      router.push("/");
     }
   };
 
   useEffect(() => {
     if (googleScriptLoaded) {
-      // Ensure that the script is loaded before initializing
       const initializeGoogleOneTap = async () => {
         const [nonce, hashedNonce] = await generateNonce();
         console.log("Nonce: ", nonce, hashedNonce);
 
-        // Check for an existing session
         const { data, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Error getting session", error);
@@ -64,17 +60,16 @@ const OneTapComponent = () => {
           return;
         }
 
-        // Initialize One Tap
         window.google?.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
           nonce: hashedNonce,
           prompt_parent_id: "oneTap",
-          cancel_on_tap_outside: false, // Prevent dismissal on outside click
-          auto_select: false, // Disable auto-select for better control
+          cancel_on_tap_outside: false,
+          auto_select: false,
           context: "use",
           ux_mode: "popup",
-          itp_support: true, // Enable better support for ITP browsers
-          use_fedcm_for_prompt: true, // Use FedCM for better prompt management
+          itp_support: true,
+          use_fedcm_for_prompt: true,
           intermediate_iframe_close_callback: () => {
             console.log("User closed the One Tap iFrame.");
           },
@@ -82,25 +77,23 @@ const OneTapComponent = () => {
             handleCredential(response, nonce),
         });
 
-        // Ensure the prompt is always displayed
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
             console.log("One Tap not displayed, forcing display...");
-            window.google.accounts.id.prompt(); // Re-prompt if not displayed
+            window.google.accounts.id.prompt();
           }
         });
       };
 
       initializeGoogleOneTap();
     }
-  }, [googleScriptLoaded, supabase, router]); // Trigger the effect when the script is loaded
+  }, [googleScriptLoaded, supabase, router]);
 
   return (
     <>
-      {/* Load the Google script */}
       <Script
         src="https://accounts.google.com/gsi/client"
-        onLoad={() => setGoogleScriptLoaded(true)} // Set the state when the script is loaded
+        onLoad={() => setGoogleScriptLoaded(true)}
       />
       <div id="oneTap" className="fixed top-20  right-0 z-[100]" />
     </>
