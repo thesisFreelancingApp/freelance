@@ -17,7 +17,7 @@ export default async function Index() {
   const categories = await getCategories(10);
   const authenticated = await isAuthenticated();
   const services = await getFeaturedServices();
-  const freelancer = await getFreelancer();
+  const freelancer = await getFreelancer(3);
   console.log(freelancer,"sdsd");
   return (
     <>

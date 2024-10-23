@@ -5,8 +5,7 @@ export const protectedRoutes = [
   "/hello",
   "/settings",
   "/profile",
-  "/seller-dashboard",
-
+  "/createGig",
 ];
 
 // List of non-auth routes

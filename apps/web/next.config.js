@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: false,
   images: {
     domains: ["res.cloudinary.com"],
-    domains: ['straitwebsolutions.com', 'fiverr-res.cloudinary.com'],
+    domains: ["fiverr-res.cloudinary.com"],
   },
 };
 

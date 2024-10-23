@@ -1,12 +1,21 @@
 import { MessageBox } from "@/components/MessageBox";
 import { Button } from "@/components/ui/button";
-import { getServiceById } from "@/server.actions/services.actions";
+import {
+  getServiceById,
+  getRelatedServices,
+} from "@/server.actions/services.actions";
 import { Check, Clock, RefreshCcw, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Decimal } from "@prisma/client/runtime/library";
 import ServiceReviews from "@/app/pages/review/ServiceReviews";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import ImageCarousel from "@/components/ImageCarousel";
+import { Suspense } from "react";
+import Loading from "@/app/loading";
+
 export default async function ServiceDetailPage({
   params,
 }: {
@@ -15,7 +24,7 @@ export default async function ServiceDetailPage({
   const service = await getServiceById(parseInt(params.id));
 
   if (!service) {
-    return <div>Service not found</div>;
+    notFound();
   }
 
   const averageRating =
@@ -60,6 +69,11 @@ export default async function ServiceDetailPage({
     </Card>
   );
 
+  const relatedServices = await getRelatedServices(
+    service.category.id,
+    service.id,
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
@@ -85,15 +99,11 @@ export default async function ServiceDetailPage({
                 </div>
               </div>
             </div>
-            <div className="mb-8 rounded-lg overflow-hidden bg-muted">
-              <img
-                src={
-                  service.images?.[0] || "/placeholder.svg?height=400&width=600"
-                }
-                alt="Service preview"
-                className="w-full h-64 object-cover"
-              />
-            </div>
+            <Suspense fallback={<Loading />}>
+              <div className="mb-8">
+                <ImageCarousel images={service.images || []} />
+              </div>
+            </Suspense>
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle>About This Service</CardTitle>
@@ -124,14 +134,11 @@ export default async function ServiceDetailPage({
               </CardHeader>
               <CardContent>
                 {service.ratings && service.ratings.length > 0 ? (
-                  service.ratings.map((rating, index) => (
-                    <div key={index} className="mb-6 pb-4 border-b">
+                  service.ratings.map((rating) => (
+                    <div key={rating.id} className="mb-6 pb-4 border-b">
                       <div className="flex items-center mb-2">
                         <img
-                          src={
-                            rating.buyer.profilePic ||
-                            "/placeholder.svg?height=40&width=40"
-                          }
+                          src={rating.buyer.profilePic || "/placeholder.svg"}
                           alt={`${rating.buyer.firstName} ${rating.buyer.lastName}`}
                           className="w-10 h-10 rounded-full mr-3"
                         />
@@ -174,19 +181,89 @@ export default async function ServiceDetailPage({
             </div>
 
             </Card>
+
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>Related Services</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {relatedServices.map((relatedService) => (
+                    <Link
+                      href={`/service/${relatedService.id}`}
+                      key={relatedService.id}
+                    >
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-sm">
+                            {relatedService.name}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <img
+                            src={relatedService.images[0] || "/placeholder.svg"}
+                            alt={relatedService.name}
+                            className="w-full h-32 object-cover"
+                          />
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="md:col-span-1">
             <div className="sticky top-4">
-              <Tabs defaultValue="basic" className="w-full">
+              <Tabs
+                defaultValue={service.packages[0].name.toLowerCase()}
+                className="w-full"
+              >
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="basic">Basic</TabsTrigger>
-                  <TabsTrigger value="standard">Standard</TabsTrigger>
-                  <TabsTrigger value="premium">Premium</TabsTrigger>
+                  {service.packages.map((pkg) => (
+                    <TabsTrigger key={pkg.id} value={pkg.name.toLowerCase()}>
+                      {pkg.name}
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
                 {service.packages.map((pkg) => (
                   <TabsContent key={pkg.id} value={pkg.name.toLowerCase()}>
-                    {renderPackage(pkg)}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>{pkg.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-2xl font-bold mb-4">
+                          ${formatPrice(pkg.price)}
+                        </p>
+                        <p className="text-sm mb-4">{pkg.description}</p>
+                        <div className="flex justify-between text-sm mb-4">
+                          <span className="flex items-center">
+                            <Clock className="w-4 h-4 mr-2" />{" "}
+                            {pkg.deliveryTime} days delivery
+                          </span>
+                          <span className="flex items-center">
+                            <RefreshCcw className="w-4 h-4 mr-2" />{" "}
+                            {pkg.revisions} revisions
+                          </span>
+                        </div>
+                        <ul className="mb-4">
+                          {pkg.features.map((feature, index) => (
+                            <li
+                              key={index}
+                              className="flex items-center text-sm mb-2"
+                            >
+                              <Check className="w-4 h-4 mr-2 text-green-500" />
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                        <Button className="w-full">
+                          Continue (${formatPrice(pkg.price)})
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 ))}
               </Tabs>
