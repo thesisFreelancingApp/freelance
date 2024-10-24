@@ -11,7 +11,8 @@
         "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && rm -rf prisma/migrations && cd ../mobile && rm -rf node_modules",
         "prismaUnix": "cd apps/web/prisma && rm -rf  prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
         "prismaWin": "cd apps/web/prisma && rmdir /s /q   prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
-        "seed": "cd apps/web && npm run seed"
+        "seed": "cd apps/web && npm run seed",
+        "studio": "cd apps/web && npx prisma studio"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.7",

@@ -1,12 +1,12 @@
-import { notFound } from "next/navigation";
+// import { notFound } from "next/navigation";
 import {
   getCategoryByName,
   getServicesByCategory,
 } from "@/server.actions/category/category.actions";
 import Link from "next/link";
-import ServiceCard from "@/components/ServiceCard";
-import FilterSortBar from "@/components/FilterSortBar";
-import Pagination from "@/components/Pagination";
+import ServiceCard from "@/app/pages/services/ServiceCard";
+import FilterSortBar from "@/app/pages/services/FiltredSortBar";
+import Pagination from "@/app/pages/services/Pagination";
 import { ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +35,25 @@ export default async function CategoryPage({
   console.log("----------", decodedName);
   const category = await getCategoryByName(decodedName);
   console.log("----------", category);
-  if (!category) notFound();
+  if (!category) {
+    return (
+      <div className="container px-4 py-8 mx-auto text-center">
+        <h1 className="text-2xl font-semibold text-red-500">
+          Category Not Found
+        </h1>
+        <p className="mt-4 text-muted-foreground">
+          The category you're looking for does not exist. Please check the name
+          or explore other categories.
+        </p>
+        <Link href="/categories">
+          <Button variant="outline" className="mt-6">
+            Explore Categories
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+  // if (!category) notFound();
 
   const page = parseInt(searchParams.page || "1");
   const { services, totalPages } = await getServicesByCategory(

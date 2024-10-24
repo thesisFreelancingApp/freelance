@@ -47,7 +47,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* Google OneTap Authentication */}
-          <GoogleAuthDirect />
+          {/* <GoogleAuthDirect /> */}
 
           {/* Toaster for Notifications */}
           <Toaster />

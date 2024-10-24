@@ -4,7 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { encodeHelper } from "@/hooks/use-Url";
 // import Link from "next/link";
+
 // Définition des types
 interface SubCategory {
   name: string;
@@ -32,7 +34,7 @@ const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
   //   router.push(`/categories/${subSubName}`);
   // };
   return (
-    <div className="absolute left-0 z-10 grid w-full grid-cols-4 gap-4 p-4 bg-white shadow-lg top-full">
+    <div className="absolute left-0 z-10 grid w-full grid-cols-4 gap-4 p-4 shadow-lg bg-background top-full">
       {subCategories.map((subcategory: SubCategory) => (
         <div key={subcategory.name} className="pb-2 border-b">
           <h4 className="font-bold">{subcategory.name}</h4>
@@ -42,7 +44,7 @@ const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
                 <li className="flex items-center">
                   <Link
                     key={subSub.name}
-                    href={`/categories/${encodeURIComponent(subSub.name)}`}
+                    href={`/categories/${encodeHelper(subcategory.name)}/${encodeHelper(subSub.name)}`}
                     className="flex items-center pl-2 group hover:cursor-pointer"
                   >
                     <span>{subSub.name}</span>
@@ -121,23 +123,26 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
       {/* Left Chevron */}
       <button
         onClick={scrollLeft}
-        className="absolute z-20 flex justify-start text-black -translate-y-1/2 bg-white rounded-full left-2 top-1/2"
+        className="absolute z-20 flex justify-start -translate-y-1/2 rounded-full left-2 top-1/2"
         aria-label="Scroll left"
       >
         <FaChevronLeft />
       </button>
 
       {/* Left gradient overlay */}
-      <div className="absolute top-0 left-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-r from-white to-transparent"></div>
+      <div className="absolute top-0 left-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-r from-background to-transparent"></div>
 
       {/* Main Menu */}
       <ul
+        className="flex p-4 space-x-6 overflow-x-auto scrollbar-hide"
+        style={{ margin: "0 2rem" }}
         ref={menuRef}
-        className="flex p-4 space-x-6 overflow-x-auto bg-white scrollbar-hide "
-        style={{ margin: "0 2rem" }} // Ajout de marges pour éviter le chevauchement
       >
         {allCategories.map((category: Category, index: number) => (
-          <Link href={category.name}>
+          <Link
+            key={category.name}
+            href={`/categories/${encodeHelper(category.name)}`}
+          >
             <li
               key={category.name}
               onMouseEnter={() => handleMouseEnter(index)}
@@ -155,12 +160,12 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
       </ul>
 
       {/* Right gradient overlay */}
-      <div className="absolute top-0 right-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-l from-white to-transparent"></div>
+      <div className="absolute top-0 right-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-l from-background to-transparent"></div>
 
       {/* Right Chevron */}
       <button
         onClick={scrollRight}
-        className="absolute z-20 p-2 text-black -translate-y-1/2 bg-white rounded-full right-2 top-1/2"
+        className="absolute z-20 p-2 -translate-y-1/2 rounded-full right-2 top-1/2"
         aria-label="Scroll right"
       >
         <FaChevronRight />
