@@ -1,5 +1,5 @@
 import { decodeHelper } from "@/hooks/use-Url";
-import { useSearchParams } from "next/navigation";
+
 import DynamicBreadc from "@/components/ui/breadcrumpDyn";
 const SubCategoryPage = ({
   params,
