@@ -1,12 +1,12 @@
-// import { notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   getCategoryByName,
   getServicesByCategory,
-} from "@/server.actions/category/category.actions";
+} from "@/server.actions/category.actions";
 import Link from "next/link";
-import ServiceCard from "@/app/pages/services/ServiceCard";
-import FilterSortBar from "@/app/pages/services/FiltredSortBar";
-import Pagination from "@/app/pages/services/Pagination";
+import ServiceCard from "@/components/ServiceCard";
+import FilterSortBar from "@/components/FilterSortBar";
+import Pagination from "@/components/Pagination";
 import { ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,28 +32,8 @@ export default async function CategoryPage({
   searchParams: { page?: string; sort?: string; priceRange?: string };
 }) {
   const decodedName = decodeURIComponent(params.name);
-  console.log("----------", decodedName);
   const category = await getCategoryByName(decodedName);
-  console.log("----------", category);
-  if (!category) {
-    return (
-      <div className="container px-4 py-8 mx-auto text-center">
-        <h1 className="text-2xl font-semibold text-red-500">
-          Category Not Found
-        </h1>
-        <p className="mt-4 text-muted-foreground">
-          The category you're looking for does not exist. Please check the name
-          or explore other categories.
-        </p>
-        <Link href="/categories">
-          <Button variant="outline" className="mt-6">
-            Explore Categories
-          </Button>
-        </Link>
-      </div>
-    );
-  }
-  // if (!category) notFound();
+  if (!category) notFound();
 
   const page = parseInt(searchParams.page || "1");
   const { services, totalPages } = await getServicesByCategory(
@@ -64,18 +44,18 @@ export default async function CategoryPage({
   );
 
   return (
-    <div className="container px-4 py-8 mx-auto">
+    <div className="container mx-auto px-4 py-8">
       <nav
         aria-label="Breadcrumb"
-        className="flex items-center mb-6 space-x-2 text-sm"
+        className="flex items-center space-x-2 text-sm mb-6"
       >
         <Link
           href="/"
-          className="transition-colors text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors"
         >
           Home
         </Link>
-        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
         <span className="font-medium">{category.name}</span>
       </nav>
 
@@ -104,7 +84,7 @@ export default async function CategoryPage({
                 >
                   <Badge
                     variant="secondary"
-                    className="cursor-pointer hover:bg-secondary/80"
+                    className="hover:bg-secondary/80 cursor-pointer"
                   >
                     {subcat.name}
                   </Badge>
@@ -115,25 +95,25 @@ export default async function CategoryPage({
         </Card>
       )}
 
-      <div className="flex flex-col items-start justify-between gap-4 mb-6 sm:flex-row sm:items-center">
-        <p className="font-medium text-muted-foreground">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <p className="text-muted-foreground font-medium">
           {services.length} services available
         </p>
         <FilterSortBar />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {services.length > 0 ? (
           services.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))
         ) : (
           <Card className="col-span-full">
-            <CardContent className="py-12 text-center">
-              <p className="mb-4 text-2xl font-semibold text-muted-foreground">
+            <CardContent className="text-center py-12">
+              <p className="text-2xl font-semibold text-muted-foreground mb-4">
                 No services found
               </p>
-              <p className="mb-6 text-muted-foreground">
+              <p className="text-muted-foreground mb-6">
                 Try adjusting your filters or check back later for new services.
               </p>
               <Button
