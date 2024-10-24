@@ -170,16 +170,15 @@ export default async function ServiceDetailPage({
               </CardContent>
 
               <div>
-              {/* Use the ServiceReviews component here */}
+                {/* Use the ServiceReviews component here */}
 
-              {/* @ts-ignore */}
+                {/* @ts-ignore */}
 
-              <ServiceReviews
-                ratings={service.ratings}
-                serviceId={service.id}
-              />
-            </div>
-
+                <ServiceReviews
+                  ratings={service.ratings}
+                  serviceId={service.id}
+                />
+              </div>
             </Card>
 
             <Card className="mt-8">

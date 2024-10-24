@@ -1,4 +1,4 @@
-import { Jobs, Level, Plan, PrismaClient, Role } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,10 +10,7 @@ const allUsers = [
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg",
     email: "johndoe@example.com",
 
-    jobs: Jobs.Programmation_Tech, // Utilisation de l'enum 'Jobs'
-    plan: Plan.Travail_principal, // Utilisation de l'enum 'Plan'
     role: Role.user, // Utilisation de l'enum 'Role'
-    level: Level.advanced, // Utilisation de l'enum 'Level'
     skills: JSON.stringify(["JavaScript", "React", "Node.js"]),
     languages: JSON.stringify(["English", "French"]),
   },
@@ -24,10 +21,7 @@ const allUsers = [
     profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
     email: "janesmith@example.com",
 
-    jobs: Jobs.Graphisme_Design, // Utilisation de l'enum 'Jobs'
-    plan: Plan.Travail_secondaire, // Utilisation de l'enum 'Plan'
     role: Role.user, // Utilisation de l'enum 'Role'
-    level: Level.intermediate, // Utilisation de l'enum 'Level'
     skills: JSON.stringify(["Photoshop", "Illustrator", "Figma"]),
     languages: JSON.stringify(["English", "Spanish"]),
   },
@@ -38,10 +32,7 @@ const allUsers = [
     profilePic: "https://randomuser.me/api/portraits/men/3.jpg",
     email: "mikejohnson@example.com",
 
-    jobs: Jobs.Redaction_Traduction, // Utilisation de l'enum 'Jobs'
-    plan: Plan.usage_personnel, // Utilisation de l'enum 'Plan'
     role: Role.user, // Utilisation de l'enum 'Role'
-    level: Level.beginner, // Utilisation de l'enum 'Level'
     skills: JSON.stringify(["Content Writing", "SEO", "Copywriting"]),
     languages: JSON.stringify(["English", "German"]),
   },
@@ -69,12 +60,9 @@ export const seedUsers = async () => {
             firstName: user.firstName,
             lastName: user.lastName,
             profilePic: user.profilePic,
-            jobs: user.jobs,
-            plan: user.plan,
+
             role: user.role,
-            level: user.level,
-            skills: user.skills,
-            languages: user.languages,
+
             userEmail: user.email,
             username: user.firstName + user.lastName,
           },
