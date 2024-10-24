@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getCategories } from "@/server.actions/category.actions";
+import { getCategories } from "@/server.actions/category/category.actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";

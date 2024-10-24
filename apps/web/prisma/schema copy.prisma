@@ -1,0 +1,185 @@
+// Datasource and Generator
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+//
+// Models
+//
+
+// AuthUser model represents a user authenticated via Supabase
+model AuthUser {
+  id        String   @id
+  email     String   @unique
+  name      String?
+  account   Account?
+  profile   Profile? @relation("ProfileAuthUser")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Profile model stores general user details
+model Profile {
+  id            String   @id
+  authUser      AuthUser @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
+  firstName     String?
+  lastName      String?
+  profilePic    String?
+  role          String?
+  phoneNumber   String?
+  address       String?
+  bio           String?
+  birthDate     DateTime?
+  username      String   @unique
+  userEmail     String   @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  seller        Seller?
+  buyer         Buyer?
+  categories    CategoryHierarchy[] @relation("ProfileCategories")
+  messages      Message[] @relation("MessageSender")
+}
+
+// Seller model represents a user who sells services
+model Seller {
+  id              String   @id
+  profileId       String   @unique
+  profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  sellerRating    Float?
+  totalEarnings   Float    @default(0.0)
+  createdServices Service[] @relation("CreatedServices")
+  freelancerChatRooms ChatRoom[] @relation("FreelancerChatRooms")
+  freelancerRatings Rating[] @relation("FreelancerRatings")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Buyer model represents a user who purchases services
+model Buyer {
+  id              String   @id
+  profileId       String   @unique
+  profile         Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  totalSpent      Float    @default(0.0)
+  purchasedServices Service[] @relation("PurchasedServices")
+  clientChatRooms ChatRoom[] @relation("ClientChatRooms")
+  buyerRatings    Rating[]  @relation("BuyerRatings")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Account model stores OAuth details for user authentication via external providers
+model Account {
+  id                Int      @id @default(autoincrement())
+  lastProvider      String?
+  providers         String[]
+  providerAccountId String?
+  userEmail         String   @unique
+  user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Service model represents a service offered by a freelancer
+model Service {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  categoryId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  category      CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id])
+  images        String[]
+  tags          String[]
+
+  // Relations
+  creator       Seller  @relation("CreatedServices", fields: [creatorId], references: [id])
+  creatorId     String
+  buyers        Buyer[] @relation("PurchasedServices")
+  ratings       Rating[]  @relation("ServiceRatings")
+  packages      GigPackage[]
+}
+
+// GigPackage model represents different service tiers
+model GigPackage {
+  id          Int      @id @default(autoincrement())
+  serviceId   Int
+  name        String
+  description String
+  price       Decimal  @db.Decimal(10, 2)
+  deliveryTime Int
+  revisions   Int
+  features    String[]
+
+  service     Service  @relation(fields: [serviceId], references: [id])
+}
+
+// Rating model for feedback on services
+model Rating {
+  id         Int      @id @default(autoincrement())
+  buyerId    String
+  sellerId   String
+  serviceId  Int
+  rating     Int
+  review     String?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  buyer      Buyer   @relation("BuyerRatings", fields: [buyerId], references: [id])
+  seller     Seller  @relation("FreelancerRatings", fields: [sellerId], references: [id])
+  service    Service @relation("ServiceRatings", fields: [serviceId], references: [id])
+}
+
+// ChatRoom model for managing conversations between freelancers and clients
+model ChatRoom {
+  id           Int      @id @default(autoincrement())
+  clientId     String
+  freelancerId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  client       Buyer    @relation("ClientChatRooms", fields: [clientId], references: [id])
+  freelancer   Seller   @relation("FreelancerChatRooms", fields: [freelancerId], references: [id])
+  messages     Message[]
+}
+
+// Message model for individual chat messages
+model Message {
+  id         Int      @id @default(autoincrement())
+  chatRoomId Int
+  senderId   String
+  content    String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender     Profile  @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+// CategoryHierarchy model represents a hierarchical structure of categories
+model CategoryHierarchy {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  level       Int
+  parentId    Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parentId], references: [id])
+  children    CategoryHierarchy[] @relation("Hierarchy")
+  services    Service[] @relation("CategoryServices")
+  profiles    Profile[] @relation("ProfileCategories")
+}
