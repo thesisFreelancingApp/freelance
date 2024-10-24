@@ -1,6 +1,4 @@
-// Prisma schema file: https://pris.ly/d/prisma-schema
-// Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// Datasource et Générateur
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
@@ -11,199 +9,293 @@ generator client {
   provider = "prisma-client-js"
 }
 
-//
-// Models
-//
-
-// AuthUser model represents a user authenticated via Supabase
-model AuthUser {
-  id        String   @id // Primary key, comes from Supabase
-  email     String   @unique // Unique email for user
-  name      String?  // Optional field for user's name
-  account   Account? // One-to-one relation with the OAuth Account model
-  profile   Profile? @relation("ProfileAuthUser") // Optional one-to-one relation with Profile, via user ID
-  profileByEmail Profile? @relation("ProfileUser") // Optional one-to-one relation with Profile, via email
-  createdAt DateTime @default(now()) // Timestamp when user was created
-  updatedAt DateTime @updatedAt // Timestamp when user was last updated
+// Enums
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  COMPLETED
+  CANCELLED
 }
 
-// Profile model stores additional details about a user, such as role, skills, and more
-model Profile {
-  id            String   @id // Primary key, matches AuthUser ID
-  authUser      AuthUser @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade) // Relation to AuthUser
-  firstName     String?  // Optional field for user's first name
-  lastName      String?  // Optional field for user's last name
-  profilePic    String?  // Optional profile picture URL
-  role          Role?    // Role enum to define user type (e.g., user, admin)
-  phoneNumber   String?  // Optional field for user's phone number
-  address       String?  // Optional field for user's address
-  bio           String?  // Optional biography of the user
-  birthDate     DateTime? // Optional birth date of the user
-  username      String   @unique // Unique username for the user
-  userEmail     String   @unique // Unique email field to link with AuthUser email
-  user          AuthUser @relation("ProfileUser", fields: [userEmail], references: [email], onDelete: Cascade) // Relation to AuthUser using email
-  createdAt     DateTime @default(now()) // Timestamp when profile was created
-  updatedAt     DateTime @updatedAt // Timestamp when profile was last updated
+// ------------------------
+// Modèles d'Authentification
+// ------------------------
 
-  // Seller and Buyer fields
-  isSeller      Boolean  @default(false) // Indicates if the user is a seller
-  isBuyer       Boolean  @default(false) // Indicates if the user is a buyer
-  sellerRating  Float?   // Seller rating, optional
-  totalEarnings Float    @default(0.0) // Total earnings for seller
-  totalSpent    Float    @default(0.0) // Total amount spent by buyer
+model AuthUser {
+  id        String           @id
+  email     String           @unique
+  role      String           @default("USER")
+  name      String?
+  username  String           @unique
+  account   Account?
+  profile   PersonalProfile? @relation("ProfileAuthUser")
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model Account {
+  id                Int      @id @default(autoincrement())
+  lastProvider      String?
+  providers         String[]
+  providerAccountId String?
+  userEmail         String   @unique
+  user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ------------------------
+// Profils Utilisateurs et Rôles
+// ------------------------
+
+model PersonalProfile {
+  id                    String                @id
+  authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
+  firstName             String?
+  lastName              String?
+  profilePic            String?
+  phoneNumber           String?
+  address               String?
+  bio                   String?
+  birthDate             DateTime?
+  userEmail             String                @unique
+  professionalProfileid String?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
   // Relations
-  categories        CategoryHierarchy[] @relation("ProfileCategories") // Many-to-many relation with categories
-  createdServices   Service[] @relation("CreatedServices") // Services created by this user (as seller)
-  purchasedServices Service[] @relation("PurchasedServices") // Services purchased by this user (as buyer)
-  buyerRatings      Rating[]  @relation("BuyerRatings") // Ratings given to the user as a buyer
-  freelancerRatings Rating[]  @relation("FreelancerRatings") // Ratings given to the user as a freelancer
-  clientChatRooms   ChatRoom[] @relation("ClientChatRooms") // Chat rooms where the user is the client
-  freelancerChatRooms ChatRoom[] @relation("FreelancerChatRooms") // Chat rooms where the user is the freelancer
-  sentMessages       Message[] // Messages sent by the user
+  seller                Seller?
+  buyer                 Buyer?
+  messages              Message[]             @relation("MessageSender")
+  notifications         Notification[]
+  chatRooms             ChatRoomParticipant[] @relation("ProfileChatRooms")
+  ratingsGiven          Rating[]              @relation("RatingRater")
+  ratingsReceived       Rating[]              @relation("RatingRatee")
+  createdServices       CustomService[]       @relation("CustomServiceCreator")
+  participantIn         CustomServiceParticipant[]
+  professionalProfile   ProfessionalProfile? @relation(fields: [professionalProfileid], references: [id])
+
 }
 
-// Account model stores OAuth details for user authentication via external providers
-model Account {
-  id                Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  lastProvider      String?  // Last provider used for OAuth (optional)
-  providers         String[] // List of providers used by the user
-  providerAccountId String?  // Provider-specific account ID (optional)
-  userEmail         String   @unique // Links to the AuthUser email
-  user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade) // Relation to AuthUser
-  accessToken       String?  // OAuth access token
-  refreshToken      String?  // OAuth refresh token
-  expiresAt         Int?     // Token expiration timestamp (optional)
-  createdAt         DateTime @default(now()) // Timestamp when the account was created
-  updatedAt         DateTime @updatedAt // Timestamp when the account was last updated
+model Seller {
+  id                   String               @id
+  profileId            String               @unique
+  language             String[]
+  profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  sellerRating         Float?
+  totalEarnings        Float                @default(0.0)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  // Relations
+  createdServices      Service[]            @relation("CreatedServices")
+  professionalProfile  ProfessionalProfile?
 }
 
-// CategoryHierarchy model represents a hierarchical structure of categories
-model CategoryHierarchy {
-  id          Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  name        String   // Name of the category
-  description String?  // Optional category description
-  level       Int      // Category level (depth in the hierarchy)
-  parentId    Int?     // Optional reference to the parent category
-  createdAt   DateTime @default(now()) // Timestamp when category was created
-  updatedAt   DateTime @updatedAt // Timestamp when category was last updated
-  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parentId], references: [id]) // Relation to parent category
-  children    CategoryHierarchy[] @relation("Hierarchy") // Relation to child categories
-  services    Service[] @relation("CategoryServices") // Relation to services in this category
+model Buyer {
+  id                String          @id
+  profileId         String          @unique
+  profile           PersonalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  totalSpent        Float           @default(0.0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-  // Many-to-many relation with Profile
-  profiles    Profile[] @relation("ProfileCategories") // Relation to profiles associated with this category
+  // Relations
+  purchasedServices Service[]       @relation("PurchasedServices")
 }
 
-// Service model represents a service offered by a freelancer
+// ------------------------
+// Profil Professionnel
+// ------------------------
+
+model ProfessionalProfile {
+  id               String          @id @default(uuid())
+  sellerId         String          @unique
+  personalWebsite  String?         // Lien vers le site web personnel
+  occupations      Json?           // Un tableau JSON pour stocker plusieurs occupations
+  skills           Json?           // Un tableau JSON pour stocker plusieurs compétences
+  educations       Json?           // Un tableau JSON pour stocker plusieurs entrées éducatives
+  certifications   Json?           // Un tableau JSON pour stocker plusieurs certifications
+  companyName      String?
+  profession       String?
+  experienceYears  Int?
+  website          String?
+  preferredCategoryId Int?         // Référence optionnelle à la catégorie préférée
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  // Relations
+  seller           Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  preferredCategory MainCategories? @relation(fields: [preferredCategoryId], references: [id])
+  PersonalProfile  PersonalProfile[]
+}
+
+
+// ------------------------
+// Modèles de Service
+// ------------------------
+
 model Service {
-  id            Int      @id @default(autoincrement())
+  id            String           @id @default(uuid())
   name          String
   description   String?
-  categoryId    Int
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  category      CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id])
-
   images        String[]
   tags          String[]
-
-  // Relations
-  creator       Profile  @relation("CreatedServices", fields: [creatorId], references: [id])
   creatorId     String
-  buyers        Profile[] @relation("PurchasedServices")
-  ratings       Rating[]  @relation("ServiceRatings")
-  
-  //  relation to GigPackage
-  packages      GigPackage[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relations
+  creator       Seller           @relation("CreatedServices", fields: [creatorId], references: [id])
+  buyers        Buyer[]          @relation("PurchasedServices")
+  ratings       Rating[]         @relation("ServiceRatings")
+  packages      ServicePackage[]
 }
 
-// New GigPackage model
-model GigPackage {
-  id          Int      @id @default(autoincrement())
-  serviceId   Int
-  name        String   // e.g., "Basic", "Standard", "Premium"
-  description String   // Add this line
-  price       Decimal  @db.Decimal(10, 2)
-  deliveryTime Int     // in days
-  revisions   Int
-  features    String[]
+model ServicePackage {
+  id            String    @id @default(uuid())
+  serviceId     String
+  name          String
+  description   String
+  price         Decimal   @db.Decimal(10, 2)
+  deliveryTime  Int
+  revisions     Int
+  features      String[]
 
-  // Relation to Service
-  service     Service  @relation(fields: [serviceId], references: [id])
+  // Relations
+  service       Service   @relation(fields: [serviceId], references: [id])
 }
 
-// Rating model for feedback on services
+// ------------------------
+// Modèle de Notation
+// ------------------------
+
 model Rating {
-  id         Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  buyerId    String   // Foreign key to Profile (buyer)
-  sellerId   String   // Foreign key to Profile (seller/freelancer)
-  serviceId  Int      // Foreign key to Service
-  rating     Int      // Rating score (e.g., 1 to 5)
-  review     String?  // Optional text review
-  createdAt  DateTime @default(now()) // Timestamp when rating was created
+  id              String           @id @default(uuid())
+  raterId         String
+  rateeId         String
+  serviceId       String?
+  customServiceId String?
+  rating          Int
+  review          String?
+  createdAt       DateTime         @default(now())
 
-  buyer      Profile  @relation("BuyerRatings", fields: [buyerId], references: [id]) // Relation to buyer
-  seller     Profile  @relation("FreelancerRatings", fields: [sellerId], references: [id]) // Relation to seller (freelancer)
-  service    Service  @relation("ServiceRatings", fields: [serviceId], references: [id]) // Relation to service
+  // Relations
+  rater           PersonalProfile  @relation("RatingRater", fields: [raterId], references: [id])
+  ratee           PersonalProfile  @relation("RatingRatee", fields: [rateeId], references: [id])
+  service         Service?         @relation("ServiceRatings", fields: [serviceId], references: [id])
+  customService   CustomService?   @relation(fields: [customServiceId], references: [id])
 }
 
-// Enums for fixed sets of values
-enum Role {
-  user      // Regular user role
-  admin     // Admin role
+// ------------------------
+// Demandes de Services Personnalisés
+// ------------------------
+
+model CustomService {
+  id             String                   @id @default(uuid())
+  creatorId      String
+  assigneeId     String?
+  title          String
+  description    String
+  minBudget      Decimal?                 @db.Decimal(10, 2)
+  maxBudget      Decimal?                 @db.Decimal(10, 2)
+  proposedPrice  Decimal?                 @db.Decimal(10, 2)
+  message        String?
+  status         RequestStatus            @default(PENDING)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  // Relations
+  creator        PersonalProfile          @relation("CustomServiceCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  ratings        Rating[]
+  participants   CustomServiceParticipant[]
 }
 
-enum Level {
-  beginner      // Beginner level
-  intermediate  // Intermediate level
-  advanced      // Advanced level
+model CustomServiceParticipant {
+  id               String            @id @default(uuid())
+  customServiceId  String
+  participantId    String
+  joinedAt         DateTime          @default(now())
+
+  // Relations
+  customService    CustomService     @relation(fields: [customServiceId], references: [id], onDelete: Cascade)
+  participant      PersonalProfile   @relation(fields: [participantId], references: [id], onDelete: Cascade)
 }
 
-enum Plan {
-  Travail_principal    // Main work
-  Travail_secondaire   // Side work
-  usage_personnel      // Personal use
-}
+// ------------------------
+// Modèles de Chat
+// ------------------------
 
-enum Jobs {
-  Graphisme_Design       
-  Programmation_Tech     
-  Marketing_digital      
-  Video_Animation        
-  Redaction_Traduction   
-  Musique_Audio         
-  Business               
-  Finance                
-  Services_IA            
-  Croissance_personnelle 
-  Consultations          
-  Photographie          
-}
-
-// ChatRoom model for managing conversations between freelancers and clients
 model ChatRoom {
-  id           Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  clientId     String   // Foreign key to Profile (client)
-  freelancerId String   // Foreign key to Profile (freelancer)
-  createdAt    DateTime @default(now()) // Timestamp when chat room was created
-  updatedAt    DateTime @updatedAt // Timestamp when chat room was last updated
+  id           String                @id @default(uuid())
+  title        String?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
 
   // Relations
-  client       Profile  @relation("ClientChatRooms", fields: [clientId], references: [id]) // Relation to client
-  freelancer   Profile  @relation("FreelancerChatRooms", fields: [freelancerId], references: [id]) // Relation to freelancer
-  messages     Message[] // Messages within this chat room
+  participants ChatRoomParticipant[] @relation("ChatRoomParticipants")
+  messages     Message[]
 }
 
-// Message model for individual chat messages
-model Message {
-  id         Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  chatRoomId Int      // Foreign key to ChatRoom
-  senderId   String   // Foreign key to Profile (sender of the message)
-  content    String   // Message content
-  createdAt  DateTime @default(now()) // Timestamp when the message was created
+model ChatRoomParticipant {
+  id             String           @id @default(uuid())
+  chatRoomId     String
+  participantId  String
+  role           String
+  createdAt      DateTime         @default(now())
 
   // Relations
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // Relation to the chat room
-  sender     Profile  @relation(fields: [senderId], references: [id]) // Relation to the sender
+  chatRoom       ChatRoom         @relation("ChatRoomParticipants", fields: [chatRoomId], references: [id])
+  profile        PersonalProfile  @relation("ProfileChatRooms", fields: [participantId], references: [id])
+}
+
+model Message {
+  id          String           @id @default(uuid())
+  chatRoomId  String
+  senderId    String
+  content     String
+  createdAt   DateTime         @default(now())
+
+  // Relations
+  chatRoom    ChatRoom         @relation(fields: [chatRoomId], references: [id])
+  sender      PersonalProfile  @relation("MessageSender", fields: [senderId], references: [id])
+}
+
+// ------------------------
+// Notifications
+// ------------------------
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  type        String?
+  content     String?
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  // Relations
+  recipient   PersonalProfile  @relation(fields: [recipientId], references: [id])
+}
+
+// ------------------------
+// Catégories
+// ------------------------
+
+model MainCategories {
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String?
+  level       Int
+  parentId    Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
+  children    MainCategories[] @relation("Hierarchy")
+  professionalProfiles ProfessionalProfile[] 
 }
