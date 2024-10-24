@@ -13,6 +13,7 @@ import {
   Bell,
   HelpCircle,
   Home,
+  LayoutDashboard,
   LogOut,
   Settings,
   UserCog,
@@ -91,6 +92,14 @@ export default function UserMenu({ data }: UserMenuProps) {
               <span>Home</span>
             </Link>
           </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link href="/seller-dashboard" className="flex items-center">
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              <span>Seller Dashboard</span>
+            </Link>
+          </DropdownMenuItem>
+
           <DropdownMenuItem asChild>
             <Link href="/help" className="flex items-center">
               <HelpCircle className="w-4 h-4 mr-2" />

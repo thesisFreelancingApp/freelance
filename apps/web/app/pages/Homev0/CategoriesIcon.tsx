@@ -33,7 +33,9 @@ export default function CategoriesGrid() {
             </div>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                 {categories.map((category) => (
-                    <div key={category.name} className="flex flex-col items-center group cursor-pointer">
+                    
+                    <div onClick={() => handleCategory(category.id)} key={category.name} className="flex flex-col items-center group cursor-pointer">
+
                         <Image
                             src={category.icon}
                             alt={category.name}

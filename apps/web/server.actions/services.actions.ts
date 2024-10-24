@@ -239,3 +239,39 @@ export const getServicesByCategory = async (categoryId: number) => {
   });
   return services;
 };
+
+export const getRelatedServices = async (
+  categoryId: number,
+  currentServiceId: number,
+  limit = 3,
+) => {
+  const services = await prisma.service.findMany({
+    where: {
+      categoryId: categoryId,
+      id: { not: currentServiceId },
+    },
+    take: limit,
+    include: {
+      ratings: true,
+      creator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+          sellerRating: true,
+        },
+      },
+      category: true,
+      packages: true,
+    },
+  });
+
+  return services.map((service) => ({
+    ...service,
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(),
+    })),
+  }));
+};
