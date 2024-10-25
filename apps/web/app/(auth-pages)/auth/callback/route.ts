@@ -1,5 +1,5 @@
 "use server";
-import { welcomeBack, welcome } from "@/config/routes";
+import { welcome, welcomeBack } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
@@ -136,7 +136,6 @@ export async function GET(request: Request) {
         profile: {
           create: {
             userEmail: email,
-            // You can add more profile fields here if needed
           },
         },
       },
