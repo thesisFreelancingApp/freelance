@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
+
 export async function updateProfileWithEmail(profileData: {
   firstName?: string;
   lastName?: string;
@@ -17,8 +18,11 @@ export async function updateProfileWithEmail(profileData: {
       console.log("Erreur lors de la récupération de l'utilisateur:", error);
       return false;
     }
+
     const email = user.user.email;
-    await prisma.profile.update({
+
+    // Mise à jour du profil dans la table PersonalProfile
+    await prisma.personalProfile.update({
       where: { userEmail: email },
       data: {
         firstName: profileData.firstName,
@@ -39,7 +43,7 @@ export async function updateProfileWithEmail(profileData: {
 
 export async function getUserProfile(email: string) {
   try {
-    const userProfile = await prisma.profile.findUnique({
+    const userProfile = await prisma.personalProfile.findUnique({
       where: { userEmail: email },
       select: {
         firstName: true,

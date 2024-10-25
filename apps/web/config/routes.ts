@@ -1,7 +1,7 @@
 // List of protected routes
 export const protectedRoutes = [
-  "/username",
-  "/complete-profile",
+  "/welcome",
+  "/welcome-back",
   "/hello",
   "/settings",
   "/profile",
@@ -12,7 +12,7 @@ export const protectedRoutes = [
 export const nonAuthRoutes = ["/sign-in", "/sign-up"];
 
 // List of post Auth routes
-export const welcome = "/username";
+export const welcome = "/welcome";
 
 export const logout = "/see-you-soon";
 

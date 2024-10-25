@@ -1,5 +1,5 @@
 "use server";
-import { welcomeBack } from "@/config/routes";
+import { welcomeBack, welcome } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
@@ -160,6 +160,6 @@ export async function GET(request: Request) {
   }
 
   return isNewUser
-    ? NextResponse.redirect(`${origin}/username`)
+    ? NextResponse.redirect(`${origin}${welcome}`)
     : NextResponse.redirect(`${origin}${welcomeBack}`);
 }
