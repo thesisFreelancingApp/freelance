@@ -1,3 +1,6 @@
+"use server"
+
+
 import prisma from "@/lib/prismaClient";
 
 export const createProfessionalProfile = async (data: {
@@ -12,7 +15,7 @@ export const createProfessionalProfile = async (data: {
   profession?: string;
   experienceYears?: number;
   website?: string;
-  preferredCategoryId?: number;
+//   preferredCategoryId?: number;
 }) => {
   const newProfile = await prisma.professionalProfile.create({
     data: {
@@ -27,7 +30,7 @@ export const createProfessionalProfile = async (data: {
       profession: data.profession || null,
       experienceYears: data.experienceYears || null,
       website: data.website || null,
-      preferredCategoryId: data.preferredCategoryId || null,
+    //   preferredCategoryId: data.preferredCategoryId || null,
     },
   });
 

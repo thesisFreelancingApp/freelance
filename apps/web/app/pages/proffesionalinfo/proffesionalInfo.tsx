@@ -1,34 +1,60 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createProfessionalProfile } from "@/server.actions/info"; // Make sure the path is correct
 
-type Skill = { name: string; level: string }
-type Education = { country: string; university: string; title: string; major: string; year: string }
-type Certification = { name: string; issuer: string; year: string }
+type Skill = { name: string; level: string };
+type Education = { country: string; university: string; title: string; major: string; year: string };
+type Certification = { name: string; issuer: string; year: string };
 
 export default function ProfessionalInfoForm() {
-  const [occupation, setOccupation] = useState("")
-  const [occupationFrom, setOccupationFrom] = useState("")
-  const [occupationTo, setOccupationTo] = useState("")
-  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }])
-  const [education, setEducation] = useState<Education[]>([{ country: "", university: "", title: "", major: "", year: "" }])
-  const [certifications, setCertifications] = useState<Certification[]>([{ name: "", issuer: "", year: "" }])
-  const [website, setWebsite] = useState("")
+  const [occupation, setOccupation] = useState("");
+  const [occupationFrom, setOccupationFrom] = useState("");
+  const [occupationTo, setOccupationTo] = useState("");
+  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }]);
+  const [education, setEducation] = useState<Education[]>([{ country: "", university: "", title: "", major: "", year: "" }]);
+  const [certifications, setCertifications] = useState<Certification[]>([{ name: "", issuer: "", year: "" }]);
+  const [website, setWebsite] = useState("");
 
-  const addSkill = () => setSkills([...skills, { name: "", level: "" }])
-  const removeSkill = (index: number) => setSkills(skills.filter((_, i) => i !== index))
+  const addSkill = () => setSkills([...skills, { name: "", level: "" }]);
+  const removeSkill = (index: number) => setSkills(skills.filter((_, i) => i !== index));
 
-  const addEducation = () => setEducation([...education, { country: "", university: "", title: "", major: "", year: "" }])
-  const removeEducation = (index: number) => setEducation(education.filter((_, i) => i !== index))
+  const addEducation = () => setEducation([...education, { country: "", university: "", title: "", major: "", year: "" }]);
+  const removeEducation = (index: number) => setEducation(education.filter((_, i) => i !== index));
 
-  const addCertification = () => setCertifications([...certifications, { name: "", issuer: "", year: "" }])
-  const removeCertification = (index: number) => setCertifications(certifications.filter((_, i) => i !== index))
+  const addCertification = () => setCertifications([...certifications, { name: "", issuer: "", year: "" }]);
+  const removeCertification = (index: number) => setCertifications(certifications.filter((_, i) => i !== index));
+
+  const handleSubmit = async () => {
+    const sellerId = "23b7525f-7c3d-4136-bc7a-39c4d8f25b24";
+
+    try {
+      await createProfessionalProfile({
+        sellerId,
+        language: ["English"], // Update this with proper languages
+        personalWebsite: website,
+        occupations: JSON.stringify([{ occupation, from: occupationFrom, to: occupationTo }]),
+        skills: JSON.stringify(skills),
+        educations: JSON.stringify(education),
+        certifications: JSON.stringify(certifications),
+        companyName: "Your Company", // Optional: Update this with real company name
+        profession: occupation,
+        experienceYears: 5, // Optional: You can make this dynamic
+        website,
+        // preferredCategoryId: 1, // Optional: Update with dynamic category selection
+      });
+      alert("Profile created successfully!");
+    } catch (error) {
+      console.error("Error creating profile:", error);
+      alert("There was an error creating your profile. Please try again.");
+    }
+  };
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -67,18 +93,18 @@ export default function ProfessionalInfoForm() {
               <Input
                 value={skill.name}
                 onChange={(e) => {
-                  const newSkills = [...skills]
-                  newSkills[index].name = e.target.value
-                  setSkills(newSkills)
+                  const newSkills = [...skills];
+                  newSkills[index].name = e.target.value;
+                  setSkills(newSkills);
                 }}
                 placeholder="Skill name"
               />
               <Select
                 value={skill.level}
                 onValueChange={(value) => {
-                  const newSkills = [...skills]
-                  newSkills[index].level = value
-                  setSkills(newSkills)
+                  const newSkills = [...skills];
+                  newSkills[index].level = value;
+                  setSkills(newSkills);
                 }}
               >
                 <SelectTrigger className="w-[180px]">
@@ -110,45 +136,45 @@ export default function ProfessionalInfoForm() {
               <Input
                 value={edu.country}
                 onChange={(e) => {
-                  const newEducation = [...education]
-                  newEducation[index].country = e.target.value
-                  setEducation(newEducation)
+                  const newEducation = [...education];
+                  newEducation[index].country = e.target.value;
+                  setEducation(newEducation);
                 }}
                 placeholder="Country"
               />
               <Input
                 value={edu.university}
                 onChange={(e) => {
-                  const newEducation = [...education]
-                  newEducation[index].university = e.target.value
-                  setEducation(newEducation)
+                  const newEducation = [...education];
+                  newEducation[index].university = e.target.value;
+                  setEducation(newEducation);
                 }}
                 placeholder="University"
               />
               <Input
                 value={edu.title}
                 onChange={(e) => {
-                  const newEducation = [...education]
-                  newEducation[index].title = e.target.value
-                  setEducation(newEducation)
+                  const newEducation = [...education];
+                  newEducation[index].title = e.target.value;
+                  setEducation(newEducation);
                 }}
                 placeholder="Title"
               />
               <Input
                 value={edu.major}
                 onChange={(e) => {
-                  const newEducation = [...education]
-                  newEducation[index].major = e.target.value
-                  setEducation(newEducation)
+                  const newEducation = [...education];
+                  newEducation[index].major = e.target.value;
+                  setEducation(newEducation);
                 }}
                 placeholder="Major"
               />
               <Input
                 value={edu.year}
                 onChange={(e) => {
-                  const newEducation = [...education]
-                  newEducation[index].year = e.target.value
-                  setEducation(newEducation)
+                  const newEducation = [...education];
+                  newEducation[index].year = e.target.value;
+                  setEducation(newEducation);
                 }}
                 placeholder="Year"
               />
@@ -171,27 +197,27 @@ export default function ProfessionalInfoForm() {
               <Input
                 value={cert.name}
                 onChange={(e) => {
-                  const newCertifications = [...certifications]
-                  newCertifications[index].name = e.target.value
-                  setCertifications(newCertifications)
+                  const newCertifications = [...certifications];
+                  newCertifications[index].name = e.target.value;
+                  setCertifications(newCertifications);
                 }}
                 placeholder="Certificate name"
               />
               <Input
                 value={cert.issuer}
                 onChange={(e) => {
-                  const newCertifications = [...certifications]
-                  newCertifications[index].issuer = e.target.value
-                  setCertifications(newCertifications)
+                  const newCertifications = [...certifications];
+                  newCertifications[index].issuer = e.target.value;
+                  setCertifications(newCertifications);
                 }}
                 placeholder="Issuing body"
               />
               <Input
                 value={cert.year}
                 onChange={(e) => {
-                  const newCertifications = [...certifications]
-                  newCertifications[index].year = e.target.value
-                  setCertifications(newCertifications)
+                  const newCertifications = [...certifications];
+                  newCertifications[index].year = e.target.value;
+                  setCertifications(newCertifications);
                 }}
                 placeholder="Year"
               />
@@ -213,12 +239,14 @@ export default function ProfessionalInfoForm() {
             id="website"
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
-            placeholder="https://example.com"
+            placeholder="https://"
           />
         </div>
 
-        <Button className="w-full">Continue</Button>
+        <Button onClick={handleSubmit} className="w-full">
+          Submit
+        </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
