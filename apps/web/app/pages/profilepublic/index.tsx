@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getUserProfileByUsername } from '@/server.actions/profilePublic/profilePublic.actions';
-import Profile from '@/app/pages/profilepublic/profile';
 import { GetServerSidePropsContext } from 'next';
+import { StarIcon, MapPinIcon, GlobeAltIcon, HeartIcon } from '@heroicons/react/24/solid';
+import Profile from './profile';
+import UserProfileCard from './profilecontactemoi';
 
 type UserProfile = {
   firstName?: string | null;
@@ -11,34 +13,72 @@ type UserProfile = {
   address?: string | null;
   phoneNumber?: string | null;
   bio?: string | null;
+  profilePic?: string | null;
+  title?: string | null;
+  rating?: number;
+  reviews?: number;
+  languages?: string[];
+  skills?: string[];
 };
 
+export default function UserProfilePage({ username }: { username: string }) {
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const userProfile = await getUserProfileByUsername(username);
+        if (userProfile) {
+          setProfile(userProfile as UserProfile);
+        } else {
+          console.error("Profil utilisateur non trouvé");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération du profil utilisateur :", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProfile();
+  }, [username]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Chargement...</div>;
+  }
+
+  if (!profile) {
+    return <div className="flex justify-center items-center h-screen">Profil non trouvé</div>;
+  }
+
+  return (
+    <p>hello</p>
+    
+    // <div className="flex justify-between items-start space-x-8 mb-5">
+    //   <div className="w-2/3">
+    //     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    //       <Profile profile={{ ...profile, username: username, profilePic: profile.profilePic || '/placeholder.svg' }} />
+    //     </div>
+    //   </div>
+    //   <div className="flex">
+    //     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    //       <UserProfileCard
+    //         firstName={profile.firstName || ''}
+    //         lastName={profile.lastName || ''}
+    //         username={profile.username || ''}
+    //         profilePic={profile.profilePic || '/placeholder.svg'}
+    //       />
+    //     </div>
+    //   </div>
+    // </div>
+  );
+}
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { username } = context.params || {};
   if (typeof username !== 'string') {
-    return { props: { userProfile: null } }; // Handle the case where username is not a string
+    return { props: { initialUsername: '' } };
   }
-  const userProfile = await getUserProfileByUsername(username);
-  return { props: { userProfile } };
+  return { props: { initialUsername: username } };
 }
-
-const UserProfilePage = ({ userProfile }: { userProfile: UserProfile | null }) => {
-  if (!userProfile) {
-    return <div>User not found</div>;
-  }
-
-  return (
-    <Profile
-      firstName={userProfile.firstName || ''}
-      lastName={userProfile.lastName || ''}
-      username={userProfile.username || ''}
-      email={userProfile.userEmail || ''}
-      address={userProfile.address || ''}
-      phoneNumber={userProfile.phoneNumber || ''}
-      bio={userProfile.bio || ''}
-    />
-  );
-};
-
-export default UserProfilePage;
