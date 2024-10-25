@@ -31,7 +31,7 @@ enum Role {
 model AuthUser {
   id        String           @id
   email     String           @unique
-role     Role   @default(USER)
+  role      Role             @default(USER)
   name      String?
   username  String           @unique
   account   Account?
@@ -64,6 +64,7 @@ model PersonalProfile {
   firstName             String?
   lastName              String?
   profilePic            String?
+  title                 String?
   phoneNumber           String?
   address               String?
   bio                   String?
@@ -81,7 +82,7 @@ model PersonalProfile {
   chatRooms             ChatRoomParticipant[] @relation("ProfileChatRooms")
   ratingsGiven          Rating[]              @relation("RatingRater")
   ratingsReceived       Rating[]              @relation("RatingRatee")
-  createdServices       CustomService[]       @relation("CustomServiceCreator")
+  createdProjects      Projects[]       @relation("CustomServiceCreator")
   participantIn         CustomServiceParticipant[]
   professionalProfile   ProfessionalProfile? @relation(fields: [professionalProfileid], references: [id])
 
@@ -186,7 +187,7 @@ model Rating {
   raterId         String
   rateeId         String
   serviceId       String?
-  customServiceId String?
+  projectsId     String?
   rating          Int
   review          String?
   createdAt       DateTime         @default(now())
@@ -195,14 +196,14 @@ model Rating {
   rater           PersonalProfile  @relation("RatingRater", fields: [raterId], references: [id])
   ratee           PersonalProfile  @relation("RatingRatee", fields: [rateeId], references: [id])
   service         Service?         @relation("ServiceRatings", fields: [serviceId], references: [id])
-  customService   CustomService?   @relation(fields: [customServiceId], references: [id])
+  projects   Projects?   @relation(fields: [projectsId], references: [id])
 }
 
 // ------------------------
 // Demandes de Services Personnalisés
 // ------------------------
 
-model CustomService {
+model Projects {
   id             String                   @id @default(uuid())
   creatorId      String
   assigneeId     String?
@@ -229,7 +230,7 @@ model CustomServiceParticipant {
   joinedAt         DateTime          @default(now())
 
   // Relations
-  customService    CustomService     @relation(fields: [customServiceId], references: [id], onDelete: Cascade)
+  customService    Projects    @relation(fields: [customServiceId], references: [id], onDelete: Cascade)
   participant      PersonalProfile   @relation(fields: [participantId], references: [id], onDelete: Cascade)
 }
 

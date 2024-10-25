@@ -62,7 +62,7 @@ export default function RootLayout({
             <Header />
 
             {/* Main Content Area */}
-            <main className="flex flex-col items-center justify-center flex-1 w-full min-h-[90vh] gap-10 md:gap-20">
+            <main className="flex flex-col items-center  align-top  flex-1 w-full min-h-[80vh] gap-10 md:gap-20">
               {children}
             </main>
 

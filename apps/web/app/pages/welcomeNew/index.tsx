@@ -48,21 +48,33 @@ export default function MultiStepFormPage() {
     null,
   );
   const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
-  const [fieldErrors, setFieldErrors] = React.useState({
-    firstName: false,
-    lastName: false,
-    address: false,
-    birthDate: false,
-    phoneNumber: false,
-    bio: false,
+
+  // Mise à jour de fieldErrors avec string | null pour des messages d'erreur
+  const [fieldErrors, setFieldErrors] = React.useState<
+    Record<string, string | null>
+  >({
+    firstName: null,
+    lastName: null,
+    address: null,
+    birthDate: null,
+    phoneNumber: null,
+    bio: null,
   });
+
   const [profile, setProfile] = React.useState<ProfileData>(initialProfile);
 
   const validateField = (name: string, value: string | Date | undefined) => {
-    const errors: { [key: string]: boolean } = {};
-    errors[name] = !value;
+    const errors: { [key: string]: string | null } = {};
+
+    // Validation basique : champ requis
+    if (!value) {
+      errors[name] = `Ce champ est requis.`;
+    } else {
+      errors[name] = null;
+    }
+
     setFieldErrors((prev) => ({ ...prev, ...errors }));
-    return errors[name];
+    return !!errors[name];
   };
 
   const handleCheckUsername = async () => {
@@ -148,6 +160,7 @@ export default function MultiStepFormPage() {
             profile={profile}
             setProfile={setProfile}
             fieldErrors={fieldErrors}
+            setFieldErrors={setFieldErrors} // Ajout de setFieldErrors comme prop
             handleUpdateProfile={handleUpdateProfile}
             handleInputChange={handleInputChange}
             loading={loading}

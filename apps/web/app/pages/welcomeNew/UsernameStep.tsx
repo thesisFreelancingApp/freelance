@@ -1,9 +1,10 @@
-"use client ";
+"use client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import * as React from "react";
+
 interface UsernameStepProps {
   username: string;
   setUsername: React.Dispatch<React.SetStateAction<string>>;
@@ -33,6 +34,14 @@ export default function UsernameStep({
     }
   }, [username]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    // Allow only lowercase letters and numbers
+    if (/^[a-z0-9]*$/.test(newValue)) {
+      setUsername(newValue);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -40,7 +49,7 @@ export default function UsernameStep({
         <Input
           id="username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={handleInputChange}
           placeholder="Entrez votre nom d'utilisateur"
         />
       </div>
@@ -50,7 +59,7 @@ export default function UsernameStep({
         </Alert>
       )}
       {isAvailable && (
-        <Alert variant="default">
+        <Alert variant="success">
           <AlertDescription>Nom d'utilisateur disponible</AlertDescription>
         </Alert>
       )}

@@ -53,25 +53,22 @@ export default function UserProfilePage({ username }: { username: string }) {
   }
 
   return (
-    <p>hello</p>
     
-    // <div className="flex justify-between items-start space-x-8 mb-5">
-    //   <div className="w-2/3">
-    //     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-    //       <Profile profile={{ ...profile, username: username, profilePic: profile.profilePic || '/placeholder.svg' }} />
-    //     </div>
-    //   </div>
-    //   <div className="flex">
-    //     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-    //       <UserProfileCard
-    //         firstName={profile.firstName || ''}
-    //         lastName={profile.lastName || ''}
-    //         username={profile.username || ''}
-    //         profilePic={profile.profilePic || '/placeholder.svg'}
-    //       />
-    //     </div>
-    //   </div>
-    // </div>
+    
+    <div className="flex items-start space-x-8 mb-5">
+      
+        
+          <Profile profile={{ ...profile, username: username, profilePic: profile.profilePic || '/placeholder.svg' }} />
+
+    
+      <UserProfileCard
+      
+            firstName={profile.firstName || ''}
+            lastName={profile.lastName || ''}
+            username={profile.username || ''}
+            profilePic={profile.profilePic || '/placeholder.svg'}
+          />
+    </div>
   );
 }
 
