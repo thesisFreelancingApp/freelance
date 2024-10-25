@@ -1,10 +1,11 @@
-import { welcomeBack } from "@/config/routes";
+"use server";
+import { welcomeBack, welcome } from "@/config/routes";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { encodedRedirect } from "@/lib/utils-encodedRedirect";
 import { NextResponse } from "next/server";
 
-// Journalisation avancée des erreurs
+// Advanced error logging
 function logError(errorMessage: string, details?: any) {
   console.error(
     `[${new Date().toISOString()}] ERROR: ${errorMessage}`,
@@ -12,7 +13,7 @@ function logError(errorMessage: string, details?: any) {
   );
 }
 
-// Fonction utilitaire pour récupérer la session et l'utilisateur
+// Utility function to get session and user
 async function fetchSessionAndUser(supabase: any) {
   const [
     { data: sessionData, error: sessionError },
@@ -25,7 +26,7 @@ async function fetchSessionAndUser(supabase: any) {
   return { sessionData, userData, sessionError, userError };
 }
 
-// Met à jour le compte uniquement si les données ont changé
+// Update account only if data has changed
 async function updateAccountIfNeeded(
   existingUser: any,
   provider: string,
@@ -61,13 +62,12 @@ async function updateAccountIfNeeded(
   }
 }
 
-// La fonction principale qui traite la requête GET
+// Main function that handles GET request
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.origin;
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
-  // console.log("here------------------------", redirectTo);
 
   const supabase = createClient();
   let isNewUser = false;
@@ -118,9 +118,11 @@ export async function GET(request: Request) {
   if (!existingUser) {
     const newUser = await prisma.authUser.create({
       data: {
+        id: user.id,
         email,
         name: fullName,
-        id: user.id,
+        username: "user" + user.id,
+        role: "USER",
         account: {
           create: {
             providerAccountId,
@@ -133,9 +135,8 @@ export async function GET(request: Request) {
         },
         profile: {
           create: {
-            username: "user" + user.id,
             userEmail: email,
-            role: "user",
+            // You can add more profile fields here if needed
           },
         },
       },
@@ -159,6 +160,6 @@ export async function GET(request: Request) {
   }
 
   return isNewUser
-    ? NextResponse.redirect(`${origin}/username`)
+    ? NextResponse.redirect(`${origin}${welcome}`)
     : NextResponse.redirect(`${origin}${welcomeBack}`);
 }

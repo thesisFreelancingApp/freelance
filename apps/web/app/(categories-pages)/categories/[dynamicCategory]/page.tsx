@@ -1,6 +1,4 @@
 import { decodeHelper } from "@/hooks/use-Url";
-import { useSearchParams } from "next/navigation";
-
 const SubCategoryPage = ({
   params,
 }: {

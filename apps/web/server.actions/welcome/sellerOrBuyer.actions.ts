@@ -1,63 +1,71 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
-export async function updateProfileWithEmail(profileData: {
-  firstName?: string;
-  lastName?: string;
-  address?: string;
-  birthDate?: Date;
-  phoneNumber?: string;
-  bio?: string;
-}): Promise<boolean> {
-  try {
-    // Initialiser le client Supabase
-    const supabase = createClient();
-    const { data: user, error } = await supabase.auth.getUser();
-    if (error || !user.user?.email) {
-      console.log("Erreur lors de la récupération de l'utilisateur:", error);
-      return false;
-    }
-    const email = user.user.email;
-    await prisma.profile.update({
-      where: { userEmail: email },
-      data: {
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        address: profileData.address,
-        birthDate: profileData.birthDate,
-        phoneNumber: profileData.phoneNumber,
-        bio: profileData.bio,
-      },
-    });
 
-    return true; // Mise à jour réussie
-  } catch (error) {
-    console.log("Erreur lors de la mise à jour du profil:", error);
-    return false; // En cas d'erreur, retourne false
-  }
+interface InitializeBuyerAndSellerProfileOptions {
+  buyer?: boolean;
+  seller?: boolean;
 }
 
-export async function getUserProfile(email: string) {
+export async function initializeBuyerAndSellerProfile({
+  buyer = false,
+  seller = false,
+}: InitializeBuyerAndSellerProfileOptions) {
   try {
-    const userProfile = await prisma.profile.findUnique({
-      where: { userEmail: email },
-      select: {
-        firstName: true,
-        lastName: true,
-        address: true,
-        birthDate: true,
-        phoneNumber: true,
-        bio: true,
-      },
-    });
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
 
-    if (!userProfile) {
-      throw new Error("Profil non trouvé");
+    if (error || !user.user?.email) {
+      console.log("Error retrieving user:", error);
+      return { success: false, message: "User email not found." };
     }
 
-    return userProfile; // Retourne les données du profil
+    const email = user.user.email;
+
+    // Find the existing PersonalProfile by email
+    const personalProfile = await prisma.personalProfile.findUnique({
+      where: { userEmail: email },
+    });
+
+    if (!personalProfile) {
+      return {
+        success: false,
+        message: "Personal profile not found for the given email.",
+      };
+    }
+
+    const profileId = personalProfile.id;
+
+    // Conditionally create a `Buyer` profile
+    if (buyer) {
+      await prisma.buyer.create({
+        data: {
+          id: profileId, // Set Buyer ID to match PersonalProfile ID
+          profileId: profileId, // Link to the existing PersonalProfile
+        },
+      });
+    }
+
+    // Conditionally create a `Seller` profile without `ProfessionalProfile`
+    if (seller) {
+      await prisma.seller.create({
+        data: {
+          id: profileId, // Set Seller ID to match PersonalProfile ID
+          profileId: profileId, // Link to the existing PersonalProfile
+          language: [], // Initialize an empty language array or a default if needed
+        },
+      });
+    }
+
+    return {
+      success: true,
+      message: "Buyer and/or Seller profile initialized successfully.",
+    };
   } catch (error) {
-    console.log("Erreur lors de la récupération du profil:", error);
-    throw new Error("Impossible de récupérer le profil utilisateur");
+    console.error("Error initializing Buyer and/or Seller profile(s):", error);
+    return {
+      success: false,
+      message: "Failed to initialize Buyer and/or Seller profile(s).",
+    };
   }
 }
