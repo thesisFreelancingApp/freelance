@@ -91,7 +91,6 @@ model PersonalProfile {
 model Seller {
   id                   String               @id
   profileId            String               @unique
-  language             String[]
   profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
   sellerRating         Float?
   totalEarnings        Float                @default(0.0)
@@ -122,6 +121,7 @@ model Buyer {
 model ProfessionalProfile {
   id               String          @id @default(uuid())
   sellerId         String          @unique
+  language             String[]
   personalWebsite  String?         // Lien vers le site web personnel
   occupations      Json?           // Un tableau JSON pour stocker plusieurs occupations
   skills           Json?           // Un tableau JSON pour stocker plusieurs compétences
