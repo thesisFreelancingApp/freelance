@@ -64,6 +64,7 @@ model PersonalProfile {
   firstName             String?
   lastName              String?
   profilePic            String?
+  title                 String?
   phoneNumber           String?
   address               String?
   bio                   String?
