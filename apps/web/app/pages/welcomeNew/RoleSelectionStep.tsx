@@ -63,19 +63,23 @@ export default function RoleSelectionStep({
           onClick={() => setIsBuyerSelected((prev) => !prev)}
         >
           <CardHeader>
-            <CardTitle>Devenir Buyer</CardTitle>
+            <CardTitle>Devenir Client</CardTitle>
             <CardDescription>
               Accédez aux services en tant qu'acheteur.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p>
-              En tant que Buyer, vous pouvez parcourir et acheter des services.
+              En tant que Client, vous pouvez parcourir et acheter des services.
             </p>
           </CardContent>
-          {isBuyerSelected && (
+          {isBuyerSelected ? (
             <CardFooter>
               <p className="text-primary">Sélectionné</p>
+            </CardFooter>
+          ) : (
+            <CardFooter>
+              <p className="text-transparent ">Sélectionné</p>
             </CardFooter>
           )}
         </Card>
@@ -84,20 +88,24 @@ export default function RoleSelectionStep({
           onClick={() => setIsSellerSelected((prev) => !prev)}
         >
           <CardHeader>
-            <CardTitle>Devenir Seller</CardTitle>
+            <CardTitle>Devenir Freelanceur</CardTitle>
             <CardDescription>
               Vendez vos services et atteignez plus de clients.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p>
-              En tant que Seller, vous pouvez offrir des services et être payé
-              par les Buyers.
+              En tant que Freelanceur, vous pouvez offrir des services et être
+              payé.
             </p>
           </CardContent>
-          {isSellerSelected && (
+          {isSellerSelected ? (
             <CardFooter>
               <p className="text-primary">Sélectionné</p>
+            </CardFooter>
+          ) : (
+            <CardFooter>
+              <p className="text-transparent ">Sélectionné</p>
             </CardFooter>
           )}
         </Card>

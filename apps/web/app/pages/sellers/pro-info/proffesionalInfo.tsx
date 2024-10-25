@@ -1,97 +1,97 @@
-'use client'
+"use client";
 
-import { useState } from "react"
-import { Trash2, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { createProfessionalProfile } from "@/server.actions/info" // Update this path accordingly
-import { useRouter } from "next/navigation"
-import * as Toast from "@radix-ui/react-toast"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/select";
+import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info"; // Update this path accordingly
+import * as Toast from "@radix-ui/react-toast";
+import { Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-type Occupation = { title: string; from: string; to: string }
-type Skill = { name: string; level: string }
+type Occupation = { title: string; from: string; to: string };
+type Skill = { name: string; level: string };
 type Education = {
-  country: string
-  university: string
-  title: string
-  major: string
-  year: string
-}
-type Certification = { name: string; issuer: string; year: string }
-type Language = { name: string; proficiency: string }
+  country: string;
+  university: string;
+  title: string;
+  major: string;
+  year: string;
+};
+type Certification = { name: string; issuer: string; year: string };
+type Language = { name: string; proficiency: string };
 
 export default function ProfessionalInfoForm() {
-  const [currentStep, setCurrentStep] = useState(1)
-  const totalSteps = 3
-  const progress = (currentStep / totalSteps) * 100
-  
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 3;
+  const progress = (currentStep / totalSteps) * 100;
+
   // Page 1 States
   const [occupations, setOccupations] = useState<Occupation[]>([
-    { title: "", from: "", to: "" }
-  ])
-  const [companyName, setCompanyName] = useState("")
-  const [profession, setProfession] = useState("")
-  const [experienceYears, setExperienceYears] = useState<number | "">("")
+    { title: "", from: "", to: "" },
+  ]);
+  const [companyName, setCompanyName] = useState("");
+  const [profession, setProfession] = useState("");
+  const [experienceYears, setExperienceYears] = useState<number | "">("");
 
   // Page 2 States
-  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }])
+  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }]);
   const [education, setEducation] = useState<Education[]>([
     { country: "", university: "", title: "", major: "", year: "" },
-  ])
+  ]);
 
   // Page 3 States
   const [certifications, setCertifications] = useState<Certification[]>([
     { name: "", issuer: "", year: "" },
-  ])
+  ]);
   const [languages, setLanguages] = useState<Language[]>([
     { name: "", proficiency: "" },
-  ])
-  const [website, setWebsite] = useState("")
+  ]);
+  const [website, setWebsite] = useState("");
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const [toastOpen, setToastOpen] = useState(false)
-  const [toastMessage, setToastMessage] = useState("")
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const addOccupation = () => {
-    setOccupations([...occupations, { title: "", from: "", to: "" }])
-  }
+    setOccupations([...occupations, { title: "", from: "", to: "" }]);
+  };
 
   const removeOccupation = (index: number) => {
-    setOccupations(occupations.filter((_, i) => i !== index))
-  }
+    setOccupations(occupations.filter((_, i) => i !== index));
+  };
 
-  const addSkill = () => setSkills([...skills, { name: "", level: "" }])
+  const addSkill = () => setSkills([...skills, { name: "", level: "" }]);
   const removeSkill = (index: number) =>
-    setSkills(skills.filter((_, i) => i !== index))
+    setSkills(skills.filter((_, i) => i !== index));
 
   const addEducation = () =>
     setEducation([
       ...education,
       { country: "", university: "", title: "", major: "", year: "" },
-    ])
+    ]);
   const removeEducation = (index: number) =>
-    setEducation(education.filter((_, i) => i !== index))
+    setEducation(education.filter((_, i) => i !== index));
 
   const addCertification = () =>
-    setCertifications([...certifications, { name: "", issuer: "", year: "" }])
+    setCertifications([...certifications, { name: "", issuer: "", year: "" }]);
   const removeCertification = (index: number) =>
-    setCertifications(certifications.filter((_, i) => i !== index))
+    setCertifications(certifications.filter((_, i) => i !== index));
 
   const addLanguage = () =>
-    setLanguages([...languages, { name: "", proficiency: "" }])
+    setLanguages([...languages, { name: "", proficiency: "" }]);
   const removeLanguage = (index: number) =>
-    setLanguages(languages.filter((_, i) => i !== index))
+    setLanguages(languages.filter((_, i) => i !== index));
 
   const handleSubmit = async () => {
     const profileData = {
@@ -105,35 +105,35 @@ export default function ProfessionalInfoForm() {
       educations: education,
       certifications,
       website,
-    }
+    };
 
-    console.log("Profile Data to Submit:", profileData)
+    console.log("Profile Data to Submit:", profileData);
 
     try {
-      const newProfile = await createProfessionalProfile(profileData)
-      console.log("Profile created:", newProfile)
-      setToastMessage("Profile created successfully!")
-      setToastOpen(true)
+      const newProfile = await createProfessionalProfile(profileData);
+      console.log("Profile created:", newProfile);
+      setToastMessage("Profile created successfully!");
+      setToastOpen(true);
       // router.push("/") // Redirect after successful profile creation
     } catch (error) {
-      console.error("Error creating profile:", error)
-      setToastMessage("Error creating profile. Please try again.")
-      setToastOpen(true)
+      console.error("Error creating profile:", error);
+      setToastMessage("Error creating profile. Please try again.");
+      setToastOpen(true);
     }
-  }
+  };
 
   const getStepTitle = (step: number) => {
     switch (step) {
       case 1:
-        return "Basic Professional Info"
+        return "Basic Professional Info";
       case 2:
-        return "Skills and Education"
+        return "Skills and Education";
       case 3:
-        return "Additional Information"
+        return "Additional Information";
       default:
-        return ""
+        return "";
     }
-  }
+  };
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -149,13 +149,13 @@ export default function ProfessionalInfoForm() {
               <Label>Your Occupations</Label>
               {occupations.map((occupation, index) => (
                 <div key={index} className="space-y-2">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                     <Input
                       value={occupation.title}
                       onChange={(e) => {
-                        const newOccupations = [...occupations]
-                        newOccupations[index].title = e.target.value
-                        setOccupations(newOccupations)
+                        const newOccupations = [...occupations];
+                        newOccupations[index].title = e.target.value;
+                        setOccupations(newOccupations);
                       }}
                       placeholder="Enter occupation"
                     />
@@ -163,9 +163,9 @@ export default function ProfessionalInfoForm() {
                       type="date"
                       value={occupation.from}
                       onChange={(e) => {
-                        const newOccupations = [...occupations]
-                        newOccupations[index].from = e.target.value
-                        setOccupations(newOccupations)
+                        const newOccupations = [...occupations];
+                        newOccupations[index].from = e.target.value;
+                        setOccupations(newOccupations);
                       }}
                       placeholder="From"
                     />
@@ -173,9 +173,9 @@ export default function ProfessionalInfoForm() {
                       type="date"
                       value={occupation.to}
                       onChange={(e) => {
-                        const newOccupations = [...occupations]
-                        newOccupations[index].to = e.target.value
-                        setOccupations(newOccupations)
+                        const newOccupations = [...occupations];
+                        newOccupations[index].to = e.target.value;
+                        setOccupations(newOccupations);
                       }}
                       placeholder="To"
                     />
@@ -187,14 +187,14 @@ export default function ProfessionalInfoForm() {
                       onClick={() => removeOccupation(index)}
                       className="mt-2"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                      <Trash2 className="w-4 h-4 mr-2" />
                       Remove Occupation
                     </Button>
                   )}
                 </div>
               ))}
               <Button onClick={addOccupation} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2" />
                 Add Occupation
               </Button>
             </div>
@@ -247,18 +247,18 @@ export default function ProfessionalInfoForm() {
                   <Input
                     value={skill.name}
                     onChange={(e) => {
-                      const newSkills = [...skills]
-                      newSkills[index].name = e.target.value
-                      setSkills(newSkills)
+                      const newSkills = [...skills];
+                      newSkills[index].name = e.target.value;
+                      setSkills(newSkills);
                     }}
                     placeholder="Skill name"
                   />
                   <Select
                     value={skill.level}
                     onValueChange={(value) => {
-                      const newSkills = [...skills]
-                      newSkills[index].level = value
-                      setSkills(newSkills)
+                      const newSkills = [...skills];
+                      newSkills[index].level = value;
+                      setSkills(newSkills);
                     }}
                   >
                     <SelectTrigger className="w-[180px]">
@@ -277,7 +277,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeSkill(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -295,36 +295,36 @@ export default function ProfessionalInfoForm() {
                   <Input
                     value={edu.country}
                     onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index].country = e.target.value
-                      setEducation(newEducation)
+                      const newEducation = [...education];
+                      newEducation[index].country = e.target.value;
+                      setEducation(newEducation);
                     }}
                     placeholder="Country"
                   />
                   <Input
                     value={edu.university}
                     onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index].university = e.target.value
-                      setEducation(newEducation)
+                      const newEducation = [...education];
+                      newEducation[index].university = e.target.value;
+                      setEducation(newEducation);
                     }}
                     placeholder="University"
                   />
                   <Input
                     value={edu.title}
                     onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index].title = e.target.value
-                      setEducation(newEducation)
+                      const newEducation = [...education];
+                      newEducation[index].title = e.target.value;
+                      setEducation(newEducation);
                     }}
                     placeholder="Title"
                   />
                   <Input
                     value={edu.major}
                     onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index].major = e.target.value
-                      setEducation(newEducation)
+                      const newEducation = [...education];
+                      newEducation[index].major = e.target.value;
+                      setEducation(newEducation);
                     }}
                     placeholder="Major"
                   />
@@ -332,9 +332,9 @@ export default function ProfessionalInfoForm() {
                     type="number"
                     value={edu.year}
                     onChange={(e) => {
-                      const newEducation = [...education]
-                      newEducation[index].year = e.target.value
-                      setEducation(newEducation)
+                      const newEducation = [...education];
+                      newEducation[index].year = e.target.value;
+                      setEducation(newEducation);
                     }}
                     placeholder="Year"
                   />
@@ -344,7 +344,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeEducation(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -371,18 +371,18 @@ export default function ProfessionalInfoForm() {
                   <Input
                     value={cert.name}
                     onChange={(e) => {
-                      const newCertifications = [...certifications]
-                      newCertifications[index].name = e.target.value
-                      setCertifications(newCertifications)
+                      const newCertifications = [...certifications];
+                      newCertifications[index].name = e.target.value;
+                      setCertifications(newCertifications);
                     }}
                     placeholder="Certification name"
                   />
                   <Input
                     value={cert.issuer}
                     onChange={(e) => {
-                      const newCertifications = [...certifications]
-                      newCertifications[index].issuer = e.target.value
-                      setCertifications(newCertifications)
+                      const newCertifications = [...certifications];
+                      newCertifications[index].issuer = e.target.value;
+                      setCertifications(newCertifications);
                     }}
                     placeholder="Issuer"
                   />
@@ -390,9 +390,9 @@ export default function ProfessionalInfoForm() {
                     type="number"
                     value={cert.year}
                     onChange={(e) => {
-                      const newCertifications = [...certifications]
-                      newCertifications[index].year = e.target.value
-                      setCertifications(newCertifications)
+                      const newCertifications = [...certifications];
+                      newCertifications[index].year = e.target.value;
+                      setCertifications(newCertifications);
                     }}
                     placeholder="Year"
                   />
@@ -402,7 +402,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeCertification(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -420,19 +420,19 @@ export default function ProfessionalInfoForm() {
                   <Input
                     value={lang.name}
                     onChange={(e) => {
-                      const newLanguages = [...languages]
-                      newLanguages[index].name = e.target.value
-                      setLanguages(newLanguages)
+                      const newLanguages = [...languages];
+                      newLanguages[index].name = e.target.value;
+                      setLanguages(newLanguages);
                     }}
                     placeholder="Language"
                   />
                   <Select
                     value={lang.proficiency}
                     onValueChange={(value) => {
-                      const newLanguages = [...languages]
-                      
-                      newLanguages[index].proficiency = value
-                      setLanguages(newLanguages)
+                      const newLanguages = [...languages];
+
+                      newLanguages[index].proficiency = value;
+                      setLanguages(newLanguages);
                     }}
                   >
                     <SelectTrigger className="w-[180px]">
@@ -450,7 +450,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeLanguage(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -478,7 +478,7 @@ export default function ProfessionalInfoForm() {
           </>
         )}
       </CardContent>
-      
+
       <Toast.Provider>
         <Toast.Root open={toastOpen} onOpenChange={setToastOpen}>
           <Toast.Title>{toastMessage}</Toast.Title>
@@ -486,8 +486,5 @@ export default function ProfessionalInfoForm() {
         <Toast.Viewport />
       </Toast.Provider>
     </Card>
-  )
+  );
 }
-
-
-

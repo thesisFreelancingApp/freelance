@@ -42,7 +42,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
         profilePic: true,
         authUser: {
           select: {
-            username: true, // Fetching the username from the related AuthUser model
+            username: true,
           },
         },
       },
