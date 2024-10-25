@@ -1,8 +1,4 @@
-import { NextPage } from "next";
-import Steps from "./steps";
-
-const Page: NextPage = () => {
-  return <Steps />;
-};
-
-export default Page;
+import MultiStepFormPage from "@/app/pages/welcomeNew";
+export default function Steps() {
+  return <MultiStepFormPage />;
+}

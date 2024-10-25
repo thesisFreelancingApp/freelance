@@ -24,8 +24,6 @@ enum Role {
  
 }
 
-
-
 // ------------------------
 // Modèles d'Authentification
 // ------------------------
@@ -90,7 +88,7 @@ model PersonalProfile {
 }
 
 model Seller {
-  id                   String               @id
+  id                   String               @id @default(uuid())
   profileId            String               @unique
   profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
   sellerRating         Float?
@@ -104,7 +102,7 @@ model Seller {
 }
 
 model Buyer {
-  id                String          @id
+  id                String          @id @default(uuid())
   profileId         String          @unique
   profile           PersonalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   totalSpent        Float           @default(0.0)
@@ -120,27 +118,28 @@ model Buyer {
 // ------------------------
 
 model ProfessionalProfile {
-  id               String          @id @default(uuid())
-  sellerId         String          @unique
+  id                   String               @id @default(uuid())
+  sellerProfileId      String               @unique
   language             String[]
-  personalWebsite  String?         // Lien vers le site web personnel
-  occupations      Json?           // Un tableau JSON pour stocker plusieurs occupations
-  skills           Json?           // Un tableau JSON pour stocker plusieurs compétences
-  educations       Json?           // Un tableau JSON pour stocker plusieurs entrées éducatives
-  certifications   Json?           // Un tableau JSON pour stocker plusieurs certifications
-  companyName      String?
-  profession       String?
-  experienceYears  Int?
-  website          String?
-  preferredCategoryId Int?         // Référence optionnelle à la catégorie préférée
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  personalWebsite      String?
+  occupations          Json?
+  skills               Json?
+  educations           Json?
+  certifications       Json?
+  companyName          String?
+  profession           String?
+  experienceYears      Int?
+  website              String?
+  preferredCategoryId  Int?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
 
   // Relations
-  seller           Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  preferredCategory MainCategories? @relation(fields: [preferredCategoryId], references: [id])
-  PersonalProfile  PersonalProfile[]
+  seller               Seller               @relation(fields: [sellerProfileId], references: [profileId], onDelete: Cascade)
+  preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
+  PersonalProfile      PersonalProfile[]
 }
+
 
 
 // ------------------------
