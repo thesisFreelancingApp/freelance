@@ -52,7 +52,6 @@ export async function initializeBuyerAndSellerProfile({
         data: {
           id: profileId, // Set Seller ID to match PersonalProfile ID
           profileId: profileId, // Link to the existing PersonalProfile
-          language: [], // Initialize an empty language array or a default if needed
         },
       });
     }
