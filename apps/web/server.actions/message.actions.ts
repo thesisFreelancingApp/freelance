@@ -45,16 +45,7 @@ export async function sendMessage(receiverId: string, content: string) {
       data: { lastMessageAt: message.createdAt },
     });
 
-    // Broadcast the new message using Supabase Realtime
-    await supabase.from("messages").insert({
-      id: message.id,
-      content: message.content,
-      senderId: message.senderId,
-      chatRoomId: message.chatRoomId,
-      createdAt: message.createdAt,
-    });
-
-    return { message, chatRoomId: chatRoom.id };
+    return { ...message, chatRoomId: chatRoom.id };
   } catch (error) {
     console.error("Error sending message:", error);
     throw new Error("Failed to send message");
@@ -217,21 +208,9 @@ export async function getAllChatRooms() {
     },
   });
 
-  return chatRooms.map((chatRoom) => {
-    const otherUser =
-      chatRoom.clientId === user.id ? chatRoom.freelancer : chatRoom.client;
-    const lastMessage = chatRoom.messages[0];
-
-    return {
-      id: chatRoom.id,
-      otherUser,
-      lastMessage: lastMessage
-        ? {
-            id: lastMessage.id,
-            content: lastMessage.content,
-            createdAt: lastMessage.createdAt,
-          }
-        : null,
-    };
-  });
+  return chatRooms.map((room) => ({
+    id: room.id,
+    otherUser: room.clientId === user.id ? room.freelancer : room.client,
+    lastMessage: room.messages[0] || null,
+  }));
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   getAllChatRooms,
   getMessages,
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 interface ChatRoom {
   id: number;
@@ -20,7 +21,6 @@ interface ChatRoom {
     profilePic: string | null;
   };
   lastMessage: {
-    id: number;
     content: string;
     createdAt: Date;
   } | null;
@@ -30,7 +30,7 @@ interface Message {
   id: number;
   senderId: string;
   content: string;
-  createdAt: string | Date;
+  createdAt: Date;
 }
 
 export default function MessagesLayout() {
@@ -38,37 +38,79 @@ export default function MessagesLayout() {
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
   useEffect(() => {
-    const fetchChatRooms = async () => {
-      try {
-        const rooms = await getAllChatRooms();
-        setChatRooms(rooms);
-        if (rooms.length > 0) {
-          setSelectedRoom(rooms[0]);
-        }
-      } catch (error) {
-        console.error("Failed to fetch chat rooms:", error);
-      }
-    };
-
     fetchChatRooms();
+    const channel = supabase
+      .channel("realtime messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "Message",
+        },
+        handleNewMessage,
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
     if (selectedRoom) {
-      const fetchMessages = async () => {
-        try {
-          const fetchedMessages = await getMessages(selectedRoom.id);
-          setMessages(fetchedMessages);
-        } catch (error) {
-          console.error("Failed to fetch messages:", error);
-        }
-      };
-
-      fetchMessages();
+      fetchMessages(selectedRoom.id);
     }
   }, [selectedRoom]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]",
+      );
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  };
+
+  const fetchChatRooms = async () => {
+    try {
+      const rooms = await getAllChatRooms();
+      setChatRooms(rooms);
+      if (rooms.length > 0 && !selectedRoom) {
+        setSelectedRoom(rooms[0]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch chat rooms:", error);
+    }
+  };
+
+  const fetchMessages = async (roomId: number) => {
+    try {
+      const fetchedMessages = await getMessages(roomId);
+      setMessages(fetchedMessages);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    }
+  };
+
+  const handleNewMessage = (payload: any) => {
+    const newMessage = payload.new as Message & { chatRoomId: number };
+    if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
+      setMessages((prev) => [...prev, newMessage]);
+    }
+    fetchChatRooms(); // Update chat room list to show latest message
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,9 +119,6 @@ export default function MessagesLayout() {
     try {
       await sendMessage(selectedRoom.otherUser.id, newMessage);
       setNewMessage("");
-      // Refresh messages
-      const updatedMessages = await getMessages(selectedRoom.id);
-      setMessages(updatedMessages);
     } catch (error) {
       console.error("Failed to send message:", error);
     }
@@ -131,7 +170,7 @@ export default function MessagesLayout() {
               Chat with {selectedRoom.otherUser.firstName}{" "}
               {selectedRoom.otherUser.lastName}
             </h2>
-            <ScrollArea className="flex-grow mb-4">
+            <ScrollArea className="flex-grow mb-4" ref={scrollAreaRef}>
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -158,6 +197,7 @@ export default function MessagesLayout() {
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </ScrollArea>
             <form onSubmit={handleSendMessage} className="flex space-x-2">
               <Input
