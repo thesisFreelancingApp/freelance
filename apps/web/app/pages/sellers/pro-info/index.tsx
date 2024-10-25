@@ -1,3 +1,5 @@
+"use client";
+
 import { EducationSection } from "@/app/pages/sellers/pro-info/EducationSection";
 import OccupationsSection from "@/app/pages/sellers/pro-info/OccupationsSection";
 import SkillsSection from "@/app/pages/sellers/pro-info/SkillsSection";
@@ -5,9 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
+import { format } from "date-fns";
 import { useState } from "react";
 
-type Occupation = { title: string; from: string; to: string };
+// Define the Occupation type with Date
+type Occupation = {
+  title: string;
+  from: Date | undefined;
+  to: Date | undefined;
+};
 type Skill = { name: string; level: string };
 type Education = {
   country: string;
@@ -16,42 +24,50 @@ type Education = {
   major: string;
   year: string;
 };
+type Certification = { name: string; issuer: string; year: string };
+type Language = { name: string; proficiency: string };
 
 export default function ProfessionalInfoForm() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
 
-  // Example ID – Replace this with the actual value from your app's context or props
-  const sellerProfileId = "yourSellerProfileId"; // Replace with dynamic value as needed
-
   // States for each section
   const [occupations, setOccupations] = useState<Occupation[]>([
-    { title: "", from: "", to: "" },
-  ]);
-  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }]);
-  const [education, setEducation] = useState<Education[]>([
-    { country: "", university: "", title: "", major: "", year: "" },
+    { title: "", from: undefined, to: undefined },
   ]);
   const [companyName, setCompanyName] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
   const [experienceYears, setExperienceYears] = useState<number | "">("");
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [certifications, setCertifications] = useState<string[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }]);
+  const [education, setEducation] = useState<Education[]>([
+    { country: "", university: "", title: "", major: "", year: "" },
+  ]);
+  const [certifications, setCertifications] = useState<Certification[]>([
+    { name: "", issuer: "", year: "" },
+  ]);
+  const [languages, setLanguages] = useState<Language[]>([
+    { name: "", proficiency: "" },
+  ]);
   const [website, setWebsite] = useState<string>("");
 
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
-  // Form submit handler
+
   const handleSubmit = async () => {
     const profileData = {
-      sellerProfileId,
       companyName,
       profession,
-      experienceYears: experienceYears === "" ? undefined : experienceYears, // Ensure experienceYears is either a number or undefined
-      languages,
+      experienceYears: experienceYears === "" ? undefined : experienceYears,
+      languages: languages.map((lang) => lang.name),
       personalWebsite: website,
-      occupations,
+      occupations: occupations.map((occupation) => ({
+        ...occupation,
+        from: occupation.from
+          ? format(occupation.from, "yyyy-MM-dd")
+          : undefined,
+        to: occupation.to ? format(occupation.to, "yyyy-MM-dd") : undefined,
+      })),
       skills,
       educations: education,
       certifications,
@@ -80,7 +96,10 @@ export default function ProfessionalInfoForm() {
           <OccupationsSection
             occupations={occupations}
             addOccupation={() =>
-              setOccupations([...occupations, { title: "", from: "", to: "" }])
+              setOccupations([
+                ...occupations,
+                { title: "", from: undefined, to: undefined },
+              ])
             }
             removeOccupation={(index) =>
               setOccupations(occupations.filter((_, i) => i !== index))

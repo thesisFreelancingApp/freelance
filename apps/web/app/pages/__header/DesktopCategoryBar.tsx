@@ -1,10 +1,10 @@
 "use client";
+import { encodeHelper } from "@/hooks/use-Url";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { encodeHelper } from "@/hooks/use-Url";
 // import Link from "next/link";
 
 // Définition des types
@@ -81,11 +81,19 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
     menuRef.current?.scrollBy({ left: 200, behavior: "smooth" });
   };
 
-  // Handle mouse enter for a category
+  // Delay constant for displaying the submenu
+  const SUBMENU_DELAY = 300; // Adjust as needed
+
+  // Handle mouse enter for a category with submenu delay
   const handleMouseEnter = (index: number) => {
+    // Clear any existing timeout to prevent multiple triggers
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setActiveCategory(index);
-    setIsHovering(true);
+
+    // Set a new timeout to display the submenu after a short delay
+    timeoutRef.current = window.setTimeout(() => {
+      setActiveCategory(index);
+      setIsHovering(true);
+    }, SUBMENU_DELAY);
   };
 
   // Handle mouse leave with delay
@@ -123,14 +131,14 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
       {/* Left Chevron */}
       <button
         onClick={scrollLeft}
-        className="absolute z-20 flex justify-start -translate-y-1/2 rounded-full left-2 top-1/2"
+        className="absolute left-0 z-20 p-2 transform -translate-y-1/2 rounded-full top-1/2"
         aria-label="Scroll left"
       >
         <FaChevronLeft />
       </button>
 
       {/* Left gradient overlay */}
-      <div className="absolute top-0 left-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-r from-background to-transparent"></div>
+      <div className="absolute left-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-r from-background to-transparent"></div>
 
       {/* Main Menu */}
       <ul
@@ -165,7 +173,7 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
       {/* Right Chevron */}
       <button
         onClick={scrollRight}
-        className="absolute z-20 p-2 -translate-y-1/2 rounded-full right-2 top-1/2"
+        className="absolute right-0 z-20 p-2 -translate-y-1/2 rounded-full top-1/2"
         aria-label="Scroll right"
       >
         <FaChevronRight />
