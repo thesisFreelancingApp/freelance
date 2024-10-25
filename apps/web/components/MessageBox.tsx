@@ -30,6 +30,7 @@ import {
   getMessages,
   getOrCreateChatRoom,
 } from "@/server.actions/message.actions";
+import { useRouter } from "next/navigation";
 
 interface MessageBoxProps {
   receiverId: string;
@@ -57,6 +58,7 @@ export function MessageBox({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (isOpen) {
@@ -167,7 +169,15 @@ export function MessageBox({
         <MessageSquare className="w-4 h-4 mr-2" />
         Send Message
       </Button>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          if (!open) {
+            router.push(`/messages/${chatRoomId}`);
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">

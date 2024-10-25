@@ -5,82 +5,66 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function sendMessage(receiverId: string, content: string) {
   const supabase = createClient();
-
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (userError || !user) {
     throw new Error("You must be logged in to send a message");
   }
-  console.log(
-    "here ya lhoooooooooo ==================================================",
-    user.id,
-    receiverId,
-  );
 
-  // Find or create a chat room
-  let chatRoom = await prisma.chatRoom.findFirst({
-    where: {
-      OR: [
-        { clientId: user.id, freelancerId: receiverId },
-        { clientId: receiverId, freelancerId: user.id },
-      ],
-    },
-  });
-
-  if (!chatRoom) {
-    console.log("chatRoom not found, creating new one", user.id, receiverId);
-
-    chatRoom = await prisma.chatRoom.create({
-      data: {
+  try {
+    // Find or create a chat room
+    const chatRoom = await prisma.chatRoom.upsert({
+      where: {
+        clientId_freelancerId: {
+          clientId: user.id,
+          freelancerId: receiverId,
+        },
+      },
+      create: {
         clientId: user.id,
         freelancerId: receiverId,
       },
+      update: {},
     });
+
+    // Create the message
+    const message = await prisma.message.create({
+      data: {
+        chatRoomId: chatRoom.id,
+        senderId: user.id,
+        content,
+      },
+    });
+
+    // Update lastMessageAt in ChatRoom
+    await prisma.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { lastMessageAt: message.createdAt },
+    });
+
+    // Broadcast the new message using Supabase Realtime
+    await supabase.from("messages").insert({
+      id: message.id,
+      content: message.content,
+      senderId: message.senderId,
+      chatRoomId: message.chatRoomId,
+      createdAt: message.createdAt,
+    });
+
+    return { message, chatRoomId: chatRoom.id };
+  } catch (error) {
+    console.error("Error sending message:", error);
+    throw new Error("Failed to send message");
   }
-
-  // Create the message
-  const message = await prisma.message.create({
-    data: {
-      chatRoomId: chatRoom.id,
-      senderId: user.id,
-      content,
-    },
-  });
-
-  // Update lastMessageAt in ChatRoom
-  await prisma.chatRoom.update({
-    where: { id: chatRoom.id },
-    data: { lastMessageAt: message.createdAt },
-  });
-
-  // Broadcast the new message using Supabase Realtime
-  await supabase.from("messages").insert({
-    id: message.id,
-    content: message.content,
-    senderId: message.senderId,
-    chatRoomId: message.chatRoomId,
-    createdAt: message.createdAt,
-  });
-
-  return { message, chatRoomId: chatRoom.id };
 }
 
 export async function getMessages(chatRoomId: number) {
   return prisma.message.findMany({
     where: { chatRoomId },
     orderBy: { createdAt: "asc" },
-    include: {
-      sender: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-        },
-      },
-    },
   });
 }
 
@@ -192,4 +176,62 @@ export async function getRecentMessages() {
   });
 
   return { messages: recentMessages, unreadCount };
+}
+
+export async function getAllChatRooms() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const chatRooms = await prisma.chatRoom.findMany({
+    where: {
+      OR: [{ clientId: user.id }, { freelancerId: user.id }],
+    },
+    orderBy: { lastMessageAt: "desc" },
+    include: {
+      messages: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+      client: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+        },
+      },
+      freelancer: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePic: true,
+        },
+      },
+    },
+  });
+
+  return chatRooms.map((chatRoom) => {
+    const otherUser =
+      chatRoom.clientId === user.id ? chatRoom.freelancer : chatRoom.client;
+    const lastMessage = chatRoom.messages[0];
+
+    return {
+      id: chatRoom.id,
+      otherUser,
+      lastMessage: lastMessage
+        ? {
+            id: lastMessage.id,
+            content: lastMessage.content,
+            createdAt: lastMessage.createdAt,
+          }
+        : null,
+    };
+  });
 }
