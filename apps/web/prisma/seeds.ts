@@ -1,8 +1,6 @@
-import { seedCategory } from "./seeds/categories";
-import { seedRatings } from "./seeds/rating";
-import { seedServices } from "./seeds/services";
-import { seedUsers } from "./seeds/users";
 import { PrismaClient } from "@prisma/client";
+import { seedCategory } from "./seeds/categories";
+import { seedUsers } from "./seeds/users";
 
 const prisma = new PrismaClient();
 
@@ -12,16 +10,16 @@ async function mainSeed() {
 
     // Ensure the database schema is up to date
     console.log("----- Updating database schema...");
-    await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "CategoryHierarchy" (
-      "id" SERIAL PRIMARY KEY,
-      "name" TEXT NOT NULL,
-      "description" TEXT,
-      "level" INTEGER NOT NULL,
-      "parentId" INTEGER,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL,
-      FOREIGN KEY ("parentId") REFERENCES "CategoryHierarchy"("id")
-    )`;
+    // await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "CategoryHierarchy" (
+    //   "id" SERIAL PRIMARY KEY,
+    //   "name" TEXT NOT NULL,
+    //   "description" TEXT,
+    //   "level" INTEGER NOT NULL,
+    //   "parentId" INTEGER,
+    //   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    //   "updatedAt" TIMESTAMP(3) NOT NULL,
+    //   FOREIGN KEY ("parentId") REFERENCES "CategoryHierarchy"("id")
+    // )`;
     console.log("----- Database schema updated successfully.");
 
     console.log("----- Seeding Categories...");
@@ -30,11 +28,11 @@ async function mainSeed() {
     console.log("----- Seeding Users...");
     await seedUsers();
 
-    console.log("----- Seeding Services...");
-    await seedServices();
+    // console.log("----- Seeding Services...");
+    // await seedServices();
 
-    console.log("----- Seeding Rating...");
-    await seedRatings();
+    // console.log("----- Seeding Rating...");
+    // await seedRatings();
 
     console.log("----- Database seeding completed successfully.");
   } catch (error) {

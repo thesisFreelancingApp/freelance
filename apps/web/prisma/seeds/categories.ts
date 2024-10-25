@@ -3397,7 +3397,7 @@ const allCategories = [
 
 export const seedCategory = async () => {
   console.log("----- Seeding Categories: cleanup process is starting...");
-  await prisma.categoryHierarchy.deleteMany();
+  await prisma.mainCategories.deleteMany();
   console.log(
     "----- The categoryHierarchy table has been successfully cleared.",
   );
@@ -3409,7 +3409,7 @@ export const seedCategory = async () => {
 
   for (const category of sortedCategories) {
     try {
-      const createdCategory = await prisma.categoryHierarchy.create({
+      const createdCategory = await prisma.mainCategories.create({
         data: {
           name: category.name,
           level: category.level,

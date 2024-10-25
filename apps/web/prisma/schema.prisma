@@ -18,6 +18,13 @@ enum RequestStatus {
   CANCELLED
 }
 
+// Define the Role enum in users.ts
+enum Role {
+  USER 
+  ADMIN 
+}
+
+
 // ------------------------
 // Modèles d'Authentification
 // ------------------------
@@ -25,7 +32,7 @@ enum RequestStatus {
 model AuthUser {
   id        String           @id
   email     String           @unique
-  role      String           @default("USER")
+  role      Role          @default(USER)
   name      String?
   username  String           @unique
   account   Account?
