@@ -13,7 +13,6 @@ const usersData = [
 
     isBuyer: true,
     isSeller: false,
-    languages: ["English", "French"],
   },
   {
     id: "2",
@@ -25,7 +24,6 @@ const usersData = [
 
     isBuyer: false,
     isSeller: true,
-    languages: ["English", "German"],
   },
   {
     id: "3",
@@ -37,7 +35,6 @@ const usersData = [
 
     isBuyer: true,
     isSeller: true,
-    languages: ["English", "Spanish"],
   },
 ];
 
@@ -77,7 +74,7 @@ export async function seedUsers() {
               seller: {
                 create: {
                   id: `${userData.id}-seller`, // Unique ID for Seller
-                  language: userData.languages,
+
                   totalEarnings: 0.0,
                   sellerRating: 4.5,
                 },
