@@ -37,18 +37,23 @@ export async function getUserProfile(): Promise<UserProfile | null> {
         address: true,
         birthDate: true,
         phoneNumber: true,
-
         userEmail: true,
         bio: true,
-        profilePic: true, // Sélectionne les nouveaux champs du schéma mis à jour
+        profilePic: true,
+        authUser: {
+          select: {
+            username: true, // Fetching the username from the related AuthUser model
+          },
+        },
       },
     });
-
     if (!userProfile) {
       throw new Error("Profil non trouvé");
     }
-
-    return userProfile;
+    return {
+      ...userProfile,
+      username: userProfile.authUser?.username ?? null,
+    };
   } catch (error) {
     console.error("Erreur lors de la récupération du profil:", error);
     throw new Error("Impossible de récupérer le profil utilisateur");
