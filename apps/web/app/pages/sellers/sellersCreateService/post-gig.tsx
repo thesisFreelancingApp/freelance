@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -103,7 +102,7 @@ const PostGig = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <h1 className="mb-8 text-4xl font-bold text-center text-primary">
+      <h1 className="text-4xl font-bold mb-8 text-primary text-center">
         Create Your Gig
       </h1>
       <Card className="w-full shadow-lg">
@@ -111,7 +110,7 @@ const PostGig = () => {
           <ProgressBar currentStep={currentStep} totalSteps={4} />
           <div className="mt-8">
             <div className="h-[500px] overflow-y-auto">{renderStep()}</div>
-            <div className="flex justify-between pt-4 mt-8 border-t">
+            <div className="flex justify-between mt-8 pt-4 border-t">
               {currentStep > 1 && (
                 <Button variant="outline" onClick={handlePrevious}>
                   Previous

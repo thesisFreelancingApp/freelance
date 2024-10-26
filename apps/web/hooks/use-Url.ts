@@ -1,5 +1,5 @@
 export const encodeHelper = (str: string) => {
-  console.log("------------", str);
+  // console.log("------------", str);
   return encodeURIComponent(str.replace(/\s+/g, "-"));
 };
 

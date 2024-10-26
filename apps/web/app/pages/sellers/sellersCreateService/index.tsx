@@ -2,11 +2,11 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Step1Overview from "@/app/pages/createGig/Step1Overview";
-import Step2Pricing from "@/app/pages/createGig/Step2Pricing";
-import Step4Media from "@/app/pages/createGig/Step4Media";
-import Step5Publish from "@/app/pages/createGig/Step5Publish";
-import ProgressBar from "@/app/pages/createGig/ProgressBar";
+import Step1Overview from "./Step1Overview";
+import Step2Pricing from "./Step2Pricing";
+import Step4Media from "./Step4Media";
+import Step5Publish from "./Step5Publish";
+import ProgressBar from "./ProgressBar";
 
 interface PricingTier {
   name: string;

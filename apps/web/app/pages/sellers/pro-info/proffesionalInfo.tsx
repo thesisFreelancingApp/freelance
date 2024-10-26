@@ -1,11 +1,11 @@
+
 "use client";
 
-import { useState } from "react";
-import { Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -13,13 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProfessionalProfile } from "@/server.actions/info"; // Update this path accordingly
-import { useRouter } from "next/navigation";
+import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info"; // Update this path accordingly
 import * as Toast from "@radix-ui/react-toast";
-import { Progress } from "@/components/ui/progress";
+import { Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-type Occupation = { title: string; from: string; to: string };
 type Skill = { name: string; level: string };
+type Occupation = {
+  title: string;
+  from: undefined | string;
+  to: undefined | string;
+};
 type Education = {
   country: string;
   university: string;
@@ -37,7 +42,7 @@ export default function ProfessionalInfoForm() {
 
   // Page 1 States
   const [occupations, setOccupations] = useState<Occupation[]>([
-    { title: "", from: "", to: "" },
+    { title: "", from: undefined, to: undefined },
   ]);
   const [companyName, setCompanyName] = useState("");
   const [profession, setProfession] = useState("");
@@ -110,7 +115,6 @@ export default function ProfessionalInfoForm() {
     console.log("Profile Data to Submit:", profileData);
 
     try {
-      //@ts-ignore
       const newProfile = await createProfessionalProfile(profileData);
       console.log("Profile created:", newProfile);
       setToastMessage("Profile created successfully!");
@@ -150,7 +154,7 @@ export default function ProfessionalInfoForm() {
               <Label>Your Occupations</Label>
               {occupations.map((occupation, index) => (
                 <div key={index} className="space-y-2">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                     <Input
                       value={occupation.title}
                       onChange={(e) => {
@@ -188,14 +192,14 @@ export default function ProfessionalInfoForm() {
                       onClick={() => removeOccupation(index)}
                       className="mt-2"
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                      <Trash2 className="w-4 h-4 mr-2" />
                       Remove Occupation
                     </Button>
                   )}
                 </div>
               ))}
               <Button onClick={addOccupation} variant="outline" size="sm">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2" />
                 Add Occupation
               </Button>
             </div>
@@ -278,7 +282,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeSkill(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -345,7 +349,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeEducation(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -403,7 +407,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeCertification(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
@@ -451,7 +455,7 @@ export default function ProfessionalInfoForm() {
                       size="icon"
                       onClick={() => removeLanguage(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>

@@ -42,7 +42,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
         profilePic: true,
         authUser: {
           select: {
-            username: true, // Fetching the username from the related AuthUser model
+            username: true,
           },
         },
       },
@@ -63,47 +63,49 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 // Fonction pour mettre à jour le profil utilisateur
 export async function updateUserProfile(data: UserProfile) {
   try {
-    // Initialisation du client Supabase
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
 
-    if (error || !user?.user?.email) {
+    if (error || !user.user?.email) {
       console.error("Erreur lors de la récupération de l'utilisateur:", error);
       throw new Error("Utilisateur non authentifié");
     }
 
     const email = user.user.email;
+    const { username, ...profileData } = data;
 
-    // Exclure le champ `userEmail` des données soumises car il ne doit pas être modifié
-    const { userEmail, ...profileData } = data;
-
-    // Nettoyer les données en supprimant les champs indéfinis avant la mise à jour
+    // Clean up profile data to exclude undefined or null values
     const cleanProfileData = Object.fromEntries(
-      Object.entries(profileData).filter(
-        ([_, v]) => v !== undefined && v !== null,
-      ),
+      Object.entries(profileData).filter(([, value]) => value != null),
     );
 
-    // Mise à jour du profil utilisateur dans la base de données via Prisma
-    const updatedProfile = await prisma.personalProfile.update({
-      where: { userEmail: email },
-      data: {
-        ...cleanProfileData, // Mise à jour des champs fournis (firstName, lastName, etc.)
-      },
-      select: {
-        firstName: true,
-        lastName: true,
-        address: true,
-        birthDate: true,
-        phoneNumber: true,
-        bio: true,
-        profilePic: true, // Ajout du champ profilePic
-      },
-    });
+    // Update AuthUser and PersonalProfile within a transaction
+    const [updatedAuthUser, updatedProfile] = await prisma.$transaction([
+      prisma.authUser.update({
+        where: { email },
+        data: {
+          ...(username != null && { username }), // Only update if username is not null
+        },
+        select: { username: true },
+      }),
+      prisma.personalProfile.update({
+        where: { userEmail: email },
+        data: cleanProfileData,
+        select: {
+          firstName: true,
+          lastName: true,
+          address: true,
+          birthDate: true,
+          phoneNumber: true,
+          bio: true,
+        },
+      }),
+    ]);
 
-    // Revalidation du cache de la page de profil
+    // Revalidate the profile path after updating
     revalidatePath(`/profile`);
-    return updatedProfile;
+
+    return { ...updatedAuthUser, ...updatedProfile };
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profil:", error);
     throw new Error("Impossible de mettre à jour le profil utilisateur");
