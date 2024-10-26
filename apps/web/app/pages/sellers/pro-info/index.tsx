@@ -1,17 +1,16 @@
 "use client";
 
-import CertificationsSection from "@/app/pages/sellers/pro-info/CertificationsSection";
-import EducationSection from "@/app/pages/sellers/pro-info/EducationSection";
+import SkillsAndEducation from "@/app/pages/sellers/pro-info/EducationAndSkillsSection";
 import LanguageSection from "@/app/pages/sellers/pro-info/LanguageSection";
 import OccupationsSection from "@/app/pages/sellers/pro-info/OccupationsSection";
-import SkillsSection from "@/app/pages/sellers/pro-info/SkillsSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
 import * as Toast from "@radix-ui/react-toast";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 // Define the types for various sections
 type Occupation = {
@@ -31,8 +30,15 @@ type Certification = {
 };
 
 export default function ProfessionalInfoForm() {
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 5;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const totalSteps = 4;
+  const initialStep = parseInt(searchParams.get("step") || "1", 10);
+  const [currentStep, setCurrentStep] = useState<number>(
+    Math.min(initialStep, totalSteps),
+  );
+
   const progress = (currentStep / totalSteps) * 100;
 
   // State for each section
@@ -40,12 +46,13 @@ export default function ProfessionalInfoForm() {
     { title: "", from: undefined, to: undefined },
   ]);
   const [skills, setSkills] = useState<string[]>([]);
-  const [education, setEducation] = useState<Education[]>([]);
+  const [educations, setEducations] = useState<Education[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [type, setCompanyType] = useState<"freelancer" | "company">(
     "freelancer",
   );
+  const [timeZone, setTimeZone] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
   const [experienceLevel, setExperienceLevel] =
@@ -54,6 +61,12 @@ export default function ProfessionalInfoForm() {
 
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
+
+  // Update the URL with the current step
+  const updateStepInUrl = (step: number) => {
+    const newUrl = `${window.location.pathname}?step=${step}`;
+    router.replace(newUrl);
+  };
 
   const handleSubmit = async () => {
     const convertExperienceYears = (experienceLevel: string) => {
@@ -85,7 +98,7 @@ export default function ProfessionalInfoForm() {
         to: occupation.to ? format(occupation.to, "yyyy-MM-dd") : undefined,
       })),
       skills,
-      education: education.map((edu) => ({
+      educations: educations.map((edu) => ({
         ...edu,
         from: edu.from ? format(edu.from, "yyyy-MM-dd") : undefined,
         to: edu.to ? format(edu.to, "yyyy-MM-dd") : undefined,
@@ -95,6 +108,7 @@ export default function ProfessionalInfoForm() {
         date: cert.date ? format(cert.date, "yyyy-MM") : undefined,
       })),
       languages,
+      timeZone,
     };
 
     try {
@@ -109,9 +123,26 @@ export default function ProfessionalInfoForm() {
     }
   };
 
-  const nextStep = () =>
-    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
-  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const nextStep = () => {
+    setCurrentStep((prev) => {
+      const nextStep = Math.min(prev + 1, totalSteps);
+      updateStepInUrl(nextStep);
+      return nextStep;
+    });
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => {
+      const previousStep = Math.max(prev - 1, 1);
+      updateStepInUrl(previousStep);
+      return previousStep;
+    });
+  };
+
+  // Update the URL when `currentStep` changes
+  useEffect(() => {
+    updateStepInUrl(currentStep);
+  }, [currentStep]);
 
   return (
     <Card className="w-full max-w-3xl mx-auto">
@@ -152,16 +183,7 @@ export default function ProfessionalInfoForm() {
           />
         )}
         {currentStep === 2 && (
-          <SkillsSection skills={skills} setSkills={setSkills} />
-        )}
-        {currentStep === 3 && (
-          <EducationSection
-            educations={education}
-            setEducation={setEducation}
-          />
-        )}
-        {currentStep === 4 && (
-          <CertificationsSection
+          <SkillsAndEducation
             certifications={certifications}
             addCertification={() =>
               setCertifications([
@@ -179,10 +201,37 @@ export default function ProfessionalInfoForm() {
                 ),
               )
             }
+            skills={skills}
+            addSkill={(skill) => setSkills([...skills, skill])}
+            removeSkill={(index) =>
+              setSkills(skills.filter((_, i) => i !== index))
+            }
+            educations={educations}
+            addEducation={() =>
+              setEducations([
+                ...educations,
+                { faculty: "", from: undefined, to: undefined },
+              ])
+            }
+            removeEducation={(index) =>
+              setEducations(educations.filter((_, i) => i !== index))
+            }
+            updateEducation={(index, field, value) =>
+              setEducations(
+                educations.map((edu, i) =>
+                  i === index ? { ...edu, [field]: value } : edu,
+                ),
+              )
+            }
           />
         )}
-        {currentStep === 5 && (
-          <LanguageSection languages={languages} setLanguages={setLanguages} />
+        {currentStep === 3 && (
+          <LanguageSection
+            languages={languages}
+            setLanguages={setLanguages}
+            timeZone={timeZone}
+            setTimeZone={setTimeZone}
+          />
         )}
 
         <div className="flex justify-between mt-4">

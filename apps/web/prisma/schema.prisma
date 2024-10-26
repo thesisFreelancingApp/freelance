@@ -127,7 +127,7 @@ model ProfessionalProfile {
   personalWebsite      String?
   occupations          Json?
   companyName          String?
-type                 ProfileType?
+  type                 ProfileType?
   sector               String?
   profession           String?
   experienceYears      Int?
@@ -135,7 +135,9 @@ type                 ProfileType?
   educations           Json?
   skills               Json?
   certifications       Json?
+
   language             String[]
+  timeZone             String?
 
   
   website              String?
