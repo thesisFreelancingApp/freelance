@@ -57,11 +57,40 @@ export async function sendMessage(receiverId: string, content: string) {
   }
 }
 
-export async function getMessages(chatRoomId: number) {
-  return prisma.message.findMany({
-    where: { chatRoomId },
-    orderBy: { createdAt: "asc" },
-  });
+export async function getMessages(
+  chatRoomId: number,
+  page: number = 1,
+  pageSize: number = 20,
+) {
+  const skip = (page - 1) * pageSize;
+
+  const [messages, totalCount] = await Promise.all([
+    prisma.message.findMany({
+      where: { chatRoomId },
+      orderBy: { createdAt: "desc" },
+      take: pageSize,
+      skip,
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePic: true,
+          },
+        },
+      },
+    }),
+    prisma.message.count({
+      where: { chatRoomId },
+    }),
+  ]);
+
+  return {
+    messages: messages.reverse(), // Reverse to show oldest first
+    hasMore: skip + pageSize < totalCount,
+    totalCount,
+  };
 }
 
 export async function getOrCreateChatRoom(receiverId: string) {

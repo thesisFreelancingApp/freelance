@@ -33,6 +33,8 @@ interface Message {
   createdAt: Date;
 }
 
+const MESSAGES_PER_PAGE = 20;
+
 export default function MessagesLayout() {
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
@@ -42,6 +44,10 @@ export default function MessagesLayout() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalMessages, setTotalMessages] = useState(0);
 
   const setupRealtimeSubscription = useCallback(() => {
     if (channelRef.current) {
@@ -128,10 +134,26 @@ export default function MessagesLayout() {
     }
   };
 
-  const fetchMessages = async (roomId: number) => {
+  const fetchMessages = async (roomId: number, resetPage = true) => {
     try {
-      const fetchedMessages = await getMessages(roomId);
-      setMessages(fetchedMessages);
+      const currentPage = resetPage ? 1 : page;
+      const response = await getMessages(
+        roomId,
+        currentPage,
+        MESSAGES_PER_PAGE,
+      );
+
+      setMessages((prev) =>
+        currentPage === 1 ? response.messages : [...prev, ...response.messages],
+      );
+      setHasMore(response.hasMore);
+      setTotalMessages(response.totalCount);
+
+      if (!resetPage) {
+        setPage((prev) => prev + 1);
+      } else {
+        setPage(1);
+      }
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     }
@@ -159,6 +181,42 @@ export default function MessagesLayout() {
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
+    }
+  };
+
+  // Add intersection observer for infinite scroll
+  const observerRef = useRef<IntersectionObserver>();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMoreMessages();
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, isLoadingMore]);
+
+  const loadMoreMessages = async () => {
+    if (!selectedRoom || isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      await fetchMessages(selectedRoom.id, false);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -209,6 +267,24 @@ export default function MessagesLayout() {
               {selectedRoom.otherUser.lastName}
             </h2>
             <ScrollArea className="flex-grow mb-4" ref={scrollAreaRef}>
+              {/* Load More Messages Button/Indicator */}
+              {hasMore && (
+                <div ref={loadMoreRef} className="text-center py-2">
+                  {isLoadingMore ? (
+                    <p className="text-gray-500">Loading more messages...</p>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      onClick={() => loadMoreMessages()}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      Load More
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {/* Messages */}
               {messages.map((msg) => (
                 <div
                   key={msg.id}
