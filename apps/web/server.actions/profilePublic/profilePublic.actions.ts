@@ -1,0 +1,69 @@
+"use server";
+import prisma from "@/lib/prismaClient";
+import { createClient } from "@/lib/supabase/server";
+
+interface UserProfile {
+  firstName?: string | null;
+  lastName?: string | null;
+  address?: string | null;
+  birthDate?: Date | null;
+  phoneNumber?: string | null;
+  username?: string | null;
+  userEmail?: string | null;
+  bio?: string | null;
+}
+
+export async function getUserProfile(): Promise<UserProfile | null> {
+  const supabase = createClient();
+  const { data: user, error } = await supabase.auth.getUser();
+  if (error || !user.user?.email) {
+    console.log("Erreur lors de la récupération de l'utilisateur:", error);
+    return null;
+  }
+
+  const email = user.user.email;
+
+  try {
+    const userProfile = await prisma.personalProfile.findUnique({
+      where: { userEmail: email },
+      include: {
+        authUser: true,
+      },
+    });
+
+    if (!userProfile) {
+      throw new Error("Profil non trouvé");
+    }
+
+    return userProfile;
+  } catch (error) {
+    console.log("Erreur lors de la récupération du profil:", error);
+    throw new Error("Impossible de récupérer le profil utilisateur");
+  }
+}
+
+export async function getUserProfileByUsername(
+  username: string,
+): Promise<UserProfile | null> {
+  try {
+    const userProfile = await prisma.authUser.findUnique({
+      where: {
+        username: username,
+      },
+      include: {
+        profile: {
+          include: {
+            seller: true,
+            buyer: true,
+            professionalProfile: true,
+          },
+        },
+      },
+    });
+
+    return userProfile;
+  } catch (error) {
+    console.error("Error fetching user profile by username:", error);
+    return null;
+  }
+}

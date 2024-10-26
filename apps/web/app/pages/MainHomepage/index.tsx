@@ -2,7 +2,7 @@ import FeaturedServices from "@/app/pages/MainHomepage/FeaturedServices";
 import TopFreelancers from "@/app/pages/MainHomepage/TopFreelancers";
 import WhyChooseUs from "@/app/pages/MainHomepage/WhyChooseUs";
 import { isAuthenticated } from "@/server.actions/auth/auth.actions";
-import { getCategories } from "@/server.actions/category.actions";
+import { getCategories } from "@/server.actions/category/category.actions";
 import { getFeaturedServices } from "@/server.actions/services.actions";
 import Hero from "./BannerHero";
 import CategoryList from "./CategoryList";
@@ -30,7 +30,7 @@ export default async function Index() {
 
         <TopFreelancers freelancers={freelancers} />
 
-        <FeaturedServices services={services} />
+        {/* <FeaturedServices services={services} /> */}
 
         <WhyChooseUs />
       </section>

@@ -1,35 +1,41 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
+
+// Check if the username already exists in the AuthUser model
 export async function checkUsername(username: string): Promise<boolean> {
-  const user = await prisma.profile.findUnique({
-    where: { username: username },
+  const user = await prisma.authUser.findUnique({
+    where: { username },
   });
 
-  return user ? false : true;
+  return !user; // Returns true if username is available, false if taken
 }
 
+// Update the username of an AuthUser based on the user's email
 export async function updateUsernameByEmail(
   newUsername: string,
 ): Promise<boolean> {
   try {
-    // console.log(email);
-    // Initialiser le client Supabase
+    // Initialize the Supabase client
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
+
     if (error || !user.user?.email) {
-      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      console.log("Error retrieving user:", error);
       return false;
     }
+
     const email = user.user.email;
-    await prisma.profile.update({
-      where: { userEmail: email },
-      data: { username: newUsername }, // Met à jour le nom d'utilisateur
+
+    // Update the username in the AuthUser model
+    await prisma.authUser.update({
+      where: { email },
+      data: { username: newUsername },
     });
 
-    return true; // Mise à jour réussie
+    return true; // Update successful
   } catch (error) {
-    console.log("Erreur lors de la mise à jour du nom d'utilisateur:", error);
-    return false; // En cas d'erreur, retourne false
+    console.log("Error updating username:", error);
+    return false; // Returns false if there's an error
   }
 }

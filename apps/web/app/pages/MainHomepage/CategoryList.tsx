@@ -1,6 +1,10 @@
 "use client";
-import { Category } from "@/types/index";
+
+import { useRouter } from "next/navigation";
+import { Category } from "@/types";
+
 import Link from "next/link";
+
 interface CategoryListProps {
   categories: Category[];
 }

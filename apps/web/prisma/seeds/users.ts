@@ -1,18 +1,18 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const allUsers = [
+const usersData = [
   {
     id: "1",
     firstName: "John",
     lastName: "Doe",
     profilePic: "https://randomuser.me/api/portraits/men/1.jpg",
     email: "johndoe@example.com",
+    username: "john_doe",
 
-    role: Role.user, // Utilisation de l'enum 'Role'
-    skills: JSON.stringify(["JavaScript", "React", "Node.js"]),
-    languages: JSON.stringify(["English", "French"]),
+    isBuyer: true,
+    isSeller: false,
   },
   {
     id: "2",
@@ -20,10 +20,10 @@ const allUsers = [
     lastName: "Smith",
     profilePic: "https://randomuser.me/api/portraits/women/2.jpg",
     email: "janesmith@example.com",
+    username: "jane_smith",
 
-    role: Role.user, // Utilisation de l'enum 'Role'
-    skills: JSON.stringify(["Photoshop", "Illustrator", "Figma"]),
-    languages: JSON.stringify(["English", "Spanish"]),
+    isBuyer: false,
+    isSeller: true,
   },
   {
     id: "3",
@@ -31,45 +31,60 @@ const allUsers = [
     lastName: "Johnson",
     profilePic: "https://randomuser.me/api/portraits/men/3.jpg",
     email: "mikejohnson@example.com",
+    username: "mike_johnson",
 
-    role: Role.user, // Utilisation de l'enum 'Role'
-    skills: JSON.stringify(["Content Writing", "SEO", "Copywriting"]),
-    languages: JSON.stringify(["English", "German"]),
+    isBuyer: true,
+    isSeller: true,
   },
 ];
 
-export const seedUsers = async () => {
-  console.log("----- Seeding Users: cleanup process is starting...");
-
+export async function seedUsers() {
+  console.log("----- Seeding: clearing existing data...");
   await prisma.authUser.deleteMany();
-  await prisma.profile.deleteMany();
-  console.log(
-    "----- The AuthUser and Profile tables have been successfully cleared.",
-  );
+  await prisma.personalProfile.deleteMany();
+  console.log("----- Seeding: creating new users...");
 
-  console.log("----- Seeding Users: process is starting...");
-
-  for (const user of allUsers) {
+  for (const userData of usersData) {
     await prisma.authUser.create({
       data: {
-        id: user.id,
-        email: user.email,
-        name: `${user.firstName} ${user.lastName}`,
+        id: userData.id,
+        email: userData.email,
+        username: userData.username,
+
+        name: `${userData.firstName} ${userData.lastName}`,
         profile: {
           create: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            profilePic: user.profilePic,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            profilePic: userData.profilePic,
+            userEmail: userData.email,
+            bio: "This is a sample bio",
+            birthDate: new Date("1990-01-01"),
+            phoneNumber: "1234567890",
+            address: "123 Main St",
+            ...(userData.isBuyer && {
+              buyer: {
+                create: {
+                  id: `${userData.id}-buyer`, // Unique ID for Buyer
+                  totalSpent: 0.0,
+                },
+              },
+            }),
+            ...(userData.isSeller && {
+              seller: {
+                create: {
+                  id: `${userData.id}-seller`, // Unique ID for Seller
 
-            role: user.role,
-
-            userEmail: user.email,
-            username: user.firstName + user.lastName,
+                  totalEarnings: 0.0,
+                  sellerRating: 4.5,
+                },
+              },
+            }),
           },
         },
       },
     });
   }
 
-  console.log("----- Seeding Users: process completed successfully.");
-};
+  console.log("----- Seeding: users created successfully.");
+}
