@@ -1,12 +1,11 @@
 "use client";
 
-import { EducationSection } from "@/app/pages/sellers/pro-info/EducationSection";
 import OccupationsSection from "@/app/pages/sellers/pro-info/OccupationsSection";
-import SkillsSection from "@/app/pages/sellers/pro-info/SkillsSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
+import * as Toast from "@radix-ui/react-toast";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -16,51 +15,35 @@ type Occupation = {
   from: Date | undefined;
   to: Date | undefined;
 };
-type Skill = { name: string; level: string };
-type Education = {
-  country: string;
-  university: string;
-  title: string;
-  major: string;
-  year: string;
-};
-type Certification = { name: string; issuer: string; year: string };
-type Language = { name: string; proficiency: string };
 
 export default function ProfessionalInfoForm() {
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 3;
+  const totalSteps = 1;
   const progress = (currentStep / totalSteps) * 100;
 
-  // States for each section
+  // States for Occupation section and additional fields
   const [occupations, setOccupations] = useState<Occupation[]>([
     { title: "", from: undefined, to: undefined },
   ]);
+  const [companyType, setCompanyType] = useState<"freelancer" | "company">(
+    "freelancer",
+  );
   const [companyName, setCompanyName] = useState<string>("");
   const [profession, setProfession] = useState<string>("");
-  const [experienceYears, setExperienceYears] = useState<number | "">("");
-  const [skills, setSkills] = useState<Skill[]>([{ name: "", level: "" }]);
-  const [education, setEducation] = useState<Education[]>([
-    { country: "", university: "", title: "", major: "", year: "" },
-  ]);
-  const [certifications, setCertifications] = useState<Certification[]>([
-    { name: "", issuer: "", year: "" },
-  ]);
-  const [languages, setLanguages] = useState<Language[]>([
-    { name: "", proficiency: "" },
-  ]);
-  const [website, setWebsite] = useState<string>("");
+  const [experienceLevel, setExperienceLevel] =
+    useState<string>("no_experience");
+  const [sector, setSector] = useState<string>("");
 
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
 
   const handleSubmit = async () => {
     const profileData = {
-      companyName,
+      companyType,
+      companyName: companyType === "company" ? companyName : undefined,
       profession,
-      experienceYears: experienceYears === "" ? undefined : experienceYears,
-      languages: languages.map((lang) => lang.name),
-      personalWebsite: website,
+      experienceLevel,
+      sector: companyType === "company" ? sector : undefined,
       occupations: occupations.map((occupation) => ({
         ...occupation,
         from: occupation.from
@@ -68,9 +51,6 @@ export default function ProfessionalInfoForm() {
           : undefined,
         to: occupation.to ? format(occupation.to, "yyyy-MM-dd") : undefined,
       })),
-      skills,
-      educations: education,
-      certifications,
     };
 
     try {
@@ -88,13 +68,18 @@ export default function ProfessionalInfoForm() {
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>{`Step ${currentStep}`}</CardTitle>
+        <CardTitle>{`Occupation Information`}</CardTitle>
         <Progress value={progress} className="w-full" />
       </CardHeader>
       <CardContent className="space-y-6">
         {currentStep === 1 && (
           <OccupationsSection
             occupations={occupations}
+            companyType={companyType}
+            companyName={companyName}
+            profession={profession}
+            experienceLevel={experienceLevel}
+            sector={sector}
             addOccupation={() =>
               setOccupations([
                 ...occupations,
@@ -111,62 +96,25 @@ export default function ProfessionalInfoForm() {
                 ),
               )
             }
+            setCompanyType={setCompanyType}
+            setCompanyName={setCompanyName}
+            setProfession={setProfession}
+            setExperienceLevel={setExperienceLevel}
+            setSector={setSector}
           />
         )}
-        {currentStep === 2 && (
-          <SkillsSection
-            skills={skills}
-            addSkill={() => setSkills([...skills, { name: "", level: "" }])}
-            removeSkill={(index) =>
-              setSkills(skills.filter((_, i) => i !== index))
-            }
-            updateSkill={(index, field, value) =>
-              setSkills(
-                skills.map((skill, i) =>
-                  i === index ? { ...skill, [field]: value } : skill,
-                ),
-              )
-            }
-          />
-        )}
-        {currentStep === 3 && (
-          <EducationSection
-            education={education}
-            addEducation={() =>
-              setEducation([
-                ...education,
-                { country: "", university: "", title: "", major: "", year: "" },
-              ])
-            }
-            removeEducation={(index) =>
-              setEducation(education.filter((_, i) => i !== index))
-            }
-            updateEducation={(index, field, value) =>
-              setEducation(
-                education.map((edu, i) =>
-                  i === index ? { ...edu, [field]: value } : edu,
-                ),
-              )
-            }
-          />
-        )}
-        <div className="flex justify-between mt-4">
-          <Button
-            onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 1))}
-          >
-            Back
-          </Button>
-          <Button
-            onClick={
-              currentStep === totalSteps
-                ? handleSubmit
-                : () => setCurrentStep((prev) => Math.min(prev + 1, totalSteps))
-            }
-          >
-            {currentStep === totalSteps ? "Submit" : "Next"}
-          </Button>
+
+        <div className="flex justify-end mt-4">
+          <Button onClick={handleSubmit}>Submit</Button>
         </div>
       </CardContent>
+
+      <Toast.Provider>
+        <Toast.Root open={toastOpen} onOpenChange={setToastOpen}>
+          <Toast.Title>{toastMessage}</Toast.Title>
+        </Toast.Root>
+        <Toast.Viewport />
+      </Toast.Provider>
     </Card>
   );
 }

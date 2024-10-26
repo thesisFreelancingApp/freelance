@@ -3,15 +3,15 @@ import Link from "next/link";
 import { Suspense } from "react";
 import UserMenu from "./user-menu";
 
-// Define the structure for user data and user types
+// Define the structure for user data and user types, allowing for null values as needed
 interface UserProfile {
-  firstName?: string;
+  firstName?: string | null;
 }
 
 interface UserData {
-  profile?: UserProfile;
-  name?: string;
-  email?: string;
+  profile?: UserProfile | null;
+  name?: string | null;
+  email?: string | null;
 }
 
 interface AuthButtonProps {
@@ -35,7 +35,7 @@ export default function AuthButton({ userData, user }: AuthButtonProps) {
         </div>
       </Suspense>
       {/* UserMenu always displays */}
-      <UserMenu data={userData || user} />
+      <UserMenu data={userData ? userData : { email: user.email }} />
     </div>
   ) : (
     <div className="flex gap-2">

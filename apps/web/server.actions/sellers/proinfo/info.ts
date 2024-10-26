@@ -24,7 +24,6 @@ export const createProfessionalProfile = async (data: {
 
     error,
   } = await supabase.auth.getUser();
-  console.log(user, "sssssssssssssssssssssssssssssssssssssssssssssssss");
 
   // If there is no authenticated user, handle the error accordingly
   if (error || !user) {

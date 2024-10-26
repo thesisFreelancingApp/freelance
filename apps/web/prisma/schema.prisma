@@ -63,7 +63,7 @@ model PersonalProfile {
   authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
   firstName             String?
   lastName              String?
-  profilePic            String?  @default("./public/profile.webp")
+  profilePic            String?  @default("https://res.cloudinary.com/dlyf0syzk/image/upload/v1729941054/profile_z0n4ja.webp")
   title                 String?
   phoneNumber           String?
   address               String?
