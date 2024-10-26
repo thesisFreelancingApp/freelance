@@ -6,22 +6,36 @@ import { createClient } from "@/lib/supabase/server";
 export const createProfessionalProfile = async (data: {
   languages: string[];
   personalWebsite?: string;
-  occupations?: any;
-  skills?: any;
-  educations?: any;
-  certifications?: any;
+  occupations?: {
+    title: string;
+    from: string | undefined;
+    to: string | undefined;
+  }[];
+  skills?: string[];
+  educations?: {
+    faculty: string;
+    from: string | undefined;
+    to: string | undefined;
+  }[];
+  certifications?: {
+    title: string;
+    institution: string;
+    date: string | undefined;
+  }[];
   companyName?: string;
   profession?: string;
   experienceYears?: number | undefined;
+  sector?: string;
   website?: string;
-  // preferredCategoryId?: number;
 }) => {
+  console.log("Profile Data:", data);
+
   // Create the Supabase client
   const supabase = createClient();
+
   // Get the current authenticated user from Supabase
   const {
     data: { user },
-
     error,
   } = await supabase.auth.getUser();
 
@@ -36,15 +50,15 @@ export const createProfessionalProfile = async (data: {
       sellerProfileId: user.id, // Use the authenticated user's ID as sellerId
       language: data.languages,
       personalWebsite: data.personalWebsite || null,
-      occupations: data.occupations || null,
-      skills: data.skills || null,
-      educations: data.educations || null,
-      certifications: data.certifications || null,
+      occupations: data.occupations || undefined,
+      skills: data.skills || undefined,
+      educations: data.educations || undefined,
+      certifications: data.certifications || undefined,
       companyName: data.companyName || null,
       profession: data.profession || null,
       experienceYears: data.experienceYears || null,
+      sector: data.sector || null,
       website: data.website || null,
-      // preferredCategoryId: data.preferredCategoryId || null,
     },
   });
 

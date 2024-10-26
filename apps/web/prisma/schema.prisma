@@ -63,7 +63,7 @@ model PersonalProfile {
   authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
   firstName             String?
   lastName              String?
-  profilePic            String?  @default("https://res.cloudinary.com/dlyf0syzk/image/upload/v1729941054/profile_z0n4ja.webp")
+  profilePic            String?  @default("/profile.webp")
   title                 String?
   phoneNumber           String?
   address               String?
@@ -117,19 +117,27 @@ model Buyer {
 // ------------------------
 // Profil Professionnel
 // ------------------------
-
+enum ProfileType {
+  FREELANCER
+  COMPANY
+}
 model ProfessionalProfile {
   id                   String               @id @default(uuid())
   sellerProfileId      String               @unique
-  language             String[]
   personalWebsite      String?
   occupations          Json?
-  skills               Json?
-  educations           Json?
-  certifications       Json?
   companyName          String?
+type                 ProfileType?
+  sector               String?
   profession           String?
   experienceYears      Int?
+
+  educations           Json?
+  skills               Json?
+  certifications       Json?
+  language             String[]
+
+  
   website              String?
   preferredCategoryId  Int?
   createdAt            DateTime             @default(now())

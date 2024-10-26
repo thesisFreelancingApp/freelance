@@ -1,6 +1,10 @@
 "use client";
 
+import CertificationsSection from "@/app/pages/sellers/pro-info/CertificationsSection";
+import EducationSection from "@/app/pages/sellers/pro-info/EducationSection";
+import LanguageSection from "@/app/pages/sellers/pro-info/LanguageSection";
 import OccupationsSection from "@/app/pages/sellers/pro-info/OccupationsSection";
+import SkillsSection from "@/app/pages/sellers/pro-info/SkillsSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -9,23 +13,37 @@ import * as Toast from "@radix-ui/react-toast";
 import { format } from "date-fns";
 import { useState } from "react";
 
-// Define the Occupation type with Date
+// Define the types for various sections
 type Occupation = {
   title: string;
   from: Date | undefined;
   to: Date | undefined;
 };
+type Education = {
+  faculty: string;
+  from: Date | undefined;
+  to: Date | undefined;
+};
+type Certification = {
+  title: string;
+  institution: string;
+  date: Date | undefined;
+};
 
 export default function ProfessionalInfoForm() {
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 1;
+  const totalSteps = 5;
   const progress = (currentStep / totalSteps) * 100;
 
-  // States for Occupation section and additional fields
+  // State for each section
   const [occupations, setOccupations] = useState<Occupation[]>([
     { title: "", from: undefined, to: undefined },
   ]);
-  const [companyType, setCompanyType] = useState<"freelancer" | "company">(
+  const [skills, setSkills] = useState<string[]>([]);
+  const [education, setEducation] = useState<Education[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [type, setCompanyType] = useState<"freelancer" | "company">(
     "freelancer",
   );
   const [companyName, setCompanyName] = useState<string>("");
@@ -38,12 +56,27 @@ export default function ProfessionalInfoForm() {
   const [toastMessage, setToastMessage] = useState<string>("");
 
   const handleSubmit = async () => {
+    const convertExperienceYears = (experienceLevel: string) => {
+      switch (experienceLevel) {
+        case "No Experience":
+          return 0;
+        case "Junior":
+          return 2;
+        case "Intermediate":
+          return 4;
+        case "Senior":
+          return 7;
+        default:
+          return undefined;
+      }
+    };
+
     const profileData = {
-      companyType,
-      companyName: companyType === "company" ? companyName : undefined,
+      type,
+      companyName: type === "company" ? companyName : "freelance",
       profession,
-      experienceLevel,
-      sector: companyType === "company" ? sector : undefined,
+      experienceYears: convertExperienceYears(experienceLevel),
+      sector: type === "company" ? sector : undefined,
       occupations: occupations.map((occupation) => ({
         ...occupation,
         from: occupation.from
@@ -51,6 +84,17 @@ export default function ProfessionalInfoForm() {
           : undefined,
         to: occupation.to ? format(occupation.to, "yyyy-MM-dd") : undefined,
       })),
+      skills,
+      education: education.map((edu) => ({
+        ...edu,
+        from: edu.from ? format(edu.from, "yyyy-MM-dd") : undefined,
+        to: edu.to ? format(edu.to, "yyyy-MM-dd") : undefined,
+      })),
+      certifications: certifications.map((cert) => ({
+        ...cert,
+        date: cert.date ? format(cert.date, "yyyy-MM") : undefined,
+      })),
+      languages,
     };
 
     try {
@@ -65,17 +109,21 @@ export default function ProfessionalInfoForm() {
     }
   };
 
+  const nextStep = () =>
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
+
   return (
     <Card className="w-full max-w-3xl mx-auto">
       <CardHeader>
-        <CardTitle>{`Occupation Information`}</CardTitle>
+        <CardTitle>Professional Information</CardTitle>
         <Progress value={progress} className="w-full" />
       </CardHeader>
       <CardContent className="space-y-6">
         {currentStep === 1 && (
           <OccupationsSection
             occupations={occupations}
-            companyType={companyType}
+            companyType={type}
             companyName={companyName}
             profession={profession}
             experienceLevel={experienceLevel}
@@ -103,9 +151,47 @@ export default function ProfessionalInfoForm() {
             setSector={setSector}
           />
         )}
+        {currentStep === 2 && (
+          <SkillsSection skills={skills} setSkills={setSkills} />
+        )}
+        {currentStep === 3 && (
+          <EducationSection
+            educations={education}
+            setEducation={setEducation}
+          />
+        )}
+        {currentStep === 4 && (
+          <CertificationsSection
+            certifications={certifications}
+            addCertification={() =>
+              setCertifications([
+                ...certifications,
+                { title: "", institution: "", date: undefined },
+              ])
+            }
+            removeCertification={(index) =>
+              setCertifications(certifications.filter((_, i) => i !== index))
+            }
+            updateCertification={(index, field, value) =>
+              setCertifications(
+                certifications.map((cert, i) =>
+                  i === index ? { ...cert, [field]: value } : cert,
+                ),
+              )
+            }
+          />
+        )}
+        {currentStep === 5 && (
+          <LanguageSection languages={languages} setLanguages={setLanguages} />
+        )}
 
-        <div className="flex justify-end mt-4">
-          <Button onClick={handleSubmit}>Submit</Button>
+        <div className="flex justify-between mt-4">
+          {currentStep > 1 && <Button onClick={prevStep}>Back</Button>}
+          {currentStep < totalSteps ? (
+            <Button onClick={nextStep}>Next</Button>
+          ) : (
+            <Button onClick={handleSubmit}>Submit</Button>
+          )}
         </div>
       </CardContent>
 
