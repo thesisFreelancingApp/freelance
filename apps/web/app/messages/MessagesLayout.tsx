@@ -212,12 +212,26 @@ export default function MessagesLayout() {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex mb-4 ${
+                  className={`flex items-end gap-2 mb-4 ${
                     msg.senderId === selectedRoom.otherUser.id
                       ? "justify-start"
                       : "justify-end"
                   }`}
                 >
+                  {msg.senderId === selectedRoom.otherUser.id && (
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage
+                        src={
+                          selectedRoom.otherUser.profilePic ||
+                          "/placeholder.svg"
+                        }
+                      />
+                      <AvatarFallback>
+                        {selectedRoom.otherUser.firstName?.[0]}
+                        {selectedRoom.otherUser.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
                   <div
                     className={`max-w-[70%] p-3 rounded-lg ${
                       msg.senderId === selectedRoom.otherUser.id
