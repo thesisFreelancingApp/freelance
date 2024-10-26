@@ -18,8 +18,12 @@ import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type Occupation = { title: string; from: string; to: string };
 type Skill = { name: string; level: string };
+type Occupation = {
+  title: string;
+  from: undefined | string;
+  to: undefined | string;
+};
 type Education = {
   country: string;
   university: string;
@@ -37,7 +41,7 @@ export default function ProfessionalInfoForm() {
 
   // Page 1 States
   const [occupations, setOccupations] = useState<Occupation[]>([
-    { title: "", from: "", to: "" },
+    { title: "", from: undefined, to: undefined },
   ]);
   const [companyName, setCompanyName] = useState("");
   const [profession, setProfession] = useState("");
