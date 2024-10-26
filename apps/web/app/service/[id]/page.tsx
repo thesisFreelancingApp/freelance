@@ -268,11 +268,10 @@ export default async function ServiceDetailPage({
               </Tabs>
               <div className="mt-6">
                 <MessageBox
-                  receiverId={service.creator.id || ""}
+                  receiverId={service.creator.id}
                   receiverName={`${service.creator.firstName} ${service.creator.lastName}`}
                   receiverProfilePic={
-                    service.creator.profilePic ||
-                    "/placeholder.svg?height=40&width=40"
+                    service.creator.profilePic || "/placeholder.svg"
                   }
                 />
               </div>

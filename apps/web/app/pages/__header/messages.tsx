@@ -35,13 +35,14 @@ interface Message {
 export default function Messages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchRecentMessages = async () => {
       try {
         const { messages, unreadCount } = await getRecentMessages();
-        setMessages(messages);
         console.log("messages ----------------------------", messages);
+        setMessages(messages);
         setUnreadCount(unreadCount);
       } catch (error) {
         console.error("Failed to fetch recent messages:", error);
@@ -50,8 +51,6 @@ export default function Messages() {
 
     fetchRecentMessages();
 
-    // Set up real-time listener using Supabase client
-    const supabase = createClient();
     const channel = supabase
       .channel("new_messages")
       .on(
@@ -61,13 +60,8 @@ export default function Messages() {
           schema: "public",
           table: "Message",
         },
-        (payload) => {
-          const newMessage = payload.new as Message;
-          setMessages((prevMessages) => [
-            newMessage,
-            ...prevMessages.slice(0, 4),
-          ]);
-          setUnreadCount((prevCount) => prevCount + 1);
+        async () => {
+          await fetchRecentMessages();
         },
       )
       .subscribe();
@@ -75,7 +69,7 @@ export default function Messages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <DropdownMenu>
@@ -111,15 +105,16 @@ export default function Messages() {
                 className="flex items-start py-2 px-4"
               >
                 <img
-                  src={message.otherUser?.profilePic || "/placeholder.svg"}
-                  alt={`${message.otherUser?.firstName} ${message.otherUser?.lastName}`}
+                  src={message.otherUser.profilePic || "/placeholder.svg"}
+                  alt={`${message.otherUser.firstName} ${message.otherUser.lastName}`}
                   className="w-8 h-8 rounded-full mr-3"
                 />
                 <div className="flex-1 overflow-hidden">
                   <p className="font-semibold text-sm truncate">
-                    {message.otherUser?.firstName} {message.otherUser?.lastName}
+                    {message.otherUser.firstName} {message.otherUser.lastName}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
+                    {message.sender.id === message.otherUser.id ? "" : "You: "}
                     {message.content}
                   </p>
                 </div>

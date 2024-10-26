@@ -15,22 +15,27 @@ export async function sendMessage(receiverId: string, content: string) {
   }
 
   try {
-    // Find or create a chat room
-    const chatRoom = await prisma.chatRoom.upsert({
+    // Check for an existing ChatRoom between the users in either direction
+    let chatRoom = await prisma.chatRoom.findFirst({
       where: {
-        clientId_freelancerId: {
+        OR: [
+          { clientId: user.id, freelancerId: receiverId },
+          { clientId: receiverId, freelancerId: user.id },
+        ],
+      },
+    });
+
+    // If no ChatRoom exists, create a new one
+    if (!chatRoom) {
+      chatRoom = await prisma.chatRoom.create({
+        data: {
           clientId: user.id,
           freelancerId: receiverId,
         },
-      },
-      create: {
-        clientId: user.id,
-        freelancerId: receiverId,
-      },
-      update: {},
-    });
+      });
+    }
 
-    // Create the message
+    // Create the message in the found or newly created chatRoom
     const message = await prisma.message.create({
       data: {
         chatRoomId: chatRoom.id,

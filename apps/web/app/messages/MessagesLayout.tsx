@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   getAllChatRooms,
   getMessages,
@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send } from "lucide-react";
+import { Send, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface ChatRoom {
@@ -41,26 +41,59 @@ export default function MessagesLayout() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  const setupRealtimeSubscription = useCallback(() => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    channelRef.current = supabase.channel("realtime messages", {
+      config: {
+        broadcast: { self: true },
+      },
+    });
+
+    channelRef.current
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "Message" },
+        handleNewMessage,
+      )
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log("Subscribed to real-time messages");
+        } else if (status === "CLOSED") {
+          console.log("Subscription closed, attempting to reconnect...");
+          setTimeout(setupRealtimeSubscription, 5000);
+        }
+      });
+
+    // Heartbeat to keep the connection alive
+    const heartbeatInterval = setInterval(() => {
+      channelRef.current?.send({
+        type: "broadcast",
+        event: "heartbeat",
+        payload: {},
+      });
+    }, 30000);
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+      clearInterval(heartbeatInterval);
+    };
+  }, [supabase]);
 
   useEffect(() => {
     fetchChatRooms();
-    const channel = supabase
-      .channel("realtime messages")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "Message",
-        },
-        handleNewMessage,
-      )
-      .subscribe();
+    const unsubscribe = setupRealtimeSubscription();
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribe();
     };
-  }, []);
+  }, [setupRealtimeSubscription]);
 
   useEffect(() => {
     if (selectedRoom) {
@@ -105,6 +138,7 @@ export default function MessagesLayout() {
   };
 
   const handleNewMessage = (payload: any) => {
+    console.log("New message received:", payload);
     const newMessage = payload.new as Message & { chatRoomId: number };
     if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
       setMessages((prev) => [...prev, newMessage]);
@@ -117,7 +151,11 @@ export default function MessagesLayout() {
     if (!newMessage.trim() || !selectedRoom) return;
 
     try {
-      await sendMessage(selectedRoom.otherUser.id, newMessage);
+      const sentMessage = await sendMessage(
+        selectedRoom.otherUser.id,
+        newMessage,
+      );
+      setMessages((prev) => [...prev, sentMessage]);
       setNewMessage("");
     } catch (error) {
       console.error("Failed to send message:", error);
