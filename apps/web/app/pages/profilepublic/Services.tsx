@@ -1,7 +1,6 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 
 type Profile = {
@@ -33,7 +32,7 @@ const MainCardProfile = ({
     <Card className="col-span-1 border-none shadow-none md:col-span-2 bg-background">
       <CardContent className="pt-2">
         <div>
-          <h3 className="mb-2 font-semibold">À propos de moi</h3>
+          <h3 className="mb-2 font-semibold">Services</h3>
           <p className="text-muted-foreground">
             {showFullBio ? profile.bio : bioPreview}
           </p>

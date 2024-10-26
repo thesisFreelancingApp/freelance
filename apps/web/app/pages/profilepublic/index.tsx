@@ -1,27 +1,57 @@
-"use client";
-
+// Imports
 import ContactCardProfile from "@/app/pages/profilepublic/ContactCard";
 import MainCardProfile from "@/app/pages/profilepublic/MainProfil";
-import MainCardProfile2 from "@/app/pages/profilepublic/Sesrvice";
-import { useState } from "react";
-export default function UserProfilePage({
-  username,
-  profile,
-}: {
+import Services from "@/app/pages/profilepublic/Services";
+import { getUserProfileByUsername } from "@/server.actions/profilePublic/profilePublic.actions";
+
+// Types
+interface Profile {
+  firstName: string;
+  lastName: string;
   username: string;
-  profile: any;
-}) {
-  const [showFullBio, setShowFullBio] = useState(false);
+  profilePic: string;
+  bio?: string;
+  birthDate?: string;
+  title?: string;
+}
 
-  const toggleBio = () => setShowFullBio(!showFullBio);
+interface UserProfile {
+  profile?: Profile;
+}
 
-  if (!profile) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Profil non trouvé
-      </div>
-    );
+// Component
+const AnotherPage = async ({ username }: { username: string }) => {
+  if (!username) {
+    return <div>Username not provided</div>;
   }
+
+  // Fetch user profile and ensure it's of type UserProfile or null
+  const userProfile = (await getUserProfileByUsername(
+    username,
+  )) as UserProfile | null;
+
+  if (!userProfile || !userProfile.profile) {
+    return <div>User profile not found</div>;
+  }
+
+  // Destructure user profile data
+  const {
+    firstName,
+    lastName,
+    profilePic = "",
+    bio,
+    birthDate,
+    title,
+  } = userProfile.profile;
+  const profile = {
+    firstName,
+    lastName,
+    username,
+    profilePic,
+    bio,
+    birthDate,
+    title,
+  };
 
   return (
     <div className="container px-4 py-8 mx-auto space-y-8">
@@ -31,7 +61,9 @@ export default function UserProfilePage({
           <ContactCardProfile profile={profile} />
         </div>
       </div>
-      <MainCardProfile2 profile={profile} username={username} />
+      <Services profile={profile} username={username} />
     </div>
   );
-}
+};
+
+export default AnotherPage;
