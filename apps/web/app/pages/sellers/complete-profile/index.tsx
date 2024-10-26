@@ -1,8 +1,8 @@
 "use client";
 
-import SkillsAndEducation from "@/app/pages/sellers/pro-info/EducationAndSkillsSection";
-import LanguageSection from "@/app/pages/sellers/pro-info/LanguageSection";
-import OccupationsSection from "@/app/pages/sellers/pro-info/OccupationsSection";
+import SkillsAndEducation from "@/app/pages/sellers/complete-profile/EducationAndSkillsSection";
+import LanguageSection from "@/app/pages/sellers/complete-profile/LanguageSection";
+import OccupationsSection from "@/app/pages/sellers/complete-profile/OccupationsSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
