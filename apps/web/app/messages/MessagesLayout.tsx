@@ -60,6 +60,8 @@ export default function MessagesLayout() {
       },
     });
 
+    let reconnectAttempts = 0;
+
     channelRef.current
       .on(
         "postgres_changes",
@@ -69,9 +71,13 @@ export default function MessagesLayout() {
       .subscribe((status) => {
         if (status === "SUBSCRIBED") {
           console.log("Subscribed to real-time messages");
-        } else if (status === "CLOSED") {
-          console.log("Subscription closed, attempting to reconnect...");
+          reconnectAttempts = 0;
+        } else if (status === "CLOSED" && reconnectAttempts < 5) {
+          reconnectAttempts++;
+          console.log("Subscription closed, retrying in 5 seconds...");
           setTimeout(setupRealtimeSubscription, 5000);
+        } else {
+          console.error("Maximum reconnect attempts reached.");
         }
       });
 
