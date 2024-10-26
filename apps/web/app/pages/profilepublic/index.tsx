@@ -1,81 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { getUserProfileByUsername } from '@/server.actions/profilePublic/profilePublic.actions';
-import { GetServerSidePropsContext } from 'next';
-import { StarIcon, MapPinIcon, GlobeAltIcon, HeartIcon } from '@heroicons/react/24/solid';
-import Profile from './profile';
-import UserProfileCard from './profilecontactemoi';
+"use client";
 
-type UserProfile = {
-  firstName?: string | null;
-  lastName?: string | null;
-  username?: string | null;
-  userEmail?: string | null;
-  address?: string | null;
-  phoneNumber?: string | null;
-  bio?: string | null;
-  profilePic?: string | null;
-  title?: string | null;
-  rating?: number;
-  reviews?: number;
-  languages?: string[];
-  skills?: string[];
-};
+import ContactCardProfile from "@/app/pages/profilepublic/ContactCard";
+import MainCardProfile from "@/app/pages/profilepublic/MainProfil";
+import MainCardProfile2 from "@/app/pages/profilepublic/Sesrvice";
+import { useState } from "react";
+export default function UserProfilePage({
+  username,
+  profile,
+}: {
+  username: string;
+  profile: any;
+}) {
+  const [showFullBio, setShowFullBio] = useState(false);
 
-export default function UserProfilePage({ username }: { username: string }) {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const userProfile = await getUserProfileByUsername(username);
-        if (userProfile) {
-          setProfile(userProfile as UserProfile);
-        } else {
-          console.error("Profil utilisateur non trouvé");
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération du profil utilisateur :", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchProfile();
-  }, [username]);
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen">Chargement...</div>;
-  }
+  const toggleBio = () => setShowFullBio(!showFullBio);
 
   if (!profile) {
-    return <div className="flex justify-center items-center h-screen">Profil non trouvé</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Profil non trouvé
+      </div>
+    );
   }
 
   return (
-    
-    
-    <div className="flex items-start space-x-8 mb-5">
-      
-        
-          <Profile profile={{ ...profile, username: username, profilePic: profile.profilePic || '/placeholder.svg' }} />
-
-    
-      <UserProfileCard
-      
-            firstName={profile.firstName || ''}
-            lastName={profile.lastName || ''}
-            username={profile.username || ''}
-            profilePic={profile.profilePic || '/placeholder.svg'}
-          />
+    <div className="container px-4 py-8 mx-auto space-y-8">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <MainCardProfile profile={profile} username={username} />
+        <div className="md:col-span-1 md:sticky md:top-8">
+          <ContactCardProfile profile={profile} />
+        </div>
+      </div>
+      <MainCardProfile2 profile={profile} username={username} />
     </div>
   );
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { username } = context.params || {};
-  if (typeof username !== 'string') {
-    return { props: { initialUsername: '' } };
-  }
-  return { props: { initialUsername: username } };
 }
