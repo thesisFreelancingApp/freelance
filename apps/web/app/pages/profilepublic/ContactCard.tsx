@@ -16,6 +16,7 @@ interface ContactCardProfileProps {
 export default function ContactCardProfile({
   profile,
 }: ContactCardProfileProps) {
+  console.log(profile);
   return (
     <Card className="col-span-1">
       <CardContent className="p-6">
@@ -23,9 +24,13 @@ export default function ContactCardProfile({
           <Avatar className="w-20 h-20 border-2 border-primary">
             <AvatarImage
               src={profile.profilePic}
-              alt={`${profile.firstName} ${profile.lastName}`}
+              alt={`${profile.firstName || ""} ${profile.lastName || ""}`}
             />
-            <AvatarFallback>{`${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}`}</AvatarFallback>
+            <AvatarFallback>
+              {`${profile.firstName?.charAt(0) || "?"}${
+                profile.lastName?.charAt(0) || "?"
+              }`}
+            </AvatarFallback>
           </Avatar>
           <h2 className="mt-4 text-xl font-semibold">
             {profile.firstName} {profile.lastName}

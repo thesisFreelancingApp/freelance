@@ -1,4 +1,4 @@
-import ProfessionalInfoForm from "@/app/pages/sellers/pro-info/proffesionalInfo";
+import ProfessionalInfoForm from "@/app/pages/sellers/complete-profile";
 
 export default function ProfessionalInfoPage() {
   return <ProfessionalInfoForm />;
