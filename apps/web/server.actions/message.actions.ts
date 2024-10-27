@@ -266,7 +266,7 @@ export async function markMessagesAsRead(chatRoomId: string) {
   }
 
   try {
-    await prisma.message.updateMany({
+    const messages = await prisma.message.updateMany({
       where: {
         chatRoomId,
         NOT: { senderId: user.id },
@@ -276,6 +276,16 @@ export async function markMessagesAsRead(chatRoomId: string) {
         isRead: true,
       },
     });
+
+    // If any messages were updated, update the chat room's updatedAt
+    if (messages.count > 0) {
+      await prisma.chatRoom.update({
+        where: { id: chatRoomId },
+        data: { updatedAt: new Date() },
+      });
+    }
+
+    return messages;
   } catch (error) {
     console.error("Error marking messages as read:", error);
     throw new Error("Failed to mark messages as read");

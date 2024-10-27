@@ -57,24 +57,35 @@ export default function Messages() {
   useEffect(() => {
     fetchMessages();
 
-    // Set up real-time subscription with specific filters
     const channel = supabase
-      .channel("messages-changes")
+      .channel("messages-notifications")
       .on(
         "postgres_changes",
         {
           event: "*",
           schema: "public",
           table: "Message",
-          filter: `isRead=false`,
         },
         (payload) => {
           console.log("Message change received:", payload);
-          fetchMessages(); // Refresh messages when there's a change
+          fetchMessages();
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "Message",
+          filter: "isRead=true",
+        },
+        (payload) => {
+          console.log("Message marked as read:", payload);
+          fetchMessages();
         },
       )
       .subscribe((status) => {
-        console.log("Subscription status:", status);
+        console.log("Notification subscription status:", status);
       });
 
     return () => {
