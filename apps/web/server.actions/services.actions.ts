@@ -1,7 +1,7 @@
-// "use server";
-import { ServicePackage } from "@prisma/client";
+"use server";
+import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "@/lib/prismaClient";
-// import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 // // Récupérer un service par ID
 // export const getServiceById = async (id: number) => {
@@ -141,20 +141,24 @@ export const getFeaturedServices = async (limit = 3) => {
   const services = await prisma.service.findMany({
     take: limit,
     include: {
-      ratings: true,
+      ratings: {
+        include: {
+          rater: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
       creator: {
-        select: {
-          profileId: true,
+        include: {
           profile: {
             select: {
               firstName: true,
               lastName: true,
               profilePic: true,
-              seller: {
-                select: {
-                  sellerRating: true,
-                },
-              },
             },
           },
         },
@@ -165,142 +169,124 @@ export const getFeaturedServices = async (limit = 3) => {
           name: true,
           description: true,
           price: true,
-          serviceId: true, // Ajout du champ serviceId
+          serviceId: true,
           deliveryTime: true,
           revisions: true,
           features: true,
         },
       },
     },
-    orderBy: { id: "desc" },
+    orderBy: { createdAt: "desc" },
   });
 
   return services.map((service) => ({
     ...service,
+    creator: {
+      ...service.creator,
+      name: `${service.creator.profile.firstName} ${service.creator.profile.lastName}`,
+      profilePic: service.creator.profile.profilePic,
+    },
     packages: service.packages.map((pkg) => ({
       ...pkg,
-      price: pkg.price.toString(), // Convert Decimal to string
-      serviceId: pkg.serviceId, // Assurez-vous que serviceId est inclus
+      price: pkg.price.toString(),
     })),
+    rating:
+      service.ratings.length > 0
+        ? service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+          service.ratings.length
+        : 0,
   }));
 };
 
-//   // Convert Decimal to string for each package price
-//   return services.map((service) => ({
-//     ...service,
-//     packages: service.packages.map((pkg) => ({
-//       ...pkg,
-//       price: pkg.price.toString(), // Convert Decimal to string
-//     })),
-//   }));
-// };
+// Create a new service
+export const createService = async (data: {
+  name: string;
+  description: string;
+  images: string[];
+  tags: string[];
+  packages: {
+    basic: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+    standard: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+    premium: {
+      name: string;
+      description: string;
+      price: number;
+      deliveryTime: number;
+      revisions: number;
+      features: string[];
+    };
+  };
+}) => {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-// // Get all services (gigs)
-// export const getAllServices = async () => {
-//   const services = await prisma.service.findMany({
-//     include: {
-//       ratings: true,
-//       category: true,
-//       creator: {
-//         select: {
-//           id: true,
-//           firstName: true,
-//           lastName: true,
-//           profilePic: true,
-//           sellerRating: true,
-//         },
-//       },
-//       packages: true,
-//     },
-//   });
-//   return services;
-// };
+  if (!user) {
+    throw new Error("You must be logged in to create a service");
+  }
 
-// // Search services
-// export const searchServices = async (
-//   query: string,
-//   categoryId: number | null = null,
-// ) => {
-//   const services = await prisma.service.findMany({
-//     where: {
-//       OR: [
-//         { name: { contains: query, mode: "insensitive" } },
-//         { description: { contains: query, mode: "insensitive" } },
-//       ],
-//       ...(categoryId && { categoryId }),
-//     },
-//     include: {
-//       ratings: true,
-//       category: true,
-//       creator: {
-//         select: {
-//           id: true,
-//           firstName: true,
-//           lastName: true,
-//           profilePic: true,
-//           sellerRating: true,
-//         },
-//       },
-//       packages: true,
-//     },
-//   });
-//   return services;
-// };
+  // Get the seller profile for the user
+  const seller = await prisma.seller.findFirst({
+    where: {
+      profile: {
+        id: user.id,
+      },
+    },
+  });
 
-// // Get services by category
-// export const getServicesByCategory = async (categoryId: number) => {
-//   const services = await prisma.service.findMany({
-//     where: { categoryId },
-//     include: {
-//       ratings: true,
-//       category: true,
-//       creator: {
-//         select: {
-//           id: true,
-//           firstName: true,
-//           lastName: true,
-//           profilePic: true,
-//           sellerRating: true,
-//         },
-//       },
-//       packages: true,
-//     },
-//   });
-//   return services;
-// };
+  if (!seller) {
+    throw new Error("Seller profile not found");
+  }
 
-// export const getRelatedServices = async (
-//   categoryId: number,
-//   currentServiceId: number,
-//   limit = 3,
-// ) => {
-//   const services = await prisma.service.findMany({
-//     where: {
-//       categoryId: categoryId,
-//       id: { not: currentServiceId },
-//     },
-//     take: limit,
-//     include: {
-//       ratings: true,
-//       creator: {
-//         select: {
-//           id: true,
-//           firstName: true,
-//           lastName: true,
-//           profilePic: true,
-//           sellerRating: true,
-//         },
-//       },
-//       category: true,
-//       packages: true,
-//     },
-//   });
+  const service = await prisma.service.create({
+    data: {
+      name: data.name,
+      description: data.description,
+      creatorId: seller.id,
+      images: data.images,
+      tags: data.tags,
+      packages: {
+        create: [
+          {
+            ...data.packages.basic,
+            price: new Decimal(data.packages.basic.price),
+          },
+          {
+            ...data.packages.standard,
+            price: new Decimal(data.packages.standard.price),
+          },
+          {
+            ...data.packages.premium,
+            price: new Decimal(data.packages.premium.price),
+          },
+        ],
+      },
+    },
+    include: {
+      packages: true,
+    },
+  });
 
-//   return services.map((service) => ({
-//     ...service,
-//     packages: service.packages.map((pkg) => ({
-//       ...pkg,
-//       price: pkg.price.toString(),
-//     })),
-//   }));
-// };
+  return {
+    ...service,
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(),
+    })),
+  };
+};
