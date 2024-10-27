@@ -12,11 +12,24 @@ export const getSession = async () => {
 };
 
 export const getUserDB = async () => {
-  const user = await prisma.authUser.findUnique({
-    where: { email: "mak.prod07@gmail.com" },
+  const supabase = createClient();
+  const { data: user, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user?.user?.email) {
+    console.error("Error fetching user from Supabase:", authError);
+    return null;
+  }
+
+  const dbUser = await prisma.authUser.findUnique({
+    where: { email: user.user.email },
     include: { profile: true },
   });
-  return user;
+
+  if (!dbUser) {
+    console.error("No user found in the database for the given email");
+  }
+
+  return dbUser;
 };
 
 export const getUser = async () => {
@@ -27,4 +40,3 @@ export const getUser = async () => {
 
   return user.user;
 };
-

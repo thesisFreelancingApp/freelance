@@ -1,4 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,7 +40,7 @@ type OccupationsSectionProps = {
   setSector: (value: string) => void;
 };
 
-export default function OccupationsSection({
+export default function Component({
   occupations,
   companyType,
   companyName,
@@ -54,130 +57,158 @@ export default function OccupationsSection({
   setSector,
 }: OccupationsSectionProps) {
   return (
-    <div className="space-y-4">
-      <Label>Company Type</Label>
-      <Select
-        value={companyType}
-        onValueChange={(value) =>
-          setCompanyType(value as "freelancer" | "company")
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select Company Type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="freelancer">Freelancer</SelectItem>
-          <SelectItem value="company">Company</SelectItem>
-        </SelectContent>
-      </Select>
-
-      {/* Conditionally disable the companyName and sector fields based on companyType */}
-      <div className="space-y-2">
-        <Label htmlFor="companyName">Company Name</Label>
-        <Input
-          id="companyName"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          placeholder="Enter your company name"
-          disabled={companyType === "freelancer"}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Sector</Label>
-        <Select
-          value={sector}
-          onValueChange={setSector}
-          disabled={companyType === "freelancer"} // Disable if "Freelancer" is selected
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Sector" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="technology">Technology</SelectItem>
-            <SelectItem value="healthcare">Healthcare</SelectItem>
-            <SelectItem value="finance">Finance</SelectItem>
-            <SelectItem value="education">Education</SelectItem>
-            <SelectItem value="marketing">Marketing</SelectItem>
-            <SelectItem value="manufacturing">Manufacturing</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="profession">Profession</Label>
-        <Input
-          id="profession"
-          value={profession}
-          onChange={(e) => setProfession(e.target.value)}
-          placeholder="Enter your profession"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Experience Level</Label>
-        <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Experience Level" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="no_experience">No Experience</SelectItem>
-            <SelectItem value="junior">Junior</SelectItem>
-            <SelectItem value="intermediate">Intermediate</SelectItem>
-            <SelectItem value="senior">Senior</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Label>Your Occupations</Label>
-      {occupations.map((occupation, index) => (
-        <div key={index} className="space-y-2">
-          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-            <Input
-              value={occupation.title}
-              onChange={(e) => updateOccupation(index, "title", e.target.value)}
-              placeholder="Enter occupation title"
-            />
-            <Input
-              type="date"
-              value={
-                occupation.from
-                  ? occupation.from.toISOString().slice(0, 10)
-                  : ""
-              }
-              onChange={(e) =>
-                updateOccupation(index, "from", new Date(e.target.value))
-              }
-              placeholder="From"
-            />
-            <Input
-              type="date"
-              value={
-                occupation.to ? occupation.to.toISOString().slice(0, 10) : ""
-              }
-              onChange={(e) =>
-                updateOccupation(index, "to", new Date(e.target.value))
-              }
-              placeholder="To"
-            />
-          </div>
-          {index > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => removeOccupation(index)}
-              className="mt-2"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Remove Occupation
-            </Button>
-          )}
+    <Card>
+      <CardHeader>
+        <CardTitle>Profil de Carrière</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="companyType">Type d'Entreprise</Label>
+          <Select
+            value={companyType}
+            onValueChange={(value) =>
+              setCompanyType(value as "freelancer" | "company")
+            }
+          >
+            <SelectTrigger id="companyType">
+              <SelectValue placeholder="Sélectionnez le type d'entreprise" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="freelancer">Freelance</SelectItem>
+              <SelectItem value="company">Entreprise</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      ))}
-      <Button onClick={addOccupation} variant="outline" size="sm">
-        <Plus className="w-4 h-4 mr-2" />
-        Add Occupation
-      </Button>
-    </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="companyName">Nom de l'Entreprise</Label>
+          <Input
+            id="companyName"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="Entrez le nom de votre entreprise"
+            disabled={companyType === "freelancer"}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="sector">Secteur</Label>
+          <Select
+            value={sector}
+            onValueChange={setSector}
+            disabled={companyType === "freelancer"}
+          >
+            <SelectTrigger id="sector">
+              <SelectValue placeholder="Sélectionnez le secteur" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="technology">Technologie</SelectItem>
+              <SelectItem value="healthcare">Santé</SelectItem>
+              <SelectItem value="finance">Finance</SelectItem>
+              <SelectItem value="education">Éducation</SelectItem>
+              <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectItem value="manufacturing">Industrie</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="profession">Profession</Label>
+          <Input
+            id="profession"
+            value={profession}
+            onChange={(e) => setProfession(e.target.value)}
+            placeholder="Entrez votre profession"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="experienceLevel">Niveau d'Expérience</Label>
+          <Select value={experienceLevel} onValueChange={setExperienceLevel}>
+            <SelectTrigger id="experienceLevel">
+              <SelectValue placeholder="Sélectionnez le niveau d'expérience" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="no_experience">Aucune expérience</SelectItem>
+              <SelectItem value="junior">Junior</SelectItem>
+              <SelectItem value="intermediate">Intermédiaire</SelectItem>
+              <SelectItem value="senior">Sénior</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-4">
+          <Label>Vos Occupations</Label>
+          {occupations.map((occupation, index) => (
+            <Card key={index}>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor={`occupation-title-${index}`}>Titre</Label>
+                    <Input
+                      id={`occupation-title-${index}`}
+                      value={occupation.title}
+                      onChange={(e) =>
+                        updateOccupation(index, "title", e.target.value)
+                      }
+                      placeholder="Entrez le titre de l'occupation"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`occupation-from-${index}`}>De</Label>
+                    <Input
+                      id={`occupation-from-${index}`}
+                      type="date"
+                      value={
+                        occupation.from
+                          ? occupation.from.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) =>
+                        updateOccupation(
+                          index,
+                          "from",
+                          new Date(e.target.value),
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`occupation-to-${index}`}>À</Label>
+                    <Input
+                      id={`occupation-to-${index}`}
+                      type="date"
+                      value={
+                        occupation.to
+                          ? occupation.to.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) =>
+                        updateOccupation(index, "to", new Date(e.target.value))
+                      }
+                    />
+                  </div>
+                </div>
+                {index > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeOccupation(index)}
+                    className="mt-4"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Supprimer l'Occupation
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+          <Button onClick={addOccupation} variant="outline" size="sm">
+            <Plus className="w-4 h-4 mr-2" />
+            Ajouter une Occupation
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

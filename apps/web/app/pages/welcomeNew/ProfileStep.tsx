@@ -104,9 +104,7 @@ export default function ProfileStep({
             placeholder="Foulen"
             value={profile.firstName}
             onChange={handleInputChange}
-            className={cn(
-              fieldErrors.firstName ? "border-red-500" : "border-gray-300",
-            )}
+            className={cn(fieldErrors.firstName ? "border-red-500" : "")}
           />
           {fieldErrors.firstName && (
             <p className="text-sm text-red-500">{fieldErrors.firstName}</p>
@@ -120,9 +118,7 @@ export default function ProfileStep({
             placeholder="Ben Falten"
             value={profile.lastName}
             onChange={handleInputChange}
-            className={cn(
-              fieldErrors.lastName ? "border-red-500" : "border-gray-300",
-            )}
+            className={cn(fieldErrors.lastName ? "border-red-500" : "")}
           />
           {fieldErrors.lastName && (
             <p className="text-sm text-red-500">{fieldErrors.lastName}</p>
@@ -137,9 +133,7 @@ export default function ProfileStep({
           placeholder="216 Rue Tounes, Tunisie"
           value={profile.address}
           onChange={handleInputChange}
-          className={cn(
-            fieldErrors.address ? "border-red-500" : "border-gray-300",
-          )}
+          className={cn(fieldErrors.address ? "border-red-500" : "")}
         />
       </div>
       <div className="space-y-2">
@@ -184,9 +178,7 @@ export default function ProfileStep({
           placeholder="+216 99 55 44 22"
           value={profile.phoneNumber}
           onChange={handlePhoneInputChange}
-          className={cn(
-            fieldErrors.phoneNumber ? "border-red-500" : "border-gray-300",
-          )}
+          className={cn(fieldErrors.phoneNumber ? "border-red-500" : "")}
         />
         {fieldErrors.phoneNumber && (
           <p className="text-sm text-red-500">{fieldErrors.phoneNumber}</p>
@@ -202,7 +194,7 @@ export default function ProfileStep({
           onChange={(e) =>
             e.target.value.length <= bioMaxLength && handleInputChange(e)
           }
-          className={cn(fieldErrors.bio ? "border-red-500" : "border-gray-300")}
+          className={cn(fieldErrors.bio ? "border-red-500" : "")}
         />
         <p className="text-sm text-gray-500">
           {profile.bio.length}/{bioMaxLength} caractères

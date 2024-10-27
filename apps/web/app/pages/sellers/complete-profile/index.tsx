@@ -1,10 +1,17 @@
 "use client";
 
+import CompletionStep from "@/app/pages/sellers/complete-profile/CompletionStep";
 import SkillsAndEducation from "@/app/pages/sellers/complete-profile/EducationAndSkillsSection";
 import LanguageSection from "@/app/pages/sellers/complete-profile/LanguageSection";
 import OccupationsSection from "@/app/pages/sellers/complete-profile/OccupationsSection";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
 import * as Toast from "@radix-ui/react-toast";
@@ -12,24 +19,25 @@ import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Define the types for various sections
 type Occupation = {
   title: string;
   from: Date | undefined;
   to: Date | undefined;
 };
+
 type Education = {
   faculty: string;
   from: Date | undefined;
   to: Date | undefined;
 };
+
 type Certification = {
   title: string;
   institution: string;
   date: Date | undefined;
 };
 
-export default function ProfessionalInfoForm() {
+export default function Component() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -41,7 +49,6 @@ export default function ProfessionalInfoForm() {
 
   const progress = (currentStep / totalSteps) * 100;
 
-  // State for each section
   const [occupations, setOccupations] = useState<Occupation[]>([
     { title: "", from: undefined, to: undefined },
   ]);
@@ -62,7 +69,6 @@ export default function ProfessionalInfoForm() {
   const [toastOpen, setToastOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
 
-  // Update the URL with the current step
   const updateStepInUrl = (step: number) => {
     const newUrl = `${window.location.pathname}?step=${step}`;
     router.replace(newUrl);
@@ -116,6 +122,8 @@ export default function ProfessionalInfoForm() {
       console.log("Profile created:", newProfile);
       setToastMessage("Profile created successfully!");
       setToastOpen(true);
+      setCurrentStep(totalSteps);
+      updateStepInUrl(totalSteps);
     } catch (error) {
       console.error("Error creating profile:", error);
       setToastMessage("Error creating profile. Please try again.");
@@ -139,117 +147,134 @@ export default function ProfessionalInfoForm() {
     });
   };
 
-  // Update the URL when `currentStep` changes
   useEffect(() => {
     updateStepInUrl(currentStep);
   }, [currentStep]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle>Professional Information</CardTitle>
-        <Progress value={progress} className="w-full" />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {currentStep === 1 && (
-          <OccupationsSection
-            occupations={occupations}
-            companyType={type}
-            companyName={companyName}
-            profession={profession}
-            experienceLevel={experienceLevel}
-            sector={sector}
-            addOccupation={() =>
-              setOccupations([
-                ...occupations,
-                { title: "", from: undefined, to: undefined },
-              ])
-            }
-            removeOccupation={(index) =>
-              setOccupations(occupations.filter((_, i) => i !== index))
-            }
-            updateOccupation={(index, field, value) =>
-              setOccupations(
-                occupations.map((occ, i) =>
-                  i === index ? { ...occ, [field]: value } : occ,
-                ),
-              )
-            }
-            setCompanyType={setCompanyType}
-            setCompanyName={setCompanyName}
-            setProfession={setProfession}
-            setExperienceLevel={setExperienceLevel}
-            setSector={setSector}
-          />
-        )}
-        {currentStep === 2 && (
-          <SkillsAndEducation
-            certifications={certifications}
-            addCertification={() =>
-              setCertifications([
-                ...certifications,
-                { title: "", institution: "", date: undefined },
-              ])
-            }
-            removeCertification={(index) =>
-              setCertifications(certifications.filter((_, i) => i !== index))
-            }
-            updateCertification={(index, field, value) =>
-              setCertifications(
-                certifications.map((cert, i) =>
-                  i === index ? { ...cert, [field]: value } : cert,
-                ),
-              )
-            }
-            skills={skills}
-            addSkill={(skill) => setSkills([...skills, skill])}
-            removeSkill={(index) =>
-              setSkills(skills.filter((_, i) => i !== index))
-            }
-            educations={educations}
-            addEducation={() =>
-              setEducations([
-                ...educations,
-                { faculty: "", from: undefined, to: undefined },
-              ])
-            }
-            removeEducation={(index) =>
-              setEducations(educations.filter((_, i) => i !== index))
-            }
-            updateEducation={(index, field, value) =>
-              setEducations(
-                educations.map((edu, i) =>
-                  i === index ? { ...edu, [field]: value } : edu,
-                ),
-              )
-            }
-          />
-        )}
-        {currentStep === 3 && (
-          <LanguageSection
-            languages={languages}
-            setLanguages={setLanguages}
-            timeZone={timeZone}
-            setTimeZone={setTimeZone}
-          />
-        )}
-
-        <div className="flex justify-between mt-4">
-          {currentStep > 1 && <Button onClick={prevStep}>Back</Button>}
-          {currentStep < totalSteps ? (
-            <Button onClick={nextStep}>Next</Button>
-          ) : (
-            <Button onClick={handleSubmit}>Submit</Button>
+    <div className="container px-4 py-8 mx-auto">
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold">
+            Détails Professionnels
+          </CardTitle>
+          <Progress value={progress} className="w-full mb-6" />
+          <CardDescription>Merci de compléter votre profil.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {currentStep === 1 && (
+            <OccupationsSection
+              occupations={occupations}
+              companyType={type}
+              companyName={companyName}
+              profession={profession}
+              experienceLevel={experienceLevel}
+              sector={sector}
+              addOccupation={() =>
+                setOccupations([
+                  ...occupations,
+                  { title: "", from: undefined, to: undefined },
+                ])
+              }
+              removeOccupation={(index) =>
+                setOccupations(occupations.filter((_, i) => i !== index))
+              }
+              updateOccupation={(index, field, value) =>
+                setOccupations(
+                  occupations.map((occ, i) =>
+                    i === index ? { ...occ, [field]: value } : occ,
+                  ),
+                )
+              }
+              setCompanyType={setCompanyType}
+              setCompanyName={setCompanyName}
+              setProfession={setProfession}
+              setExperienceLevel={setExperienceLevel}
+              setSector={setSector}
+            />
           )}
-        </div>
-      </CardContent>
+          {currentStep === 2 && (
+            <SkillsAndEducation
+              certifications={certifications}
+              addCertification={() =>
+                setCertifications([
+                  ...certifications,
+                  { title: "", institution: "", date: undefined },
+                ])
+              }
+              removeCertification={(index) =>
+                setCertifications(certifications.filter((_, i) => i !== index))
+              }
+              updateCertification={(index, field, value) =>
+                setCertifications(
+                  certifications.map((cert, i) =>
+                    i === index ? { ...cert, [field]: value } : cert,
+                  ),
+                )
+              }
+              skills={skills}
+              addSkill={(skill) => setSkills([...skills, skill])}
+              removeSkill={(index) =>
+                setSkills(skills.filter((_, i) => i !== index))
+              }
+              educations={educations}
+              addEducation={() =>
+                setEducations([
+                  ...educations,
+                  { faculty: "", from: undefined, to: undefined },
+                ])
+              }
+              removeEducation={(index) =>
+                setEducations(educations.filter((_, i) => i !== index))
+              }
+              updateEducation={(index, field, value) =>
+                setEducations(
+                  educations.map((edu, i) =>
+                    i === index ? { ...edu, [field]: value } : edu,
+                  ),
+                )
+              }
+            />
+          )}
+          {currentStep === 3 && (
+            <LanguageSection
+              languages={languages}
+              setLanguages={setLanguages}
+              timeZone={timeZone}
+              setTimeZone={setTimeZone}
+            />
+          )}
+          {currentStep === 4 && <CompletionStep />}
+          {/* Boutons de navigation */}
+          {currentStep < totalSteps - 1 && (
+            <div className="flex justify-between mt-4">
+              {currentStep > 1 && (
+                <Button variant="secondary" onClick={prevStep}>
+                  Retour
+                </Button>
+              )}
+              <Button onClick={nextStep}>Suivant</Button>
+            </div>
+          )}
 
-      <Toast.Provider>
-        <Toast.Root open={toastOpen} onOpenChange={setToastOpen}>
-          <Toast.Title>{toastMessage}</Toast.Title>
-        </Toast.Root>
-        <Toast.Viewport />
-      </Toast.Provider>
-    </Card>
+          {/* Boutons de Soumission à l’avant-dernière étape */}
+          {currentStep === totalSteps - 1 && (
+            <div className="flex justify-between mt-4">
+              <Button variant="secondary" onClick={prevStep}>
+                Retour
+              </Button>
+              <Button onClick={handleSubmit}>Soumettre</Button>
+            </div>
+          )}
+        </CardContent>
+
+        <Toast.Provider>
+          <Toast.Root open={toastOpen} onOpenChange={setToastOpen}>
+            <Toast.Title>{toastMessage}</Toast.Title>
+          </Toast.Root>
+          <Toast.Viewport />
+        </Toast.Provider>
+      </Card>
+    </div>
   );
 }

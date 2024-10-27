@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
 import { signOutAction } from "@/server.actions/auth/auth.actions";
 import {
   Bell,
+  BriefcaseBusiness,
   HelpCircle,
   Home,
   LayoutDashboard,
@@ -19,6 +21,7 @@ import {
   UserCog,
 } from "lucide-react";
 import Link from "next/link";
+
 interface UserProfile {
   profilePic?: string | null;
 }
@@ -27,17 +30,20 @@ interface UserData {
   email?: string | null;
   name?: string | null;
   id?: string | null;
-  profile?: UserProfile | null; // Add profile as an optional property
+  username?: string | null;
+  profile?: UserProfile | null;
 }
 
 interface UserMenuProps {
-  data: UserData | null; // Ensure that data can be null
+  data: UserData | null;
+  isSeller: any;
 }
 
-export default function UserMenu({ data }: UserMenuProps) {
-  const name = data?.name ?? "Guest";
+export default function UserMenu({ data, isSeller }: UserMenuProps) {
+  const name = data?.name ?? "Invité";
   const userLettre = name ? name.charAt(0) : "?";
-
+  const username = data?.username;
+  console.log("iiiiii", isSeller);
   return (
     <div className="flex justify-end">
       <DropdownMenu>
@@ -49,7 +55,10 @@ export default function UserMenu({ data }: UserMenuProps) {
             <Button variant="ghost" className="relative w-8 h-8 rounded-full">
               <Avatar className="w-10 h-10">
                 {data?.profile?.profilePic ? (
-                  <AvatarImage src={data.profile.profilePic} alt="@shadcn" />
+                  <AvatarImage
+                    src={data.profile.profilePic}
+                    alt="Photo de profil"
+                  />
                 ) : (
                   <AvatarFallback className="text-black/80 bg-secondary dark:bg-secondary dark:text-white/80">
                     {userLettre}
@@ -62,43 +71,72 @@ export default function UserMenu({ data }: UserMenuProps) {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <p className="text-xs leading-none">
-              <span>ID: </span>
+              <span>ID : </span>
               <span>{data?.id || "N/A"}</span>
             </p>
             <p className="text-[12] mt-2 font-bold leading-none">
-              {data?.email || "No email available"}
+              {data?.email || "Aucun e-mail disponible"}
             </p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
+            <Link href="/seller-dashboard" className="flex items-center">
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              <span>Tableau de bord vendeur</span>
+            </Link>
+          </DropdownMenuItem>
+          {isSeller.isSeller && isSeller.isSeller.professionalProfile ? (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href={`/${username}`} className="flex items-center">
+                  <BriefcaseBusiness className="w-5 h-5 mr-2" />
+                  <span>Détails Professionnels</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem asChild>
+                <Link
+                  href="/seller/complete-profile"
+                  className="flex items-center"
+                >
+                  <BriefcaseBusiness className="w-5 h-5 mr-2" />
+                  <span>Détails Professionnels</span>
+                  <Badge className="ml-2" variant={"destructive"}>
+                    compléter
+                  </Badge>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+
+          <DropdownMenuItem asChild>
             <Link href="/settings" className="flex items-center">
               <Settings className="w-4 h-4 mr-2" />
-              <span>Settings</span>
+              <span>Paramètres</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/profile" className="flex items-center">
               <UserCog className="w-4 h-4 mr-2" />
-              <span>Edit Profile</span>
+              <span>Modifier le profil</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/" className="flex items-center">
               <Home className="w-4 h-4 mr-2" />
-              <span>Home</span>
+              <span>Accueil</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/seller-dashboard" className="flex items-center">
-              <LayoutDashboard className="w-4 h-4 mr-2" />
-              <span>Seller Dashboard</span>
-            </Link>
-          </DropdownMenuItem>
+
           <DropdownMenuItem asChild>
             <Link href="/help" className="flex items-center">
               <HelpCircle className="w-4 h-4 mr-2" />
-              <span>Get help</span>
+              <span>Obtenir de l'aide</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -106,7 +144,7 @@ export default function UserMenu({ data }: UserMenuProps) {
             <DropdownMenuItem asChild>
               <button type="submit" className="flex items-center w-full">
                 <LogOut className="w-4 h-4 mr-2" />
-                <span>Sign out</span>
+                <span>Se déconnecter</span>
               </button>
             </DropdownMenuItem>
           </form>

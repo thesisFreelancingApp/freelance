@@ -84,34 +84,62 @@ model PersonalProfile {
   ratingsReceived       Rating[]              @relation("RatingRatee")
   createdProjects      Projects[]       @relation("CustomServiceCreator")
   participantIn         CustomServiceParticipant[]
-  professionalProfile   ProfessionalProfile? @relation(fields: [professionalProfileid], references: [id])
+
 
 }
 
+// model Seller {
+//   id                   String               @id @default(uuid())
+//   profileId            String               @unique
+//   profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+//   sellerRating         Float?
+//   totalEarnings        Float                @default(0.0)
+//   createdAt            DateTime             @default(now())
+//   updatedAt            DateTime             @updatedAt
+
+//   // Relations
+//   createdServices      Service[]            @relation("CreatedServices")
+//   professionalProfile  ProfessionalProfile?
+  
+// }
 model Seller {
-  id                   String               @id @default(uuid())
-  profileId            String               @unique
-  profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  sellerRating         Float?
-  totalEarnings        Float                @default(0.0)
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  id                    String               @id @default(uuid())
+  profileId             String               @unique
+  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+  professionalProfileId String?              @unique
+  professionalProfile   ProfessionalProfile? @relation("SellerProfessionalProfile", fields: [professionalProfileId], references: [id])
+  sellerRating          Float?
+  totalEarnings         Float                @default(0.0)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   // Relations
-  createdServices      Service[]            @relation("CreatedServices")
-  professionalProfile  ProfessionalProfile?
+  createdServices       Service[]            @relation("CreatedServices")
 }
 
+// model Buyer {
+//   id                String          @id @default(uuid())
+//   profileId         String          @unique
+//   profile           PersonalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+//   totalSpent        Float           @default(0.0)
+//   createdAt         DateTime        @default(now())
+//   updatedAt         DateTime        @updatedAt
+
+//   // Relations
+//   purchasedServices Service[]       @relation("PurchasedServices")
+// }
 model Buyer {
-  id                String          @id @default(uuid())
-  profileId         String          @unique
-  profile           PersonalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  totalSpent        Float           @default(0.0)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id                    String               @id @default(uuid())
+  profileId             String               @unique
+  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+  professionalProfileId String?              @unique
+  professionalProfile   ProfessionalProfile? @relation("BuyerProfessionalProfile", fields: [professionalProfileId], references: [id])
+  totalSpent            Float                @default(0.0)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   // Relations
-  purchasedServices Service[]       @relation("PurchasedServices")
+  purchasedServices     Service[]           @relation("PurchasedServices")
 }
 
 // ------------------------
@@ -121,9 +149,42 @@ enum ProfileType {
   FREELANCER
   COMPANY
 }
+// model ProfessionalProfile {
+//   id                   String               @id @default(uuid()) 
+//   buyerId              String?     @unique
+//   sellerId             String?     @unique
+//   sellerProfileId      String               @unique
+//   personalWebsite      String?
+//   occupations          Json?
+//   companyName          String?
+//   type                 ProfileType?
+//   sector               String?
+//   profession           String?
+//   experienceYears      Int?
+
+//   educations           Json?
+//   skills               Json?
+//   certifications       Json?
+
+//   language             String[]
+//   timeZone             String?
+
+  
+//   website              String?
+//   preferredCategoryId  Int?
+//   createdAt            DateTime             @default(now())
+//   updatedAt            DateTime             @updatedAt
+
+//   // Relations
+//   seller               Seller               @relation(fields: [sellerProfileId], references: [profileId], onDelete: Cascade)
+//   preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
+//   PersonalProfile      PersonalProfile[]
+// }
+
 model ProfessionalProfile {
-  id                   String               @id @default(uuid())
-  sellerProfileId      String               @unique
+  id                   String               @id @default(uuid()) 
+  buyer                Buyer?               @relation("BuyerProfessionalProfile")
+  seller               Seller?              @relation("SellerProfessionalProfile")
   personalWebsite      String?
   occupations          Json?
   companyName          String?
@@ -131,27 +192,19 @@ model ProfessionalProfile {
   sector               String?
   profession           String?
   experienceYears      Int?
-
   educations           Json?
   skills               Json?
   certifications       Json?
-
   language             String[]
   timeZone             String?
-
-  
   website              String?
   preferredCategoryId  Int?
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
   // Relations
-  seller               Seller               @relation(fields: [sellerProfileId], references: [profileId], onDelete: Cascade)
   preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
-  PersonalProfile      PersonalProfile[]
 }
-
-
 
 // ------------------------
 // Modèles de Service
