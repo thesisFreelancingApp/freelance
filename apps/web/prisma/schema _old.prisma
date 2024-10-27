@@ -35,6 +35,13 @@ model Profile {
   lastName      String?  // Optional field for user's last name
   profilePic    String?  // Optional profile picture URL
   role          Role?    // Role enum to define user type (e.g., user, admin)
+  level         Level?   // Level enum to define user's skill level
+  plan          Plan?    // Plan enum for user's subscription or usage plan
+  skills        String?  // Optional field for user's skills
+  languages     String?  // Optional field for user's known languages
+  education     String?  // Optional field for education details
+  certifications String? // Optional field for certifications
+  jobs          Jobs?    // Enum for user's job category (e.g., Graphisme_Design, Programmation_Tech)
   phoneNumber   String?  // Optional field for user's phone number
   address       String?  // Optional field for user's address
   bio           String?  // Optional biography of the user
@@ -183,27 +190,36 @@ enum Jobs {
 
 // ChatRoom model for managing conversations between freelancers and clients
 model ChatRoom {
-  id           Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  clientId     String   // Foreign key to Profile (client)
-  freelancerId String   // Foreign key to Profile (freelancer)
-  createdAt    DateTime @default(now()) // Timestamp when chat room was created
-  updatedAt    DateTime @updatedAt // Timestamp when chat room was last updated
+  id           Int      @id @default(autoincrement())
+  clientId     String
+  freelancerId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastMessageAt DateTime @default(now())  // Add this line
 
-  // Relations
-  client       Profile  @relation("ClientChatRooms", fields: [clientId], references: [id]) // Relation to client
-  freelancer   Profile  @relation("FreelancerChatRooms", fields: [freelancerId], references: [id]) // Relation to freelancer
-  messages     Message[] // Messages within this chat room
+  client       Profile  @relation("ClientChatRooms", fields: [clientId], references: [id])
+  freelancer   Profile  @relation("FreelancerChatRooms", fields: [freelancerId], references: [id])
+  messages     Message[]
+
+  @@unique([clientId, freelancerId])
+  @@index([clientId])
+  @@index([freelancerId])
+  @@index([lastMessageAt])  // Add this line if you want to index this field
 }
 
 // Message model for individual chat messages
 model Message {
-  id         Int      @id @default(autoincrement()) // Auto-incrementing primary key
-  chatRoomId Int      // Foreign key to ChatRoom
-  senderId   String   // Foreign key to Profile (sender of the message)
-  content    String   // Message content
-  createdAt  DateTime @default(now()) // Timestamp when the message was created
+  id         Int      @id @default(autoincrement())
+  chatRoomId Int
+  senderId   String
+  content    String
+  createdAt  DateTime @default(now())
+  isRead     Boolean  @default(false)
 
-  // Relations
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id]) // Relation to the chat room
-  sender     Profile  @relation(fields: [senderId], references: [id]) // Relation to the sender
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender     Profile  @relation(fields: [senderId], references: [id])
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@index([createdAt])
 }

@@ -281,6 +281,7 @@ model Message {
   senderId    String
   content     String
   createdAt   DateTime         @default(now())
+  isRead      Boolean          @default(false)
 
   // Relations
   chatRoom    ChatRoom         @relation(fields: [chatRoomId], references: [id])
@@ -321,3 +322,4 @@ model MainCategories {
   children    MainCategories[] @relation("Hierarchy")
   professionalProfiles ProfessionalProfile[] 
 }
+
