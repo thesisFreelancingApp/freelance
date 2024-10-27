@@ -32,14 +32,16 @@ interface PackageData {
   revisions: number;
   features: string[];
 }
-// Types pour les catégories
+
 interface Category {
   name: string;
   children: SubCategory[];
+  id: number;
 }
 
 interface SubCategory {
   name: string;
+  id: number;
   children?: SubCategory[];
 }
 
@@ -47,25 +49,43 @@ interface SubCategory {
 const categories: Category[] = [
   {
     name: "Graphic Design",
+    id: 1001,
     children: [
       {
         name: "Logo Design",
-        children: [{ name: "Simple Logo" }, { name: "Complex Logo" }],
+        id: 1002,
+        children: [
+          { name: "Simple Logo", id: 1003 },
+          { name: "Complex Logo", id: 1004 },
+        ],
       },
     ],
   },
   {
     name: "Web Development",
+    id: 1005,
     children: [
-      { name: "Frontend", children: [{ name: "React" }, { name: "Vue" }] },
+      {
+        name: "Frontend",
+        id: 1006,
+        children: [
+          { name: "React", id: 1007 },
+          { name: "Vue", id: 1008 },
+        ],
+      },
     ],
   },
   {
     name: "Digital Marketing",
+    id: 1009,
     children: [
       {
         name: "Social Media",
-        children: [{ name: "Facebook Ads" }, { name: "Google Ads" }],
+        id: 1010,
+        children: [
+          { name: "Facebook Ads", id: 1011 },
+          { name: "Google Ads", id: 1012 },
+        ],
       },
     ],
   },
@@ -84,7 +104,6 @@ export default function ServiceCreationForm({
     creatorId: creatorId,
     images: [],
   });
-  const [categoryId, setCategoryId] = useState<number | null>(null);
   const [packageData, setPackageData] = useState<PackageData>({
     name: "",
     description: "",
@@ -93,6 +112,11 @@ export default function ServiceCreationForm({
     revisions: 0,
     features: [],
   });
+
+  const [mainCategory, setMainCategory] = useState<Category | null>(null);
+  const [subCategory, setSubCategory] = useState<SubCategory | null>(null);
+  const [childCategory, setChildCategory] = useState<SubCategory | null>(null);
+
   const handleAddTag = (newTag: string) => {
     if (newTag && serviceData.tags.length < 8) {
       setServiceData((prev) => ({
@@ -108,6 +132,7 @@ export default function ServiceCreationForm({
       tags: prev.tags.filter((_, i) => i !== index),
     }));
   };
+
   const handleServiceDataChange = (field: keyof ServiceData, value: any) => {
     setServiceData((prev) => ({ ...prev, [field]: value }));
   };
@@ -117,11 +142,11 @@ export default function ServiceCreationForm({
   };
 
   const handleSubmit = async () => {
-    if (categoryId) {
+    if (childCategory) {
       try {
         const newService = await createServiceWithCategoryAndPackage(
           serviceData,
-          categoryId,
+          childCategory.id, // Corrigé pour envoyer `name` comme identifiant de catégorie finale
           packageData,
         );
         console.log("Service and package created:", newService);
@@ -131,7 +156,7 @@ export default function ServiceCreationForm({
         alert("An error occurred while creating the service.");
       }
     } else {
-      alert("Please select a category.");
+      alert("Please select a child category.");
     }
   };
 
@@ -172,7 +197,7 @@ export default function ServiceCreationForm({
                     placeholder="Enter a tag and press 'Add'"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && e.currentTarget.value) {
-                        e.preventDefault(); // Prevent form submission on Enter
+                        e.preventDefault();
                         handleAddTag(e.currentTarget.value.trim());
                         e.currentTarget.value = "";
                       }
@@ -219,7 +244,6 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
-      // Étape 2: Sélection de la catégorie avec menus déroulants
       case 2:
         return (
           <>
@@ -227,13 +251,12 @@ export default function ServiceCreationForm({
               <CardTitle>Step 2: Select Category</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Menu déroulant pour la catégorie principale */}
               <div className="space-y-2">
                 <Label>Main Category</Label>
                 <select
                   value={mainCategory?.name || ""}
                   onChange={(e) => {
-                    const selectedMainCategory = allCategories.find(
+                    const selectedMainCategory = categories.find(
                       (cat) => cat.name === e.target.value,
                     );
                     setMainCategory(selectedMainCategory || null);
@@ -243,15 +266,14 @@ export default function ServiceCreationForm({
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select a main category</option>
-                  {allCategories.map((category) => (
-                    <option key={category.name} value={category.name}>
-                      {category.name}
+                  {categories.map((cat: Category) => (
+                    <option key={cat.name} value={cat.name}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {/* Menu déroulant pour la sous-catégorie (affiché si mainCategory est sélectionnée) */}
               {mainCategory && mainCategory.children && (
                 <div className="space-y-2">
                   <Label>Sub Category</Label>
@@ -267,7 +289,7 @@ export default function ServiceCreationForm({
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select a sub-category</option>
-                    {mainCategory.children.map((subCat) => (
+                    {mainCategory.children.map((subCat: SubCategory) => (
                       <option key={subCat.name} value={subCat.name}>
                         {subCat.name}
                       </option>
@@ -276,14 +298,13 @@ export default function ServiceCreationForm({
                 </div>
               )}
 
-              {/* Menu déroulant pour la sous-sous-catégorie (affiché si subCategory est sélectionnée) */}
               {subCategory && subCategory.children && (
                 <div className="space-y-2">
                   <Label>Child Category</Label>
                   <select
                     value={childCategory?.name || ""}
                     onChange={(e) => {
-                      const selectedChildCategory = subCategory.children.find(
+                      const selectedChildCategory = subCategory.children?.find(
                         (childCat) => childCat.name === e.target.value,
                       );
                       setChildCategory(selectedChildCategory || null);
@@ -291,7 +312,7 @@ export default function ServiceCreationForm({
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select a child category</option>
-                    {subCategory.children.map((childCat) => (
+                    {subCategory.children.map((childCat: SubCategory) => (
                       <option key={childCat.name} value={childCat.name}>
                         {childCat.name}
                       </option>
@@ -302,7 +323,6 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
-
       case 3:
         return (
           <>
@@ -351,7 +371,7 @@ export default function ServiceCreationForm({
                 <Input
                   id="package-delivery-time"
                   type="number"
-                  value={packageData.deliveryTime}
+                  value={packageData.deliveryTime.toString()}
                   onChange={(e) =>
                     handlePackageDataChange(
                       "deliveryTime",
@@ -365,7 +385,7 @@ export default function ServiceCreationForm({
                 <Input
                   id="package-revisions"
                   type="number"
-                  value={packageData.revisions}
+                  value={packageData.revisions.toString()}
                   onChange={(e) =>
                     handlePackageDataChange("revisions", Number(e.target.value))
                   }
@@ -374,6 +394,7 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
+
       case 4:
         return (
           <>
@@ -408,6 +429,7 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
+
       case 5:
         return (
           <>
@@ -428,7 +450,7 @@ export default function ServiceCreationForm({
                 </p>
                 <p>
                   <strong>Category:</strong>{" "}
-                  {categories.find((c) => c.id === categoryId)?.name}
+                  {`${mainCategory?.name} > ${subCategory?.name} > ${childCategory?.name}`}
                 </p>
               </div>
               <div>
@@ -461,8 +483,6 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
-      default:
-        return null;
     }
   };
 
