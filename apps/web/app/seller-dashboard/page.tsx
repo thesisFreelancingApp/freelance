@@ -1,6 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getSellerOverview,
+  getSellerServices,
+  getActiveOrders,
+  getSellerMessages,
+} from "@/server.actions/seller-dashboard.actions";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -46,112 +52,86 @@ import {
   Briefcase,
   Users,
 } from "lucide-react";
-
-// Sample data based on the provided schema
-const revenueData = [
-  { name: "Jan", total: 1500 },
-  { name: "Feb", total: 2300 },
-  { name: "Mar", total: 1800 },
-  { name: "Apr", total: 2600 },
-  { name: "May", total: 3100 },
-  { name: "Jun", total: 2900 },
-];
-
-const servicesData = [
-  { id: "1", name: "Logo Design", category: "Design", orders: 12, rating: 4.8 },
-  {
-    id: "2",
-    name: "Website Development",
-    category: "Programming",
-    orders: 8,
-    rating: 4.9,
-  },
-  {
-    id: "3",
-    name: "Content Writing",
-    category: "Writing",
-    orders: 15,
-    rating: 4.7,
-  },
-  {
-    id: "4",
-    name: "Video Editing",
-    category: "Video & Animation",
-    orders: 6,
-    rating: 4.6,
-  },
-  {
-    id: "5",
-    name: "SEO Optimization",
-    category: "Digital Marketing",
-    orders: 10,
-    rating: 4.8,
-  },
-];
-
-const activeOrdersData = [
-  {
-    id: "1",
-    buyer: "Olivia Martin",
-    service: "Logo Design",
-    status: "In Progress",
-    dueDate: "2023-07-15",
-  },
-  {
-    id: "2",
-    buyer: "Jackson Lee",
-    service: "Website Development",
-    status: "Revision",
-    dueDate: "2023-07-18",
-  },
-  {
-    id: "3",
-    buyer: "Isabella Nguyen",
-    service: "Content Writing",
-    status: "Pending",
-    dueDate: "2023-07-20",
-  },
-];
-
-const messagesData = [
-  {
-    id: "1",
-    from: "Olivia Martin",
-    subject: "Logo Design Feedback",
-    preview: "Hi, I've reviewed the initial...",
-    time: "10:23 AM",
-  },
-  {
-    id: "2",
-    from: "Jackson Lee",
-    service: "Website Development",
-    preview: "Can we discuss the responsive...",
-    time: "Yesterday",
-  },
-  {
-    id: "3",
-    from: "Isabella Nguyen",
-    service: "Content Writing",
-    preview: "I have a question about the...",
-    time: "2 days ago",
-  },
-];
+import Loader from "@/app/loading";
+import Link from "next/link";
+import { getAllCategories } from "@/server.actions/category/category.actions";
 
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [serviceFilter, setServiceFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-  const filteredServices = servicesData.filter(
+  // State for data
+  const [overview, setOverview] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+
+  // Add state for revenue data
+  const [revenueData, setRevenueData] = useState<
+    { name: string; total: number }[]
+  >([]);
+
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [
+          overviewData,
+          servicesData,
+          ordersData,
+          messagesData,
+          categoriesData,
+        ] = await Promise.all([
+          getSellerOverview(),
+          getSellerServices(),
+          getActiveOrders(),
+          getSellerMessages(),
+          getAllCategories(), // Use the existing categories function
+        ]);
+
+        setOverview(overviewData);
+        setServices(servicesData);
+        setOrders(ordersData);
+        setMessages(messagesData);
+        // Set the revenue data from the overview
+        setRevenueData(overviewData.monthlyRevenue);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  // Filter services based on search and category
+  const filteredServices = services.filter(
     (service) =>
       service.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (serviceFilter === "all" ||
         service.category.toLowerCase() === serviceFilter.toLowerCase()),
   );
 
+  if (loading) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Welcome back, John!</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        Welcome back, {overview?.sellerName || "Seller"}!
+      </h1>
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
@@ -174,7 +154,9 @@ export default function SellerDashboard() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$45,231.89</div>
+                <div className="text-2xl font-bold">
+                  ${overview?.totalEarnings.toFixed(2)}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   +20.1% from last month
                 </p>
@@ -263,7 +245,7 @@ export default function SellerDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-8">
-                  {servicesData.slice(0, 3).map((service) => (
+                  {services.slice(0, 3).map((service) => (
                     <div key={service.id} className="flex items-center">
                       <Avatar className="h-9 w-9">
                         <AvatarImage
@@ -294,7 +276,7 @@ export default function SellerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Manage Services</CardTitle>
-              <CardDescription>Create and manage your gigs</CardDescription>
+              <CardDescription>Create and manage your Services</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex justify-between mb-4">
@@ -314,20 +296,21 @@ export default function SellerDashboard() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="design">Design</SelectItem>
-                      <SelectItem value="programming">Programming</SelectItem>
-                      <SelectItem value="writing">Writing</SelectItem>
-                      <SelectItem value="video & animation">
-                        Video & Animation
-                      </SelectItem>
-                      <SelectItem value="digital marketing">
-                        Digital Marketing
-                      </SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.name.toLowerCase()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" /> Create New Gig
+                <Button asChild>
+                  <Link href="/createGig">
+                    <Plus className="mr-2 h-4 w-4" /> Create New Service
+                  </Link>
                 </Button>
               </div>
               <Table>
@@ -371,7 +354,7 @@ export default function SellerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Active Orders</CardTitle>
-              <CardDescription>Manage your ongoing gigs</CardDescription>
+              <CardDescription>Manage your ongoing services</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -386,7 +369,7 @@ export default function SellerDashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {activeOrdersData.map((order) => (
+                  {orders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium">{order.id}</TableCell>
                       <TableCell>{order.buyer}</TableCell>
@@ -421,7 +404,7 @@ export default function SellerDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {messagesData.map((message) => (
+                {messages.map((message) => (
                   <div
                     key={message.id}
                     className="flex items-start space-x-4 p-4 rounded-lg bg-muted"
@@ -434,7 +417,7 @@ export default function SellerDashboard() {
                       <AvatarFallback>
                         {message.from
                           .split(" ")
-                          .map((n) => n[0])
+                          .map((n: string) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
@@ -469,7 +452,9 @@ export default function SellerDashboard() {
               <div className="space-y-4">
                 <div>
                   <h4 className="mb-2 text-sm font-medium">Total Earnings</h4>
-                  <div className="text-2xl font-bold">$45,231.89</div>
+                  <div className="text-2xl font-bold">
+                    ${overview?.totalEarnings.toFixed(2)}
+                  </div>
                   <Progress value={75} className="mt-2" />
                   <p className="mt-2 text-sm text-muted-foreground">
                     75% of your earnings goal
