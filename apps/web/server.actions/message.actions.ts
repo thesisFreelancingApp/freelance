@@ -15,13 +15,21 @@ export async function sendMessage(receiverId: string, content: string) {
   }
 
   try {
-    // Check for an existing ChatRoom between the users in either direction
+    // Check for an existing ChatRoom between the users
     let chatRoom = await prisma.chatRoom.findFirst({
       where: {
-        OR: [
-          { clientId: user.id, freelancerId: receiverId },
-          { clientId: receiverId, freelancerId: user.id },
-        ],
+        participants: {
+          some: {
+            participantId: user.id,
+          },
+        },
+        AND: {
+          participants: {
+            some: {
+              participantId: receiverId,
+            },
+          },
+        },
       },
     });
 
@@ -29,28 +37,42 @@ export async function sendMessage(receiverId: string, content: string) {
     if (!chatRoom) {
       chatRoom = await prisma.chatRoom.create({
         data: {
-          clientId: user.id,
-          freelancerId: receiverId,
+          participants: {
+            create: [
+              { participantId: user.id, role: "user" },
+              { participantId: receiverId, role: "user" },
+            ],
+          },
         },
       });
     }
 
-    // Create the message in the found or newly created chatRoom
+    // Create the message
     const message = await prisma.message.create({
       data: {
         chatRoomId: chatRoom.id,
         senderId: user.id,
         content,
       },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            profilePic: true,
+          },
+        },
+      },
     });
 
-    // Update lastMessageAt in ChatRoom
+    // Update ChatRoom's updatedAt
     await prisma.chatRoom.update({
       where: { id: chatRoom.id },
-      data: { lastMessageAt: message.createdAt },
+      data: { updatedAt: new Date() },
     });
 
-    return { ...message, chatRoomId: chatRoom.id };
+    return message;
   } catch (error) {
     console.error("Error sending message:", error);
     throw new Error("Failed to send message");
@@ -58,7 +80,7 @@ export async function sendMessage(receiverId: string, content: string) {
 }
 
 export async function getMessages(
-  chatRoomId: number,
+  chatRoomId: string,
   page: number = 1,
   pageSize: number = 20,
 ) {
@@ -87,61 +109,99 @@ export async function getMessages(
   ]);
 
   return {
-    messages: messages.reverse(), // Reverse to show oldest first
+    messages: messages.reverse(),
     hasMore: skip + pageSize < totalCount,
     totalCount,
   };
 }
 
-export async function getOrCreateChatRoom(receiverId: string) {
+export async function getAllChatRooms() {
   const supabase = createClient();
-
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    throw new Error("You must be logged in to access chat rooms");
+  if (userError || !user) {
+    throw new Error("User not authenticated");
   }
 
-  let chatRoom = await prisma.chatRoom.findFirst({
+  const chatRooms = await prisma.chatRoom.findMany({
     where: {
-      OR: [
-        { clientId: user.id, freelancerId: receiverId },
-        { clientId: receiverId, freelancerId: user.id },
-      ],
+      participants: {
+        some: {
+          participantId: user.id,
+        },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      participants: {
+        include: {
+          profile: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
+      messages: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
     },
   });
 
-  if (!chatRoom) {
-    chatRoom = await prisma.chatRoom.create({
-      data: {
-        clientId: user.id,
-        freelancerId: receiverId,
-      },
-    });
-  }
+  return chatRooms.map((room) => {
+    const otherParticipant = room.participants.find(
+      (p) => p.participantId !== user.id,
+    )?.profile;
 
-  return chatRoom.id;
+    return {
+      id: room.id,
+      otherUser: otherParticipant || null,
+      lastMessage: room.messages[0] || null,
+    };
+  });
 }
 
 export async function getRecentMessages() {
   const supabase = createClient();
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (userError || !user) {
     throw new Error("User not authenticated");
   }
 
   const recentChatRooms = await prisma.chatRoom.findMany({
     where: {
-      OR: [{ clientId: user.id }, { freelancerId: user.id }],
+      participants: {
+        some: {
+          participantId: user.id,
+        },
+      },
     },
-    orderBy: { lastMessageAt: "desc" },
+    orderBy: { updatedAt: "desc" },
     take: 5,
     include: {
+      participants: {
+        include: {
+          profile: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
       messages: {
         orderBy: { createdAt: "desc" },
         take: 1,
@@ -156,95 +216,41 @@ export async function getRecentMessages() {
           },
         },
       },
-      client: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-        },
-      },
-      freelancer: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-        },
-      },
     },
   });
 
-  const recentMessages = recentChatRooms.map((chatRoom) => {
-    const message = chatRoom.messages[0];
-    const otherUser =
-      chatRoom.clientId === user.id ? chatRoom.freelancer : chatRoom.client;
+  const recentMessages = recentChatRooms
+    .map((chatRoom) => {
+      const message = chatRoom.messages[0];
+      const otherParticipant = chatRoom.participants.find(
+        (p) => p.participantId !== user.id,
+      )?.profile;
 
-    return {
-      id: message.id,
-      content: message.content,
-      createdAt: message.createdAt,
-      sender: message.sender,
-      otherUser: otherUser,
-    };
-  });
+      if (!message || !otherParticipant) return null;
+
+      return {
+        id: message.id,
+        content: message.content,
+        createdAt: message.createdAt,
+        sender: message.sender,
+        otherUser: otherParticipant,
+      };
+    })
+    .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
 
   const unreadCount = await prisma.message.count({
     where: {
-      OR: [
-        { chatRoom: { clientId: user.id } },
-        { chatRoom: { freelancerId: user.id } },
-      ],
+      chatRoom: {
+        participants: {
+          some: {
+            participantId: user.id,
+          },
+        },
+      },
       NOT: { senderId: user.id },
       isRead: false,
     },
   });
 
   return { messages: recentMessages, unreadCount };
-}
-
-export async function getAllChatRooms() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-
-  const chatRooms = await prisma.chatRoom.findMany({
-    where: {
-      OR: [{ clientId: user.id }, { freelancerId: user.id }],
-    },
-    orderBy: { lastMessageAt: "desc" },
-    include: {
-      messages: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-      },
-      client: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-        },
-      },
-      freelancer: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          profilePic: true,
-        },
-      },
-    },
-  });
-
-  return chatRooms.map((room) => ({
-    id: room.id,
-    otherUser: room.clientId === user.id ? room.freelancer : room.client,
-    lastMessage: room.messages[0] || null,
-  }));
 }

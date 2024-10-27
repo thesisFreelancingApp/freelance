@@ -13,13 +13,13 @@ import { Send, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface ChatRoom {
-  id: number;
+  id: string;
   otherUser: {
     id: string;
     firstName: string | null;
     lastName: string | null;
     profilePic: string | null;
-  };
+  } | null;
   lastMessage: {
     content: string;
     createdAt: Date;
@@ -27,10 +27,16 @@ interface ChatRoom {
 }
 
 interface Message {
-  id: number;
+  id: string;
   senderId: string;
   content: string;
   createdAt: Date;
+  sender: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    profilePic: string | null;
+  };
 }
 
 const MESSAGES_PER_PAGE = 20;
@@ -140,7 +146,7 @@ export default function MessagesLayout() {
     }
   };
 
-  const fetchMessages = async (roomId: number, resetPage = true) => {
+  const fetchMessages = async (roomId: string, resetPage = true) => {
     try {
       const currentPage = resetPage ? 1 : page;
       const response = await getMessages(
@@ -167,7 +173,7 @@ export default function MessagesLayout() {
 
   const handleNewMessage = (payload: any) => {
     console.log("New message received:", payload);
-    const newMessage = payload.new as Message & { chatRoomId: number };
+    const newMessage = payload.new as Message;
     if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
       setMessages((prev) => [...prev, newMessage]);
     }
@@ -176,7 +182,7 @@ export default function MessagesLayout() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedRoom) return;
+    if (!newMessage.trim() || !selectedRoom || !selectedRoom.otherUser) return;
 
     try {
       const sentMessage = await sendMessage(
@@ -242,16 +248,16 @@ export default function MessagesLayout() {
             >
               <Avatar className="w-12 h-12 mr-4">
                 <AvatarImage
-                  src={room.otherUser.profilePic || "/placeholder.svg"}
+                  src={room.otherUser?.profilePic || "/placeholder.svg"}
                 />
                 <AvatarFallback>
-                  {room.otherUser.firstName?.[0]}
-                  {room.otherUser.lastName?.[0]}
+                  {room.otherUser?.firstName?.[0]}
+                  {room.otherUser?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <p className="font-semibold">
-                  {room.otherUser.firstName} {room.otherUser.lastName}
+                  {room.otherUser?.firstName} {room.otherUser?.lastName}
                 </p>
                 <p className="text-sm text-gray-600 truncate">
                   {room.lastMessage
@@ -269,8 +275,8 @@ export default function MessagesLayout() {
         {selectedRoom ? (
           <>
             <h2 className="text-2xl font-bold mb-4">
-              Chat with {selectedRoom.otherUser.firstName}{" "}
-              {selectedRoom.otherUser.lastName}
+              Chat with {selectedRoom.otherUser?.firstName}{" "}
+              {selectedRoom.otherUser?.lastName}
             </h2>
             <ScrollArea className="flex-grow mb-4" ref={scrollAreaRef}>
               {/* Load More Messages Button/Indicator */}
@@ -295,28 +301,28 @@ export default function MessagesLayout() {
                 <div
                   key={msg.id}
                   className={`flex items-end gap-2 mb-4 ${
-                    msg.senderId === selectedRoom.otherUser.id
+                    msg.senderId === selectedRoom.otherUser?.id
                       ? "justify-start"
                       : "justify-end"
                   }`}
                 >
-                  {msg.senderId === selectedRoom.otherUser.id && (
+                  {msg.senderId === selectedRoom.otherUser?.id && (
                     <Avatar className="w-8 h-8">
                       <AvatarImage
                         src={
-                          selectedRoom.otherUser.profilePic ||
+                          selectedRoom.otherUser?.profilePic ||
                           "/placeholder.svg"
                         }
                       />
                       <AvatarFallback>
-                        {selectedRoom.otherUser.firstName?.[0]}
-                        {selectedRoom.otherUser.lastName?.[0]}
+                        {selectedRoom.otherUser?.firstName?.[0]}
+                        {selectedRoom.otherUser?.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
                   )}
                   <div
                     className={`max-w-[70%] p-3 rounded-lg ${
-                      msg.senderId === selectedRoom.otherUser.id
+                      msg.senderId === selectedRoom.otherUser?.id
                         ? "bg-gray-200"
                         : "bg-blue-500 text-white"
                     }`}
