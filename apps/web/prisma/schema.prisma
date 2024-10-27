@@ -183,8 +183,7 @@ model ServicePackage {
   serviceId     String
   name          String
   description   String
-  price         Decimal   @db.Decimal(10, 2)
-  deliveryTime  Int
+  price         Decimal   @db.Decimal(12, 3)
   revisions     Int
   features      String[]
 

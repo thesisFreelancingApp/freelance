@@ -1,13 +1,13 @@
+"use server";
 import prisma from "@/lib/prismaClient";
+import { createClient } from "@/lib/supabase/server";
 import { Prisma } from "@prisma/client";
-
 // Définition des types pour les paramètres
 interface ServiceData {
   name: string;
   description?: string;
   images: string[];
   tags: string[];
-  creatorId: string;
 }
 
 interface PackageData {
@@ -19,31 +19,41 @@ interface PackageData {
   features: string[];
 }
 
+// Modification pour accepter plusieurs packages
 export async function createServiceWithCategoryAndPackage(
   serviceData: ServiceData,
   categoryId: number,
-  packageData: PackageData,
+  packageData: PackageData[],
 ) {
   try {
+    const {
+      data: { user },
+      error,
+    } = await createClient().auth.getUser();
+    if (error || !user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return false;
+    }
+    const sellerid = user?.id as string;
     const newService = await prisma.service.create({
       data: {
         name: serviceData.name,
         description: serviceData.description,
         images: serviceData.images,
         tags: serviceData.tags,
-        creatorId: serviceData.creatorId,
+        creatorId: sellerid,
         categoryId: categoryId,
 
-        // Création du package associé
+        // Création de plusieurs packages associés
         packages: {
-          create: {
-            name: packageData.name,
-            description: packageData.description,
-            price: packageData.price,
-            deliveryTime: packageData.deliveryTime,
-            revisions: packageData.revisions,
-            features: packageData.features,
-          },
+          create: packageData.map((pkg) => ({
+            name: pkg.name,
+            description: pkg.description,
+            price: pkg.price,
+            deliveryTime: pkg.deliveryTime,
+            revisions: pkg.revisions,
+            features: pkg.features,
+          })),
         },
       },
       include: {

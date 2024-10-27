@@ -1,50 +1,31 @@
-export interface Package {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  deliveryTime: number;
-  revisions: number;
-  features: string[];
-  serviceId: string;
-}
+// export interface Package {
+//   price: string;
+//   description?: string;
+// }
 
-interface Rating {
-  id: string;
-  rating: number;
-  review: string | null;
-  createdAt: Date;
-  rater: {
-    firstName: string | null;
-    lastName: string | null;
-    profilePic: string | null;
-  };
-}
+// export interface Service {
+//   id: number;
+//   name: string;
+//   description: string | null;
+//   ratings: Rating[];
+//   category: Category;
+//   images: string[];
+//   packages: Package[];
+// }
 
-interface Creator {
-  id: string;
-  name: string;
-  profilePic: string | null;
-  profile: {
-    firstName: string | null;
-    lastName: string | null;
-    profilePic: string | null;
-  };
-  sellerRating: number | null;
-  totalEarnings: number;
-}
+// interface Rating {
+//   id: number;
+//   rating: number;
+//   review: string | null;
+//   createdAt: Date;
+// }
 
-export interface Service {
-  id: string;
-  name: string;
-  description: string | null;
-  images: string[];
-  tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  creatorId: string;
-  creator: Creator;
-  ratings: Rating[];
-  packages: Package[];
-  rating: number; // Average rating calculated from ratings array
-}
+// export interface Category {
+//   id: number;
+//   name: string;
+//   description: string | null;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   level: number;
+//   parentId: number | null;
+// }
