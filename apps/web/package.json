@@ -8,7 +8,6 @@
     "clean": "next clean"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.0.3",
     "@hookform/resolvers": "^3.9.0",
     "@next/eslint-plugin-next": "^14.2.15",
     "@prisma/client": "^5.21.1",
@@ -54,13 +53,14 @@
     "embla-carousel-react": "^8.3.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-tailwindcss": "^3.17.5",
+    "framer-motion": "^11.11.10",
     "geist": "^1.2.1",
     "globals": "^15.11.0",
     "google-one-tap": "^1.0.6",
     "input-otp": "^1.2.4",
     "kbar": "^0.1.0-beta.45",
     "lucide-react": "^0.436.0",
-    "next": "^14.2.16",
+    "next": "latest",
     "next-themes": "^0.3.0",
     "prettier": "^3.3.3",
     "react": "18.2.0",

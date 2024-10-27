@@ -31,7 +31,7 @@ export default async function Index() {
 
         <TopFreelancers freelancers={freelancers} />
 
-        {/* <FeaturedServices services={services} /> */}
+        <FeaturedServices services={services} />
 
         <WhyChooseUs />
       </section>

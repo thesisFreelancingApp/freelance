@@ -9,12 +9,14 @@ interface WebHeaderProps {
   userData: any;
   user: any;
   categories: any;
+  isSeller: any;
 }
 
 const WebHeader: React.FC<WebHeaderProps> = async ({
   userData,
   user,
   categories,
+  isSeller,
 }) => {
   return (
     <header className="flex-col hidden w-full border-b md:flex border-b-foreground/6">
@@ -31,7 +33,7 @@ const WebHeader: React.FC<WebHeaderProps> = async ({
         </Link>
         <div className="flex">
           <ThemeSwitcher />
-          <HeaderAuth user={user} userData={userData} />
+          <HeaderAuth isSeller={isSeller} user={user} userData={userData} />
         </div>
       </nav>
       <div className="container mx-auto">

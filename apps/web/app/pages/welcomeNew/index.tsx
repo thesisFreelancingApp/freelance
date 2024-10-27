@@ -176,18 +176,16 @@ export default function MultiStepFormPage() {
   };
 
   return (
-    <div className="container px-4 py-8 mx-auto">
-      <Card className="max-w-2xl mx-auto">
+    <div className="grid w-full px-4 py-8 ">
+      <Card className="w-full max-w-2xl mx-auto ">
         <CardHeader>
           <CardTitle className="text-3xl font-bold">
             Bienvenue parmi nous !
           </CardTitle>
+          <Progress value={(currentStep / 4) * 100} className="mb-6" />
           <CardDescription>Merci de compléter votre profil.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Progress value={(currentStep / 4) * 100} className="mb-6" />
-          {renderStep()}
-        </CardContent>
+        <CardContent>{renderStep()}</CardContent>
       </Card>
     </div>
   );

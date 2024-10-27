@@ -53,9 +53,16 @@ export async function getUserProfileByUsername(
       include: {
         profile: {
           include: {
-            seller: true,
-            buyer: true,
-            professionalProfile: true,
+            seller: {
+              include: {
+                professionalProfile: true,
+              },
+            },
+            buyer: {
+              include: {
+                professionalProfile: true,
+              },
+            },
           },
         },
       },

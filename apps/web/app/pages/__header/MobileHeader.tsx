@@ -14,10 +14,12 @@ export default function MobileHeader({
   userData,
   categories,
   user,
+  isSeller,
 }: {
   userData: any;
   user: any;
   categories: any;
+  isSeller: any;
 }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showCategoryBar, setShowCategoryBar] = React.useState(false);
@@ -57,7 +59,7 @@ export default function MobileHeader({
           </p>
         </Link>
 
-        <HeaderAuth user={user} userData={userData} />
+        <HeaderAuth isSeller={isSeller} user={user} userData={userData} />
       </nav>
 
       {isMenuOpen && (

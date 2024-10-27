@@ -1,0 +1,225 @@
+// Prisma schema file: https://pris.ly/d/prisma-schema
+// Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+//
+// Models
+//
+
+// AuthUser model represents a user authenticated via Supabase
+model AuthUser {
+  id        String   @id // Primary key, comes from Supabase
+  email     String   @unique // Unique email for user
+  name      String?  // Optional field for user's name
+  account   Account? // One-to-one relation with the OAuth Account model
+  profile   Profile? @relation("ProfileAuthUser") // Optional one-to-one relation with Profile, via user ID
+  profileByEmail Profile? @relation("ProfileUser") // Optional one-to-one relation with Profile, via email
+  createdAt DateTime @default(now()) // Timestamp when user was created
+  updatedAt DateTime @updatedAt // Timestamp when user was last updated
+}
+
+// Profile model stores additional details about a user, such as role, skills, and more
+model Profile {
+  id            String   @id // Primary key, matches AuthUser ID
+  authUser      AuthUser @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade) // Relation to AuthUser
+  firstName     String?  // Optional field for user's first name
+  lastName      String?  // Optional field for user's last name
+  profilePic    String?  // Optional profile picture URL
+  role          Role?    // Role enum to define user type (e.g., user, admin)
+  level         Level?   // Level enum to define user's skill level
+  plan          Plan?    // Plan enum for user's subscription or usage plan
+  skills        String?  // Optional field for user's skills
+  languages     String?  // Optional field for user's known languages
+  education     String?  // Optional field for education details
+  certifications String? // Optional field for certifications
+  jobs          Jobs?    // Enum for user's job category (e.g., Graphisme_Design, Programmation_Tech)
+  phoneNumber   String?  // Optional field for user's phone number
+  address       String?  // Optional field for user's address
+  bio           String?  // Optional biography of the user
+  birthDate     DateTime? // Optional birth date of the user
+  username      String   @unique // Unique username for the user
+  userEmail     String   @unique // Unique email field to link with AuthUser email
+  user          AuthUser @relation("ProfileUser", fields: [userEmail], references: [email], onDelete: Cascade) // Relation to AuthUser using email
+  createdAt     DateTime @default(now()) // Timestamp when profile was created
+  updatedAt     DateTime @updatedAt // Timestamp when profile was last updated
+
+  // Seller and Buyer fields
+  isSeller      Boolean  @default(false) // Indicates if the user is a seller
+  isBuyer       Boolean  @default(false) // Indicates if the user is a buyer
+  sellerRating  Float?   // Seller rating, optional
+  totalEarnings Float    @default(0.0) // Total earnings for seller
+  totalSpent    Float    @default(0.0) // Total amount spent by buyer
+
+  // Relations
+  categories        CategoryHierarchy[] @relation("ProfileCategories") // Many-to-many relation with categories
+  createdServices   Service[] @relation("CreatedServices") // Services created by this user (as seller)
+  purchasedServices Service[] @relation("PurchasedServices") // Services purchased by this user (as buyer)
+  buyerRatings      Rating[]  @relation("BuyerRatings") // Ratings given to the user as a buyer
+  freelancerRatings Rating[]  @relation("FreelancerRatings") // Ratings given to the user as a freelancer
+  clientChatRooms   ChatRoom[] @relation("ClientChatRooms") // Chat rooms where the user is the client
+  freelancerChatRooms ChatRoom[] @relation("FreelancerChatRooms") // Chat rooms where the user is the freelancer
+  sentMessages       Message[] // Messages sent by the user
+}
+
+// Account model stores OAuth details for user authentication via external providers
+model Account {
+  id                Int      @id @default(autoincrement()) // Auto-incrementing primary key
+  lastProvider      String?  // Last provider used for OAuth (optional)
+  providers         String[] // List of providers used by the user
+  providerAccountId String?  // Provider-specific account ID (optional)
+  userEmail         String   @unique // Links to the AuthUser email
+  user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade) // Relation to AuthUser
+  accessToken       String?  // OAuth access token
+  refreshToken      String?  // OAuth refresh token
+  expiresAt         Int?     // Token expiration timestamp (optional)
+  createdAt         DateTime @default(now()) // Timestamp when the account was created
+  updatedAt         DateTime @updatedAt // Timestamp when the account was last updated
+}
+
+// CategoryHierarchy model represents a hierarchical structure of categories
+model CategoryHierarchy {
+  id          Int      @id @default(autoincrement()) // Auto-incrementing primary key
+  name        String   // Name of the category
+  description String?  // Optional category description
+  level       Int      // Category level (depth in the hierarchy)
+  parentId    Int?     // Optional reference to the parent category
+  createdAt   DateTime @default(now()) // Timestamp when category was created
+  updatedAt   DateTime @updatedAt // Timestamp when category was last updated
+  parent      CategoryHierarchy?  @relation("Hierarchy", fields: [parentId], references: [id]) // Relation to parent category
+  children    CategoryHierarchy[] @relation("Hierarchy") // Relation to child categories
+  services    Service[] @relation("CategoryServices") // Relation to services in this category
+
+  // Many-to-many relation with Profile
+  profiles    Profile[] @relation("ProfileCategories") // Relation to profiles associated with this category
+}
+
+// Service model represents a service offered by a freelancer
+model Service {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  categoryId    Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  category      CategoryHierarchy @relation("CategoryServices", fields: [categoryId], references: [id])
+
+  images        String[]
+  tags          String[]
+
+  // Relations
+  creator       Profile  @relation("CreatedServices", fields: [creatorId], references: [id])
+  creatorId     String
+  buyers        Profile[] @relation("PurchasedServices")
+  ratings       Rating[]  @relation("ServiceRatings")
+  
+  //  relation to GigPackage
+  packages      GigPackage[]
+}
+
+// New GigPackage model
+model GigPackage {
+  id          Int      @id @default(autoincrement())
+  serviceId   Int
+  name        String   // e.g., "Basic", "Standard", "Premium"
+  description String   // Add this line
+  price       Decimal  @db.Decimal(10, 2)
+  deliveryTime Int     // in days
+  revisions   Int
+  features    String[]
+
+  // Relation to Service
+  service     Service  @relation(fields: [serviceId], references: [id])
+}
+
+// Rating model for feedback on services
+model Rating {
+  id         Int      @id @default(autoincrement()) // Auto-incrementing primary key
+  buyerId    String   // Foreign key to Profile (buyer)
+  sellerId   String   // Foreign key to Profile (seller/freelancer)
+  serviceId  Int      // Foreign key to Service
+  rating     Int      // Rating score (e.g., 1 to 5)
+  review     String?  // Optional text review
+  createdAt  DateTime @default(now()) // Timestamp when rating was created
+
+  buyer      Profile  @relation("BuyerRatings", fields: [buyerId], references: [id]) // Relation to buyer
+  seller     Profile  @relation("FreelancerRatings", fields: [sellerId], references: [id]) // Relation to seller (freelancer)
+  service    Service  @relation("ServiceRatings", fields: [serviceId], references: [id]) // Relation to service
+}
+
+// Enums for fixed sets of values
+enum Role {
+  user      // Regular user role
+  admin     // Admin role
+}
+
+enum Level {
+  beginner      // Beginner level
+  intermediate  // Intermediate level
+  advanced      // Advanced level
+}
+
+enum Plan {
+  Travail_principal    // Main work
+  Travail_secondaire   // Side work
+  usage_personnel      // Personal use
+}
+
+enum Jobs {
+  Graphisme_Design       
+  Programmation_Tech     
+  Marketing_digital      
+  Video_Animation        
+  Redaction_Traduction   
+  Musique_Audio         
+  Business               
+  Finance                
+  Services_IA            
+  Croissance_personnelle 
+  Consultations          
+  Photographie          
+}
+
+// ChatRoom model for managing conversations between freelancers and clients
+model ChatRoom {
+  id           Int      @id @default(autoincrement())
+  clientId     String
+  freelancerId String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastMessageAt DateTime @default(now())  // Add this line
+
+  client       Profile  @relation("ClientChatRooms", fields: [clientId], references: [id])
+  freelancer   Profile  @relation("FreelancerChatRooms", fields: [freelancerId], references: [id])
+  messages     Message[]
+
+  @@unique([clientId, freelancerId])
+  @@index([clientId])
+  @@index([freelancerId])
+  @@index([lastMessageAt])  // Add this line if you want to index this field
+}
+
+// Message model for individual chat messages
+model Message {
+  id         Int      @id @default(autoincrement())
+  chatRoomId Int
+  senderId   String
+  content    String
+  createdAt  DateTime @default(now())
+  isRead     Boolean  @default(false)
+
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender     Profile  @relation(fields: [senderId], references: [id])
+
+  @@index([chatRoomId])
+  @@index([senderId])
+  @@index([createdAt])
+}
