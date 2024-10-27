@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
+import { createProfessionalProfile } from "@/server.actions/sellers/pro-Infomation.actions";
 import * as Toast from "@radix-ui/react-toast";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";

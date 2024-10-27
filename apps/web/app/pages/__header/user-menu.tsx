@@ -20,8 +20,8 @@ import {
   UserCog,
 } from "lucide-react";
 import Link from "next/link";
-import Notifications from "./notifications";
 import Messages from "./messages";
+import Notifications from "./notifications";
 interface UserProfile {
   profilePic?: string | null;
 }
@@ -42,7 +42,7 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
   const name = data?.name ?? "Invité";
   const userLettre = name ? name.charAt(0) : "?";
   const username = data?.username;
-  console.log("iiiiii", isSeller);
+  // console.log("iiiiii", isSeller);
   return (
     <div className="flex items-center space-x-4">
       <div className="flex items-center space-x-2">

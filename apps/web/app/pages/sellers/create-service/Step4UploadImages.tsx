@@ -1,88 +1,237 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { uploadImage } from "@/server.actions/uploadMedias.actions";
+import { Loader2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-interface ImageUploadProps {
-  serviceData: {
-    images: string[];
-    name: string;
-    tags: string[];
-  }; // Inclure toutes les propriétés requises de ServiceData
-  setServiceData: (data: {
-    images: string[];
-    name: string;
-    tags: string[];
-  }) => void;
+interface MediaItem {
+  url: string;
+  type: string;
 }
 
-export default function ImageUpload({
+interface MediaUploadProps {
+  serviceData: {
+    medias: MediaItem[];
+    name: string;
+    description: string;
+    tags: string[];
+  };
+  setServiceData: React.Dispatch<
+    React.SetStateAction<{
+      medias: MediaItem[];
+      name: string;
+      description: string;
+      tags: string[];
+    }>
+  >;
+}
+
+export default function MediaUpload({
   serviceData,
   setServiceData,
-}: ImageUploadProps) {
-  const [imageUrl, setImageUrl] = useState("");
+}: MediaUploadProps) {
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<MediaItem[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const inputFileRef = useRef<HTMLInputElement>(null);
 
-  const handleAddImage = () => {
-    if (imageUrl.trim()) {
-      setServiceData({
-        ...serviceData,
-        images: [...serviceData.images, imageUrl.trim()],
-      });
-      setImageUrl(""); // Réinitialiser le champ après ajout
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []).filter(
+      (file) =>
+        file.type.startsWith("image/") || file.type.startsWith("video/"),
+    );
+    const newPreviews = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith("image/") ? "image" : "video",
+    }));
+
+    setMediaFiles((prev) => [...prev, ...files]);
+    setPreviewUrls((prev) => [...prev, ...newPreviews]);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files).filter(
+      (file) =>
+        file.type.startsWith("image/") || file.type.startsWith("video/"),
+    );
+    const newPreviews = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith("image/") ? "image" : "video",
+    }));
+
+    setMediaFiles((prev) => [...prev, ...files]);
+    setPreviewUrls((prev) => [...prev, ...newPreviews]);
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDropZoneClick = () => {
+    inputFileRef.current?.click();
+  };
+
+  // Dans le fichier MediaUpload.tsx
+  const handleUploadMedia = async () => {
+    if (mediaFiles.length === 0) return;
+    setIsUploading(true);
+    try {
+      const uploadedMedia = await Promise.all(
+        mediaFiles.map(async (file) => {
+          const url = await uploadImage(file);
+          return {
+            url,
+            type: file.type.startsWith("image/") ? "image" : "video",
+          };
+        }),
+      );
+
+      setServiceData((prevData) => ({
+        ...prevData,
+        medias: [...prevData.medias, ...uploadedMedia],
+      }));
+      setMediaFiles([]);
+      setPreviewUrls([]);
+    } catch (error) {
+      console.error("Error during upload:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    const updatedImages = serviceData.images.filter((_, i) => i !== index);
-    setServiceData({ ...serviceData, images: updatedImages });
+  const handleRemovePreview = (index: number) => {
+    setMediaFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
-  return (
-    <div>
-      <Label>Image URL</Label>
-      <div className="flex space-x-2">
-        <Input
-          type="text"
-          placeholder="Enter image URL"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAddImage();
-            }
-          }}
-        />
-        <Button onClick={handleAddImage} disabled={!imageUrl.trim()}>
-          Add Image
-        </Button>
-      </div>
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((preview) => URL.revokeObjectURL(preview.url));
+    };
+  }, [previewUrls]);
 
-      <div className="mt-4 space-y-2">
-        {serviceData.images.length > 0 && (
-          <>
-            <Label>Added Images</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {serviceData.images.map((image, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={image}
-                    alt={`Uploaded preview ${index + 1}`}
-                    className="object-cover w-full h-32 rounded"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute top-2 right-2"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Media Upload</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={handleDropZoneClick}
+            className={`border-2 border-dashed p-6 flex flex-col items-center justify-center rounded-md ${
+              isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+            } h-64 cursor-pointer`}
+          >
+            {previewUrls.length > 0 ? (
+              <div className="grid w-full grid-cols-3 gap-2">
+                {previewUrls.map((preview, index) => (
+                  <div key={index} className="relative w-full h-24">
+                    {preview.type === "image" ? (
+                      <img
+                        src={preview.url}
+                        alt={`Preview ${index + 1}`}
+                        className="object-cover w-full h-full rounded-md"
+                      />
+                    ) : (
+                      <video
+                        className="object-cover w-full h-full rounded-md"
+                        controls={true}
+                        playsInline
+                        title={`Preview ${index + 1}`}
+                        src={preview.url}
+                      />
+                    )}
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={() => handleRemovePreview(index)}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Label className="text-center">
+                {isDragging
+                  ? "Release to upload"
+                  : "Drag & drop images or videos here or click to select"}
+              </Label>
+            )}
+            <input
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              onChange={handleFileChange}
+              disabled={isUploading}
+              ref={inputFileRef}
+              className="hidden"
+            />
+          </div>
+
+          {mediaFiles.length > 0 && (
+            <div className="flex gap-2">
+              <Button onClick={handleUploadMedia} disabled={isUploading}>
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  "Upload Selected Media"
+                )}
+              </Button>
             </div>
-          </>
-        )}
-      </div>
-    </div>
+          )}
+
+          {serviceData.medias.length > 0 && (
+            <div className="space-y-2">
+              <Label>Uploaded Media</Label>
+              <div className="grid grid-cols-2 gap-4">
+                {serviceData.medias.map((mediaItem, index) => (
+                  <Card key={index} className="overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="relative aspect-video">
+                        {mediaItem.type === "image" ? (
+                          <img
+                            src={mediaItem.url}
+                            alt={`Uploaded ${index + 1}`}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <video
+                            disablePictureInPicture
+                            title={`Uploaded ${index + 1}`}
+                            controlsList="nodownload"
+                            className="object-cover w-full h-full rounded-md"
+                            controls
+                            src={mediaItem.url}
+                          />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

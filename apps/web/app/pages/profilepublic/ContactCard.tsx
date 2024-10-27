@@ -16,7 +16,7 @@ interface ContactCardProfileProps {
 export default function ContactCardProfile({
   profile,
 }: ContactCardProfileProps) {
-  console.log(profile);
+  // console.log(profile);
   return (
     <Card className="col-span-1">
       <CardContent className="p-6">

@@ -15,9 +15,27 @@ import {
 import { useState, useEffect } from "react";
 
 const recentOrders = [
-  { id: 1, client: "Alice Johnson", service: "Logo Design", status: "In Progress", amount: 150 },
-  { id: 2, client: "Bob Smith", service: "Web Development", status: "Completed", amount: 500 },
-  { id: 3, client: "Charlie Brown", service: "SEO Optimization", status: "Pending", amount: 300 },
+  {
+    id: 1,
+    client: "Alice Johnson",
+    service: "Logo Design",
+    status: "In Progress",
+    amount: 150,
+  },
+  {
+    id: 2,
+    client: "Bob Smith",
+    service: "Web Development",
+    status: "Completed",
+    amount: 500,
+  },
+  {
+    id: 3,
+    client: "Charlie Brown",
+    service: "SEO Optimization",
+    status: "Pending",
+    amount: 300,
+  },
 ];
 
 const earningsData = [
@@ -39,7 +57,6 @@ type FreelancerRating = {
   review: string | null;
 };
 
-
 type SellerData = {
   username: string | null;
   totalEarnings: number | null;
@@ -51,60 +68,75 @@ interface OverviewProps {
 }
 
 export function Overview({ sellerData }: OverviewProps) {
-  
-  console.log(sellerData);
+  // console.log(sellerData);
 
   // Calculate average rating
-  const averageRating = sellerData?.freelancerRatings && sellerData.freelancerRatings.length > 0
-    ? (sellerData.freelancerRatings.reduce((acc, rating) => acc + rating.rating, 0) / sellerData.freelancerRatings.length).toFixed(1) // Calculate average rating
-    : null;
+  const averageRating =
+    sellerData?.freelancerRatings && sellerData.freelancerRatings.length > 0
+      ? (
+          sellerData.freelancerRatings.reduce(
+            (acc, rating) => acc + rating.rating,
+            0,
+          ) / sellerData.freelancerRatings.length
+        ).toFixed(1) // Calculate average rating
+      : null;
 
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-white text-black border border-gray-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="text-black bg-white border border-gray-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-gray-600" />
+            <DollarSign className="w-4 h-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{sellerData?.totalEarnings !== null ? `$${sellerData?.totalEarnings}` : "Loading..."}</div>
+            <div className="text-2xl font-bold">
+              {sellerData?.totalEarnings !== null
+                ? `$${sellerData?.totalEarnings}`
+                : "Loading..."}
+            </div>
             <p className="text-xs text-gray-600">+20.1% from last month</p>
           </CardContent>
         </Card>
-        <Card className="bg-white text-black border border-gray-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card className="text-black bg-white border border-gray-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
-            <Package className="h-4 w-4 text-gray-600" />
+            <Package className="w-4 h-4 text-gray-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
             <p className="text-xs text-gray-600">+2 from yesterday</p>
           </CardContent>
         </Card>
-        <Card className="bg-white text-black border border-gray-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Completed</CardTitle>
-            <CreditCard className="h-4 w-4 text-gray-600" />
+        <Card className="text-black bg-white border border-gray-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">
+              Total Completed
+            </CardTitle>
+            <CreditCard className="w-4 h-4 text-gray-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">234</div>
             <p className="text-xs text-gray-600">+19% from last month</p>
           </CardContent>
         </Card>
-        <Card className="bg-white text-black border border-gray-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-            <Star className="h-4 w-4 text-gray-600" />
+        <Card className="text-black bg-white border border-gray-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">
+              Average Rating
+            </CardTitle>
+            <Star className="w-4 h-4 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{averageRating !== null ? averageRating : "N/A"}</div>
+            <div className="text-2xl font-bold">
+              {averageRating !== null ? averageRating : "N/A"}
+            </div>
             <p className="text-xs text-gray-600">+0.1 from last month</p>
           </CardContent>
         </Card>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 bg-white text-black border border-gray-300">
+        <Card className="col-span-4 text-black bg-white border border-gray-300">
           <CardHeader>
             <CardTitle>Recent Orders</CardTitle>
           </CardHeader>
@@ -126,14 +158,16 @@ export function Overview({ sellerData }: OverviewProps) {
                     <TableCell>{order.client}</TableCell>
                     <TableCell>{order.service}</TableCell>
                     <TableCell>{order.status}</TableCell>
-                    <TableCell className="text-right">${order.amount}</TableCell>
+                    <TableCell className="text-right">
+                      ${order.amount}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
-        <Card className="col-span-3 bg-white text-black border border-gray-300">
+        <Card className="col-span-3 text-black bg-white border border-gray-300">
           <CardHeader>
             <CardTitle>Earnings Overview</CardTitle>
           </CardHeader>

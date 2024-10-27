@@ -51,7 +51,7 @@ const Step1Overview: React.FC<Step1OverviewProps> = ({
     const fetchCategories = async () => {
       try {
         const fetchedCategories = await getCategories();
-        console.log(fetchedCategories, "================================");
+        // console.log(fetchedCategories, "================================");
 
         setCategories(fetchedCategories);
       } catch (error) {
