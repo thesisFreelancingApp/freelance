@@ -125,7 +125,49 @@ export default function ServiceCreationForm({
       }));
     }
   };
+  const [packages, setPackages] = useState<PackageData[]>([
+    {
+      name: "",
+      description: "",
+      price: new Prisma.Decimal(0),
+      deliveryTime: 0,
+      revisions: 0,
+      features: [],
+    },
+  ]);
 
+  const handleAddPackage = () => {
+    if (packages.length < 10) {
+      setPackages([
+        ...packages,
+        {
+          name: "",
+          description: "",
+          price: new Prisma.Decimal(0),
+          deliveryTime: 0,
+          revisions: 0,
+          features: [],
+        },
+      ]);
+    }
+  };
+
+  const handleRemovePackage = (index: number) => {
+    if (packages.length > 1) {
+      setPackages(packages.filter((_, i) => i !== index));
+    }
+  };
+
+  const handlePackageDataChange = (
+    index: number,
+    field: keyof PackageData,
+    value: any,
+  ) => {
+    const updatedPackages = packages.map((pkg, i) =>
+      i === index ? { ...pkg, [field]: value } : pkg,
+    );
+    setPackages(updatedPackages);
+  };
   const handleRemoveTag = (index: number) => {
     setServiceData((prev) => ({
       ...prev,
@@ -135,10 +177,6 @@ export default function ServiceCreationForm({
 
   const handleServiceDataChange = (field: keyof ServiceData, value: any) => {
     setServiceData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handlePackageDataChange = (field: keyof PackageData, value: any) => {
-    setPackageData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
@@ -323,6 +361,7 @@ export default function ServiceCreationForm({
             </CardContent>
           </>
         );
+
       case 3:
         return (
           <>
@@ -330,67 +369,110 @@ export default function ServiceCreationForm({
               <CardTitle>Step 3: Package Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="package-name">Package Name</Label>
-                <Input
-                  id="package-name"
-                  value={packageData.name}
-                  onChange={(e) =>
-                    handlePackageDataChange("name", e.target.value)
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="package-description">Description</Label>
-                <Textarea
-                  id="package-description"
-                  value={packageData.description}
-                  onChange={(e) =>
-                    handlePackageDataChange("description", e.target.value)
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="package-price">Price</Label>
-                <Input
-                  id="package-price"
-                  type="number"
-                  value={packageData.price.toString()}
-                  onChange={(e) =>
-                    handlePackageDataChange(
-                      "price",
-                      new Prisma.Decimal(e.target.value),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="package-delivery-time">
-                  Delivery Time (days)
-                </Label>
-                <Input
-                  id="package-delivery-time"
-                  type="number"
-                  value={packageData.deliveryTime.toString()}
-                  onChange={(e) =>
-                    handlePackageDataChange(
-                      "deliveryTime",
-                      Number(e.target.value),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="package-revisions">Revisions</Label>
-                <Input
-                  id="package-revisions"
-                  type="number"
-                  value={packageData.revisions.toString()}
-                  onChange={(e) =>
-                    handlePackageDataChange("revisions", Number(e.target.value))
-                  }
-                />
-              </div>
+              {packages.map((pkg, index) => (
+                <Card>
+                  <CardHeader>
+                    <Label>Package {index + 1}</Label>
+                  </CardHeader>
+                  <CardContent key={index} className="pb-4 space-y-2 border-b">
+                    <div className="space-y-2">
+                      <Label htmlFor={`package-name-${index}`}>
+                        Package Name
+                      </Label>
+                      <Input
+                        id={`package-name-${index}`}
+                        value={pkg.name}
+                        onChange={(e) =>
+                          handlePackageDataChange(index, "name", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`package-description-${index}`}>
+                        Description
+                      </Label>
+                      <Textarea
+                        id={`package-description-${index}`}
+                        value={pkg.description}
+                        onChange={(e) =>
+                          handlePackageDataChange(
+                            index,
+                            "description",
+                            e.target.value,
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`package-price-${index}`}>Price</Label>
+                      <Input
+                        id={`package-price-${index}`}
+                        type="number"
+                        value={pkg.price.toString()}
+                        onChange={(e) =>
+                          handlePackageDataChange(
+                            index,
+                            "price",
+                            new Prisma.Decimal(e.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`package-delivery-time-${index}`}>
+                        Delivery Time (days)
+                      </Label>
+                      <Input
+                        id={`package-delivery-time-${index}`}
+                        type="number"
+                        value={pkg.deliveryTime.toString()}
+                        onChange={(e) =>
+                          handlePackageDataChange(
+                            index,
+                            "deliveryTime",
+                            Number(e.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`package-revisions-${index}`}>
+                        Revisions
+                      </Label>
+                      <Input
+                        id={`package-revisions-${index}`}
+                        type="number"
+                        value={pkg.revisions.toString()}
+                        onChange={(e) =>
+                          handlePackageDataChange(
+                            index,
+                            "revisions",
+                            Number(e.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="mt-2"
+                      onClick={() => handleRemovePackage(index)}
+                      disabled={packages.length === 1}
+                    >
+                      Remove Package
+                    </Button>
+                  </CardContent>{" "}
+                </Card>
+              ))}
+              <Button
+                onClick={handleAddPackage}
+                disabled={packages.length >= 10}
+                className="mt-4"
+              >
+                Add Another Package
+              </Button>
+              {packages.length >= 10 && (
+                <p className="text-gray-500">Maximum of 10 packages allowed.</p>
+              )}
             </CardContent>
           </>
         );
