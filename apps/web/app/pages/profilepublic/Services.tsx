@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 
@@ -33,18 +32,7 @@ const MainCardProfile = ({
       <CardContent className="pt-2">
         <div>
           <h3 className="mb-2 font-semibold">Services</h3>
-          <p className="text-muted-foreground">
-            {showFullBio ? profile.bio : bioPreview}
-          </p>
-          {profile.bio && profile.bio.length > 100 && (
-            <Button
-              variant="link"
-              onClick={toggleBio}
-              className="h-auto p-0 mt-2 font-normal text-foreground"
-            >
-              {showFullBio ? "Lire moins" : "Lire la suite"}
-            </Button>
-          )}
+          <p className="text-muted-foreground">To change</p>
         </div>
       </CardContent>
     </Card>

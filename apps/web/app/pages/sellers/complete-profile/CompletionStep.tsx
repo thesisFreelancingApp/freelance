@@ -1,29 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { checkUserType } from "@/server.actions/welcome/checkType.action";
+import { getUserDB } from "@/server.actions/user.actions";
 import { CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function CompletionStep() {
   const router = useRouter();
-  const [userType, setUserType] = useState<{
-    isBuyer: boolean;
-    isSeller: boolean;
-  } | null>(null);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    async function fetchUserType() {
-      const result = await checkUserType();
-      if (result) {
-        setUserType({
-          isBuyer: Boolean(result.isBuyer),
-          isSeller: Boolean(result.isSeller),
-        });
+    async function fetchUserData() {
+      const result = await getUserDB();
+      if (result?.username) {
+        setUsername(result.username);
       }
     }
-    fetchUserType();
+    fetchUserData();
   }, []);
 
   return (
@@ -33,16 +27,15 @@ export default function CompletionStep() {
       <p className="text-muted-foreground">
         Félicitations ! Votre profil est maintenant complet.
       </p>
-      <div className="flex gap-4 ">
-        {userType?.isSeller && (
+      <div className="flex gap-4">
+        {username && (
           <Button
             className="w-full"
-            onClick={() => router.push("/seller/complete-profile")}
+            onClick={() => router.push(`/${username}`)}
           >
-            Completer votre profil professionnel
+            Voir mon Profile Public
           </Button>
         )}
-
         <Button
           variant="secondary"
           className="w-full"

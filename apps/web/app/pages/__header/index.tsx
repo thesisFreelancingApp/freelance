@@ -1,6 +1,7 @@
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { getAllCategories } from "@/server.actions/category/category.actions";
+import { isSellerWithProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
 import WebHeader from "./DesktopHeader";
 import MobileHeader from "./MobileHeader";
 
@@ -19,10 +20,21 @@ const Header = async () => {
     });
   }
   const categories = await getAllCategories();
+  const isSeller = await isSellerWithProfessionalProfile();
   return (
     <>
-      <MobileHeader userData={userData} user={user} categories={categories} />
-      <WebHeader categories={categories} userData={userData} user={user} />
+      <MobileHeader
+        isSeller={isSeller}
+        userData={userData}
+        user={user}
+        categories={categories}
+      />
+      <WebHeader
+        isSeller={isSeller}
+        categories={categories}
+        userData={userData}
+        user={user}
+      />
     </>
   );
 };

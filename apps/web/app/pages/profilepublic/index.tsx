@@ -40,14 +40,8 @@ const AnotherPage = async ({ username }: { username: string }) => {
   }
 
   // Destructure user profile data
-  const {
-    firstName,
-    lastName,
-    profilePic = "",
-    bio,
-    birthDate,
-    title,
-  } = userProfile.profile;
+  const { firstName, lastName, profilePic, bio, birthDate, title } =
+    userProfile.profile;
   const profile = {
     firstName,
     lastName,
