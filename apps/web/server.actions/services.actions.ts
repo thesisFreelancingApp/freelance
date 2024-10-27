@@ -280,7 +280,6 @@ export const createService = async (data: {
     })),
   };
 };
-
 export async function getServiceById(id: string): Promise<Service | null> {
   const service = await prisma.service.findUnique({
     where: { id },

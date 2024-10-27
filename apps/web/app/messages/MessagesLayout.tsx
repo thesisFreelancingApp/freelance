@@ -31,6 +31,7 @@ interface Message {
   senderId: string;
   content: string;
   createdAt: Date;
+  chatRoomId: string;
   sender: {
     id: string;
     firstName: string | null;
@@ -66,41 +67,25 @@ export default function MessagesLayout() {
       },
     });
 
-    let reconnectAttempts = 0;
-
     channelRef.current
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "Message" },
-        handleNewMessage,
+        { event: "*", schema: "public", table: "Message" },
+        (payload) => {
+          console.log("New message received:", payload);
+          handleNewMessage(payload);
+        },
       )
       .subscribe((status) => {
         if (status === "SUBSCRIBED") {
           console.log("Subscribed to real-time messages");
-          reconnectAttempts = 0;
-        } else if (status === "CLOSED" && reconnectAttempts < 5) {
-          reconnectAttempts++;
-          console.log("Subscription closed, retrying in 5 seconds...");
-          setTimeout(setupRealtimeSubscription, 5000);
-        } else {
-          console.error("Maximum reconnect attempts reached.");
         }
       });
-
-    // Heartbeat to keep the connection alive
-    const heartbeatInterval = setInterval(() => {
-      channelRef.current?.send({
-        type: "broadcast",
-        event: "heartbeat",
-        payload: {},
-      });
-    }, 30000);
 
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }
-      clearInterval(heartbeatInterval);
     };
   }, [supabase]);
 
@@ -171,14 +156,23 @@ export default function MessagesLayout() {
     }
   };
 
-  const handleNewMessage = (payload: any) => {
-    console.log("New message received:", payload);
-    const newMessage = payload.new as Message;
-    if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
-      setMessages((prev) => [...prev, newMessage]);
-    }
-    fetchChatRooms(); // Update chat room list to show latest message
-  };
+  const handleNewMessage = useCallback(
+    (payload: any) => {
+      console.log("New message received:", payload);
+      if (payload.eventType === "INSERT") {
+        const newMessage = payload.new as Message;
+        if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
+          setMessages((prev) => [...prev, newMessage]);
+          scrollToBottom();
+        }
+        fetchChatRooms(); // Update chat room list to show latest message
+      } else if (payload.eventType === "UPDATE") {
+        // Handle message updates (e.g., read status)
+        fetchMessages(selectedRoom!.id);
+      }
+    },
+    [selectedRoom, fetchChatRooms],
+  );
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

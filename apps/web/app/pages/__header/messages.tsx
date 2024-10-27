@@ -1,134 +1,260 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { getRecentMessages } from "@/server.actions/message.actions";
+  getAllChatRooms,
+  getMessages,
+  sendMessage,
+} from "@/server.actions/message.actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-interface Message {
+interface ChatRoom {
   id: number;
-  content: string;
-  createdAt: Date;
-  sender: {
-    id: string;
-    firstName: string | null;
-    lastName: string | null;
-    profilePic: string | null;
-  };
   otherUser: {
     id: string;
     firstName: string | null;
     lastName: string | null;
     profilePic: string | null;
   };
+  lastMessage: {
+    content: string;
+    createdAt: Date;
+  } | null;
 }
 
-export default function Messages() {
+interface Message {
+  id: number;
+  senderId: string;
+  content: string;
+  createdAt: Date;
+}
+
+export default function MessagesLayout() {
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [newMessage, setNewMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  useEffect(() => {
-    const fetchRecentMessages = async () => {
-      try {
-        const { messages, unreadCount } = await getRecentMessages();
-        console.log("messages ----------------------------", messages);
-        setMessages(messages);
-        setUnreadCount(unreadCount);
-      } catch (error) {
-        console.error("Failed to fetch recent messages:", error);
-      }
-    };
+  const setupRealtimeSubscription = useCallback(() => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
 
-    fetchRecentMessages();
+    channelRef.current = supabase.channel("realtime messages", {
+      config: {
+        broadcast: { self: true },
+      },
+    });
 
-    const channel = supabase
-      .channel("new_messages")
+    channelRef.current
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "Message",
-        },
-        async () => {
-          await fetchRecentMessages();
-        },
+        { event: "INSERT", schema: "public", table: "Message" },
+        handleNewMessage,
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          console.log("Subscribed to real-time messages");
+        } else if (status === "CLOSED") {
+          console.log("Subscription closed, attempting to reconnect...");
+          setTimeout(setupRealtimeSubscription, 5000);
+        }
+      });
+
+    // Heartbeat to keep the connection alive
+    const heartbeatInterval = setInterval(() => {
+      channelRef.current?.send({
+        type: "broadcast",
+        event: "heartbeat",
+        payload: {},
+      });
+    }, 30000);
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+      clearInterval(heartbeatInterval);
     };
   }, [supabase]);
 
+  useEffect(() => {
+    fetchChatRooms();
+    const unsubscribe = setupRealtimeSubscription();
+
+    return () => {
+      unsubscribe();
+    };
+  }, [setupRealtimeSubscription]);
+
+  useEffect(() => {
+    if (selectedRoom) {
+      fetchMessages(selectedRoom.id);
+    }
+  }, [selectedRoom]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]",
+      );
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  };
+
+  const fetchChatRooms = async () => {
+    try {
+      const rooms = await getAllChatRooms();
+      setChatRooms(rooms);
+      if (rooms.length > 0 && !selectedRoom) {
+        setSelectedRoom(rooms[0]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch chat rooms:", error);
+    }
+  };
+
+  const fetchMessages = async (roomId: number) => {
+    try {
+      const fetchedMessages = await getMessages(roomId);
+      setMessages(fetchedMessages);
+    } catch (error) {
+      console.error("Failed to fetch messages:", error);
+    }
+  };
+
+  const handleNewMessage = (payload: any) => {
+    console.log("New message received:", payload);
+    const newMessage = payload.new as Message & { chatRoomId: number };
+    if (selectedRoom && newMessage.chatRoomId === selectedRoom.id) {
+      setMessages((prev) => [...prev, newMessage]);
+    }
+    fetchChatRooms(); // Update chat room list to show latest message
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedRoom) return;
+
+    try {
+      const sentMessage = await sendMessage(
+        selectedRoom.otherUser.id,
+        newMessage,
+      );
+      setMessages((prev) => [...prev, sentMessage]);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <MessageSquare className="w-5 h-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">Messages</span>
-            {unreadCount > 0 && (
-              <span className="text-xs text-muted-foreground">
-                {unreadCount} unread
-              </span>
-            )}
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <div className="max-h-[300px] overflow-y-auto">
-          {messages.length === 0 ? (
-            <DropdownMenuItem>No recent messages</DropdownMenuItem>
-          ) : (
-            messages.map((message) => (
-              <DropdownMenuItem
-                key={message.id}
-                className="flex items-start py-2 px-4"
-              >
-                <img
-                  src={message.otherUser.profilePic || "/placeholder.svg"}
-                  alt={`${message.otherUser.firstName} ${message.otherUser.lastName}`}
-                  className="w-8 h-8 rounded-full mr-3"
+    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex">
+      {/* Chat rooms list */}
+      <div className="w-1/3 pr-4 border-r">
+        <h2 className="text-2xl font-bold mb-4">Messages</h2>
+        <ScrollArea className="h-full">
+          {chatRooms.map((room) => (
+            <div
+              key={room.id}
+              className={`flex items-center p-4 cursor-pointer hover:bg-gray-100 rounded-lg ${
+                selectedRoom?.id === room.id ? "bg-gray-100" : ""
+              }`}
+              onClick={() => setSelectedRoom(room)}
+            >
+              <Avatar className="w-12 h-12 mr-4">
+                <AvatarImage
+                  src={room.otherUser.profilePic || "/placeholder.svg"}
                 />
-                <div className="flex-1 overflow-hidden">
-                  <p className="font-semibold text-sm truncate">
-                    {message.otherUser.firstName} {message.otherUser.lastName}
-                  </p>
-                  <p className="text-sm text-muted-foreground truncate">
-                    {message.sender.id === message.otherUser.id ? "" : "You: "}
-                    {message.content}
-                  </p>
+                <AvatarFallback>
+                  {room.otherUser.firstName?.[0]}
+                  {room.otherUser.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <p className="font-semibold">
+                  {room.otherUser.firstName} {room.otherUser.lastName}
+                </p>
+                <p className="text-sm text-gray-600 truncate">
+                  {room.lastMessage
+                    ? room.lastMessage.content
+                    : "No messages yet"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </ScrollArea>
+      </div>
+
+      {/* Messages */}
+      <div className="w-2/3 pl-4 flex flex-col">
+        {selectedRoom ? (
+          <>
+            <h2 className="text-2xl font-bold mb-4">
+              Chat with {selectedRoom.otherUser.firstName}{" "}
+              {selectedRoom.otherUser.lastName}
+            </h2>
+            <ScrollArea className="flex-grow mb-4" ref={scrollAreaRef}>
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex mb-4 ${
+                    msg.senderId === selectedRoom.otherUser.id
+                      ? "justify-start"
+                      : "justify-end"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[70%] p-3 rounded-lg ${
+                      msg.senderId === selectedRoom.otherUser.id
+                        ? "bg-gray-200"
+                        : "bg-blue-500 text-white"
+                    }`}
+                  >
+                    <p>{msg.content}</p>
+                    <p className="text-xs mt-1 opacity-70">
+                      {new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
                 </div>
-              </DropdownMenuItem>
-            ))
-          )}
-        </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="text-center">
-          <Link href="/messages" className="w-full text-sm font-medium">
-            View all messages
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+              ))}
+              <div ref={messagesEndRef} />
+            </ScrollArea>
+            <form onSubmit={handleSendMessage} className="flex space-x-2">
+              <Input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-grow"
+              />
+              <Button type="submit">
+                <Send className="h-4 w-4" />
+              </Button>
+            </form>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500">Select a chat to start messaging</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
