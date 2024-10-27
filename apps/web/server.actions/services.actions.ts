@@ -2,6 +2,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
+import { Service } from "@/types/FeaturedServices";
 
 // // Récupérer un service par ID
 // export const getServiceById = async (id: number) => {
@@ -137,7 +138,7 @@ import { createClient } from "@/lib/supabase/server";
 
 // // Récupérer les services en vedette
 // Récupérer les services en vedette
-export const getFeaturedServices = async (limit = 3) => {
+export const getFeaturedServices = async (limit = 3): Promise<Service[]> => {
   const services = await prisma.service.findMany({
     take: limit,
     include: {
@@ -163,18 +164,7 @@ export const getFeaturedServices = async (limit = 3) => {
           },
         },
       },
-      packages: {
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          price: true,
-          serviceId: true,
-          deliveryTime: true,
-          revisions: true,
-          features: true,
-        },
-      },
+      packages: true,
     },
     orderBy: { createdAt: "desc" },
   });
@@ -290,3 +280,109 @@ export const createService = async (data: {
     })),
   };
 };
+
+export async function getServiceById(id: string): Promise<Service | null> {
+  const service = await prisma.service.findUnique({
+    where: { id },
+    include: {
+      ratings: {
+        include: {
+          rater: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
+      creator: {
+        include: {
+          profile: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
+      packages: true,
+    },
+  });
+
+  if (!service) return null;
+
+  return {
+    ...service,
+    creator: {
+      ...service.creator,
+      name: `${service.creator.profile.firstName} ${service.creator.profile.lastName}`,
+      profilePic: service.creator.profile.profilePic,
+    },
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(),
+    })),
+    rating:
+      service.ratings.length > 0
+        ? service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+          service.ratings.length
+        : 0,
+  };
+}
+
+export async function getRelatedServices(
+  serviceId: string,
+  limit = 3,
+): Promise<Service[]> {
+  const services = await prisma.service.findMany({
+    where: {
+      id: { not: serviceId },
+    },
+    take: limit,
+    include: {
+      ratings: {
+        include: {
+          rater: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
+      creator: {
+        include: {
+          profile: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePic: true,
+            },
+          },
+        },
+      },
+      packages: true,
+    },
+  });
+
+  return services.map((service) => ({
+    ...service,
+    creator: {
+      ...service.creator,
+      name: `${service.creator.profile.firstName} ${service.creator.profile.lastName}`,
+      profilePic: service.creator.profile.profilePic,
+    },
+    packages: service.packages.map((pkg) => ({
+      ...pkg,
+      price: pkg.price.toString(),
+    })),
+    rating:
+      service.ratings.length > 0
+        ? service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+          service.ratings.length
+        : 0,
+  }));
+}
