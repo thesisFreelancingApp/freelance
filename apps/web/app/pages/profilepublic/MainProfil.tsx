@@ -11,6 +11,7 @@ type Profile = {
   username: string;
   title?: string;
   bio?: string;
+  rating?: number; // Ajoutez ce champ pour la note
 };
 
 const MainCardProfile = ({
@@ -51,6 +52,12 @@ const MainCardProfile = ({
           <h4 className="text-lg text-muted-foreground">
             {profile.title || "Freelanceur"}
           </h4>
+          {profile.rating !== undefined && (
+            <div className="flex items-center gap-1">
+              <span className="text-yellow-500">★</span> {/* Étoile */}
+              <span>{profile.rating}</span> {/* Note */}
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="pt-2">
