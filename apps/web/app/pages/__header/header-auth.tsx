@@ -1,25 +1,33 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
 import UserMenu from "./user-menu";
 
-// Define the structure for user data and user types
 interface UserProfile {
-  firstName?: string;
+  firstName?: string | null;
 }
 
 interface UserData {
-  profile?: UserProfile;
-  name?: string;
-  email?: string;
+  profile?: UserProfile | null;
+  name?: string | null;
+  email?: string | null;
 }
 
 interface AuthButtonProps {
   userData?: UserData | undefined;
   user?: { email: string };
+  isSeller?: { isSeller: Boolean; isNotComplete: Boolean };
 }
 
-export default function AuthButton({ userData, user }: AuthButtonProps) {
+// Define initial structure for state
+
+export default function AuthButton({
+  userData,
+  user,
+  isSeller,
+}: AuthButtonProps) {
   return user ? (
     <div className="flex items-center gap-2">
       <Suspense fallback={<p>Loading name...</p>}>
@@ -34,8 +42,10 @@ export default function AuthButton({ userData, user }: AuthButtonProps) {
           <span className="ml-1">!</span>
         </div>
       </Suspense>
-      {/* UserMenu always displays */}
-      <UserMenu data={userData || user} />
+      <UserMenu
+        isSeller={isSeller}
+        data={userData ? userData : { email: user.email }}
+      />
     </div>
   ) : (
     <div className="flex gap-2">

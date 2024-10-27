@@ -1,7 +1,7 @@
 // Imports
-import ContactCardProfile from "@/app/pages/profilepublic/ContactCard";
-import MainCardProfile from "@/app/pages/profilepublic/MainProfil";
-import Services from "@/app/pages/profilepublic/Services";
+import ContactCardProfile from "@/app/pages/profilePublic/ContactCard";
+import MainCardProfile from "@/app/pages/profilePublic/MainProfil";
+import Services from "@/app/pages/profilePublic/Services";
 import { getUserProfileByUsername } from "@/server.actions/profilePublic/profilePublic.actions";
 
 // Types
@@ -35,14 +35,8 @@ const AnotherPage = async ({ username }: { username: string }) => {
   }
 
   // Destructure user profile data
-  const {
-    firstName,
-    lastName,
-    profilePic = "",
-    bio,
-    birthDate,
-    title,
-  } = userProfile.profile;
+  const { firstName, lastName, profilePic, bio, birthDate, title } =
+    userProfile.profile;
   const profile = {
     firstName,
     lastName,

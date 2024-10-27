@@ -63,7 +63,7 @@ model PersonalProfile {
   authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
   firstName             String?
   lastName              String?
-  profilePic            String?  @default("./public/profile.webp")
+  profilePic            String?  @default("/profile.webp")
   title                 String?
   phoneNumber           String?
   address               String?
@@ -84,64 +84,73 @@ model PersonalProfile {
   ratingsReceived       Rating[]              @relation("RatingRatee")
   createdProjects      Projects[]       @relation("CustomServiceCreator")
   participantIn         CustomServiceParticipant[]
-  professionalProfile   ProfessionalProfile? @relation(fields: [professionalProfileid], references: [id])
+
 
 }
 
 model Seller {
-  id                   String               @id @default(uuid())
-  profileId            String               @unique
-  profile              PersonalProfile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  sellerRating         Float?
-  totalEarnings        Float                @default(0.0)
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  id                    String               @id @default(uuid())
+  profileId             String               @unique
+  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+  professionalProfileId String?              @unique
+  professionalProfile   ProfessionalProfile? @relation("SellerProfessionalProfile", fields: [professionalProfileId], references: [id])
+  sellerRating          Float?
+  totalEarnings         Float                @default(0.0)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   // Relations
-  createdServices      Service[]            @relation("CreatedServices")
-  professionalProfile  ProfessionalProfile?
+  createdServices       Service[]            @relation("CreatedServices")
 }
 
+
 model Buyer {
-  id                String          @id @default(uuid())
-  profileId         String          @unique
-  profile           PersonalProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  totalSpent        Float           @default(0.0)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  id                    String               @id @default(uuid())
+  profileId             String               @unique
+  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+  professionalProfileId String?              @unique
+  professionalProfile   ProfessionalProfile? @relation("BuyerProfessionalProfile", fields: [professionalProfileId], references: [id])
+  totalSpent            Float                @default(0.0)
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   // Relations
-  purchasedServices Service[]       @relation("PurchasedServices")
+  purchasedServices     Service[]           @relation("PurchasedServices")
 }
 
 // ------------------------
 // Profil Professionnel
 // ------------------------
+enum ProfileType {
+  FREELANCER
+  COMPANY
+}
+
 
 model ProfessionalProfile {
-  id                   String               @id @default(uuid())
-  sellerProfileId      String               @unique
-  language             String[]
+  id                   String               @id @default(uuid()) 
+  buyer                Buyer?               @relation("BuyerProfessionalProfile")
+  seller               Seller?              @relation("SellerProfessionalProfile")
   personalWebsite      String?
   occupations          Json?
-  skills               Json?
-  educations           Json?
-  certifications       Json?
   companyName          String?
+  type                 ProfileType?
+  sector               String?
   profession           String?
   experienceYears      Int?
+  educations           Json?
+  skills               Json?
+  certifications       Json?
+  language             String[]
+  timeZone             String?
   website              String?
   preferredCategoryId  Int?
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
   // Relations
-  seller               Seller               @relation(fields: [sellerProfileId], references: [profileId], onDelete: Cascade)
   preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
-  PersonalProfile      PersonalProfile[]
 }
-
-
 
 // ------------------------
 // Modèles de Service
@@ -156,6 +165,11 @@ model Service {
   creatorId     String
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
+
+//services
+  categoryId    Int    
+  category      MainCategories   @relation(fields: [categoryId], references: [id]) // Relation avec MainCategories
+  
 
   // Relations
   creator       Seller           @relation("CreatedServices", fields: [creatorId], references: [id])
@@ -302,7 +316,7 @@ model MainCategories {
   parentId    Int?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-
+  services             Service[] 
   // Relations
   parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
   children    MainCategories[] @relation("Hierarchy")
