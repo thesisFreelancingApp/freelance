@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -12,28 +13,36 @@ import { Progress } from "@/components/ui/progress";
 import { createServiceWithCategoryAndPackage } from "@/server.actions/sellers/services.actions";
 import { Category, Packages, ServiceData, SubCategory } from "@/types";
 import { Prisma } from "@prisma/client";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Step1BasicInfo from "./Step1BasicInfo";
 import Step2CategorySelection from "./Step2CategorySelection";
 import Step3PackageInfo from "./Step3PackageInfo";
 import Step4UploadImages from "./Step4UploadImages";
 import Step5Review from "./Step5Review";
 
-// Définition des catégories avec sous-catégories et enfants
-
-export default function ServiceCreationForm({
+export default function FormulaireCreationService({
   categories,
 }: {
   categories: Category[];
 }) {
-  const [step, setStep] = useState(1);
-  const [serviceData, setServiceData] = useState<ServiceData>({
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const nombreEtapes = 5;
+  const etapeInitiale = parseInt(searchParams.get("step") || "1", 10);
+  const [etapeCourante, setEtapeCourante] = useState<number>(
+    Math.min(etapeInitiale, nombreEtapes),
+  );
+  const progression = (etapeCourante / nombreEtapes) * 100;
+
+  const [donneesService, setDonneesService] = useState<ServiceData>({
     name: "",
     description: "",
     tags: [],
     images: [],
   });
-  const [packages, setPackages] = useState<Packages[]>([
+  const [forfaits, setForfaits] = useState<Packages[]>([
     {
       name: "",
       description: "",
@@ -43,7 +52,7 @@ export default function ServiceCreationForm({
       features: [],
     },
   ]);
-  const [selectedCategory, setSelectedCategory] = useState<{
+  const [categorieSelectionnee, setCategorieSelectionnee] = useState<{
     main: Category | null;
     sub: SubCategory | null;
     child: SubCategory | null;
@@ -53,60 +62,84 @@ export default function ServiceCreationForm({
     child: null,
   });
 
-  const handleNext = () => setStep((prev) => Math.min(prev + 1, 5));
-  const handlePrevious = () => setStep((prev) => Math.max(prev - 1, 1));
+  const mettreAJourEtapeDansUrl = (etape: number) => {
+    const nouvelleUrl = `${window.location.pathname}?step=${etape}`;
+    router.replace(nouvelleUrl);
+  };
 
   const handleSubmit = async () => {
-    if (selectedCategory.child) {
+    if (categorieSelectionnee.child) {
       try {
         await createServiceWithCategoryAndPackage(
-          serviceData,
-          selectedCategory.child.id,
-          packages,
+          donneesService,
+          categorieSelectionnee.child.id,
+          forfaits,
         );
-        alert("Service created successfully!");
+        alert("Service créé avec succès !");
+        setEtapeCourante(nombreEtapes);
+        mettreAJourEtapeDansUrl(nombreEtapes);
       } catch (error) {
-        console.error("Error creating service:", error);
+        console.error("Erreur lors de la création du service :", error);
       }
     } else {
-      alert("Please select a child category.");
+      alert("Veuillez sélectionner une sous-catégorie.");
     }
   };
 
-  const renderStep = () => {
-    switch (step) {
+  const etapeSuivante = () => {
+    setEtapeCourante((prev) => {
+      const prochaineEtape = Math.min(prev + 1, nombreEtapes);
+      mettreAJourEtapeDansUrl(prochaineEtape);
+      return prochaineEtape;
+    });
+  };
+
+  const etapePrecedente = () => {
+    setEtapeCourante((prev) => {
+      const etapePrecedente = Math.max(prev - 1, 1);
+      mettreAJourEtapeDansUrl(etapePrecedente);
+      return etapePrecedente;
+    });
+  };
+
+  useEffect(() => {
+    mettreAJourEtapeDansUrl(etapeCourante);
+  }, [etapeCourante]);
+
+  const afficherEtape = () => {
+    switch (etapeCourante) {
       case 1:
         return (
           <Step1BasicInfo
-            serviceData={serviceData}
-            setServiceData={setServiceData}
+            serviceData={donneesService}
+            setServiceData={setDonneesService}
           />
         );
       case 2:
         return (
           <Step2CategorySelection
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            selectedCategory={categorieSelectionnee}
+            setSelectedCategory={setCategorieSelectionnee}
             categories={categories}
           />
         );
       case 3:
         return (
-          <Step3PackageInfo packages={packages} setPackages={setPackages} />
+          <Step3PackageInfo packages={forfaits} setPackages={setForfaits} />
         );
       case 4:
         return (
           <Step4UploadImages
-            serviceData={serviceData}
-            setServiceData={setServiceData}
+            serviceData={donneesService}
+            setServiceData={setDonneesService}
           />
         );
       case 5:
         return (
           <Step5Review
-            serviceData={serviceData}
-            packages={packages}
-            selectedCategory={selectedCategory}
+            serviceData={donneesService}
+            packages={forfaits}
+            selectedCategory={categorieSelectionnee}
             onSubmit={handleSubmit}
           />
         );
@@ -116,23 +149,41 @@ export default function ServiceCreationForm({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto mt-4">
       <CardHeader>
-        <CardTitle>sdjhlskjdlsk</CardTitle>
-
-        <Progress value={(step / 5) * 100} className="w-full" />
+        <div className="flex justify-center mb-4 space-x-4">
+          {[...Array(nombreEtapes)].map((_, index) => (
+            <div
+              key={index}
+              className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-semibold ${
+                etapeCourante === index + 1
+                  ? "bg-primary" // Couleur primaire pour l'étape active
+                  : "bg-gray-300" // Couleur neutre pour les autres étapes
+              }`}
+            >
+              {index + 1}
+            </div>
+          ))}
+        </div>
+        <CardTitle className="text-3xl font-bold">Détails du Service</CardTitle>
+        <Progress value={progression} className="w-full mb-6" />
+        <CardDescription>
+          Veuillez compléter les détails du service.
+        </CardDescription>
+        {/* Barre de progression avec numéros d'étapes */}
       </CardHeader>
-      <CardContent>{renderStep()}</CardContent>
+
+      <CardContent>{afficherEtape()}</CardContent>
       <CardFooter className="flex justify-between">
-        {step > 1 && (
-          <Button variant="outline" onClick={handlePrevious}>
-            Previous
+        {etapeCourante > 1 && (
+          <Button variant="outline" onClick={etapePrecedente}>
+            Précédent
           </Button>
         )}
-        {step < 5 ? (
-          <Button onClick={handleNext}>Next</Button>
+        {etapeCourante < nombreEtapes ? (
+          <Button onClick={etapeSuivante}>Suivant</Button>
         ) : (
-          <Button onClick={handleSubmit}>Confirm and Create Service</Button>
+          <Button onClick={handleSubmit}>Confirmer et Créer le Service</Button>
         )}
       </CardFooter>
     </Card>

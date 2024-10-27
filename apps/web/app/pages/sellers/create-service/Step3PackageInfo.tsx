@@ -43,15 +43,40 @@ export default function PackageSelection({
     setPackages(packages.filter((_, i) => i !== index));
   };
 
+  const handlePriceChange = (index: number, value: string) => {
+    // Permet les chiffres avec une virgule pour 3 décimales max
+    const validValue = /^[0-9]{0,5},?[0-9]{0,3}$/;
+
+    if (validValue.test(value)) {
+      const formattedValue = value.replace(",", ".");
+      const decimalValue = new Prisma.Decimal(formattedValue);
+
+      // Vérifier que la valeur est inférieure à 100000.000
+      if (decimalValue.lessThan(new Prisma.Decimal("100000.000"))) {
+        const updatedPackages = packages.map((pkg, i) =>
+          i === index ? { ...pkg, price: decimalValue } : pkg,
+        );
+        setPackages(updatedPackages);
+      } else {
+        console.error("Le prix ne peut pas dépasser 99999,999.");
+      }
+    } else {
+      console.error(
+        "Entrée invalide : maximum 5 chiffres avant et 3 décimales après la virgule.",
+      );
+    }
+  };
+
   return (
     <div>
       {packages.map((pkg, index) => (
         <div key={index} className="p-4 mb-4 border rounded">
-          <h3 className="mb-2 font-semibold">Package {index + 1}</h3>
+          <h3 className="mb-2 font-semibold">Forfait {index + 1}</h3>
 
-          <Label htmlFor={`package-name-${index}`}>Package Name</Label>
+          <Label htmlFor={`package-name-${index}`}>Nom du Forfait</Label>
           <Input
             id={`package-name-${index}`}
+            placeholder="Entrez le nom du forfait"
             value={pkg.name}
             onChange={(e) => handlePackageChange(index, "name", e.target.value)}
           />
@@ -61,6 +86,7 @@ export default function PackageSelection({
           </Label>
           <Textarea
             id={`package-description-${index}`}
+            placeholder="Entrez la description du forfait"
             value={pkg.description}
             onChange={(e) =>
               handlePackageChange(index, "description", e.target.value)
@@ -68,27 +94,22 @@ export default function PackageSelection({
           />
 
           <Label htmlFor={`package-price-${index}`} className="mt-2">
-            Price
+            Prix
           </Label>
           <Input
             id={`package-price-${index}`}
-            type="number"
-            value={pkg.price.toString()}
-            onChange={(e) =>
-              handlePackageChange(
-                index,
-                "price",
-                new Prisma.Decimal(e.target.value),
-              )
-            }
+            placeholder="Entrez le prix du forfait"
+            value={pkg.price ? pkg.price.toString().replace(".", ",") : ""}
+            onChange={(e) => handlePriceChange(index, e.target.value)}
           />
 
           <Label htmlFor={`package-delivery-${index}`} className="mt-2">
-            Delivery Time (days)
+            Délai de Livraison (jours)
           </Label>
           <Input
             id={`package-delivery-${index}`}
             type="number"
+            placeholder="Entrez le délai de livraison en jours"
             value={pkg.deliveryTime.toString()}
             onChange={(e) =>
               handlePackageChange(index, "deliveryTime", Number(e.target.value))
@@ -96,11 +117,12 @@ export default function PackageSelection({
           />
 
           <Label htmlFor={`package-revisions-${index}`} className="mt-2">
-            Revisions
+            Révisions
           </Label>
           <Input
             id={`package-revisions-${index}`}
             type="number"
+            placeholder="Entrez le nombre de révisions"
             value={pkg.revisions.toString()}
             onChange={(e) =>
               handlePackageChange(index, "revisions", Number(e.target.value))
@@ -108,11 +130,11 @@ export default function PackageSelection({
           />
 
           <Label htmlFor={`package-features-${index}`} className="mt-2">
-            Features
+            Caractéristiques
           </Label>
           <Textarea
             id={`package-features-${index}`}
-            placeholder="Enter features separated by commas"
+            placeholder="Entrez les caractéristiques, séparées par des virgules"
             value={pkg.features.join(", ")}
             onChange={(e) =>
               handlePackageChange(index, "features", e.target.value.split(","))
@@ -124,13 +146,13 @@ export default function PackageSelection({
             onClick={() => handleRemovePackage(index)}
             className="mt-4"
           >
-            Remove Package
+            Supprimer le Forfait
           </Button>
         </div>
       ))}
 
       <Button onClick={handleAddPackage} className="mt-4">
-        Add Package
+        Ajouter un Forfait
       </Button>
     </div>
   );

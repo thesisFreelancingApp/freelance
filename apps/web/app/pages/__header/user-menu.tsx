@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOutAction } from "@/server.actions/auth/auth.actions";
 import {
-  Bell,
   BriefcaseBusiness,
   HelpCircle,
   Home,
@@ -21,11 +20,11 @@ import {
   UserCog,
 } from "lucide-react";
 import Link from "next/link";
-
+import Notifications from "./notifications";
+import Messages from "./messages";
 interface UserProfile {
   profilePic?: string | null;
 }
-
 interface UserData {
   email?: string | null;
   name?: string | null;
@@ -45,13 +44,14 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
   const username = data?.username;
   console.log("iiiiii", isSeller);
   return (
-    <div className="flex justify-end">
+    <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2">
+        <Notifications />
+        <Messages />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="w-5 h-5" />
-            </Button>
             <Button variant="ghost" className="relative w-8 h-8 rounded-full">
               <Avatar className="w-10 h-10">
                 {data?.profile?.profilePic ? (

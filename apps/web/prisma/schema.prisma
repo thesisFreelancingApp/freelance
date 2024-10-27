@@ -183,8 +183,7 @@ model ServicePackage {
   serviceId     String
   name          String
   description   String
-  price         Decimal   @db.Decimal(10, 2)
-  deliveryTime  Int
+  price         Decimal   @db.Decimal(12, 3)
   revisions     Int
   features      String[]
 
@@ -281,6 +280,7 @@ model Message {
   senderId    String
   content     String
   createdAt   DateTime         @default(now())
+  isRead      Boolean          @default(false)
 
   // Relations
   chatRoom    ChatRoom         @relation(fields: [chatRoomId], references: [id])
@@ -321,3 +321,4 @@ model MainCategories {
   children    MainCategories[] @relation("Hierarchy")
   professionalProfiles ProfessionalProfile[] 
 }
+

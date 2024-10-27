@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Category, Packages, ServiceData, SubCategory } from "@/types";
 
@@ -22,26 +21,26 @@ export default function Step5Review({
   return (
     <Card className="w-full max-w-2xl p-4 mx-auto space-y-4">
       <CardHeader>
-        <CardTitle>Review and Confirm Your Service</CardTitle>
+        <CardTitle>Réviser et Confirmer Votre Service</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Service Information */}
+        {/* Informations du Service */}
         <div>
-          <h3 className="font-semibold">Service Information</h3>
+          <h3 className="font-semibold">Informations du Service</h3>
           <p>
-            <strong>Name:</strong> {serviceData.name}
+            <strong>Nom :</strong> {serviceData.name}
           </p>
           <p>
-            <strong>Description:</strong> {serviceData.description}
+            <strong>Description :</strong> {serviceData.description}
           </p>
           <p>
-            <strong>Tags:</strong> {serviceData.tags.join(", ")}
+            <strong>Tags :</strong> {serviceData.tags.join(", ")}
           </p>
         </div>
 
-        {/* Category Information */}
+        {/* Informations de la Catégorie */}
         <div>
-          <h3 className="font-semibold">Category</h3>
+          <h3 className="font-semibold">Catégorie</h3>
           <p>
             {selectedCategory.main?.name} {" > "}
             {selectedCategory.sub?.name} {" > "}
@@ -49,28 +48,28 @@ export default function Step5Review({
           </p>
         </div>
 
-        {/* Packages */}
+        {/* Forfaits */}
         <div>
-          <h3 className="font-semibold">Packages</h3>
+          <h3 className="font-semibold">Forfaits</h3>
           {packages.map((pkg, index) => (
             <div key={index} className="p-2 mb-2 border rounded">
               <p>
-                <strong>Package Name:</strong> {pkg.name}
+                <strong>Nom du Forfait :</strong> {pkg.name}
               </p>
               <p>
-                <strong>Description:</strong> {pkg.description}
+                <strong>Description :</strong> {pkg.description}
               </p>
               <p>
-                <strong>Price:</strong> ${pkg.price.toString()}
+                <strong>Prix :</strong> ${pkg.price.toString()}
               </p>
               <p>
-                <strong>Delivery Time:</strong> {pkg.deliveryTime} days
+                <strong>Délai de Livraison :</strong> {pkg.deliveryTime} jours
               </p>
               <p>
-                <strong>Revisions:</strong> {pkg.revisions}
+                <strong>Révisions :</strong> {pkg.revisions}
               </p>
               <p>
-                <strong>Features:</strong> {pkg.features.join(", ")}
+                <strong>Caractéristiques :</strong> {pkg.features.join(", ")}
               </p>
             </div>
           ))}
@@ -84,17 +83,12 @@ export default function Step5Review({
               <img
                 key={index}
                 src={image}
-                alt={`Service Image ${index + 1}`}
+                alt={`Image du Service ${index + 1}`}
                 className="object-cover w-full h-32 rounded"
               />
             ))}
           </div>
         </div>
-
-        {/* Submit Button */}
-        <Button onClick={onSubmit} className="mt-4">
-          Confirm and Create Service
-        </Button>
       </CardContent>
     </Card>
   );

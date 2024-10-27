@@ -59,13 +59,13 @@ export default function CategorySelection({
   return (
     <div>
       {/* Sélection de la catégorie principale */}
-      <Label>Main Category</Label>
+      <Label>Catégorie Principale</Label>
       <select
         value={selectedCategory.main?.name || ""}
         onChange={handleMainCategoryChange}
         className="w-full p-2 border rounded"
       >
-        <option value="">Select Main Category</option>
+        <option value="">Sélectionner une catégorie principale</option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.name}>
             {cat.name}
@@ -76,13 +76,13 @@ export default function CategorySelection({
       {/* Sélection de la sous-catégorie */}
       {selectedCategory.main && selectedCategory.main.children && (
         <>
-          <Label>Sub Category</Label>
+          <Label>Sous-catégorie</Label>
           <select
             value={selectedCategory.sub?.name || ""}
             onChange={handleSubCategoryChange}
             className="w-full p-2 border rounded"
           >
-            <option value="">Select Sub Category</option>
+            <option value="">Sélectionner une sous-catégorie</option>
             {selectedCategory.main.children.map((subCat) => (
               <option key={subCat.id} value={subCat.name}>
                 {subCat.name}
@@ -95,13 +95,13 @@ export default function CategorySelection({
       {/* Sélection de la catégorie enfant */}
       {selectedCategory.sub && selectedCategory.sub.children && (
         <>
-          <Label>Child Category</Label>
+          <Label>Catégorie</Label>
           <select
             value={selectedCategory.child?.name || ""}
             onChange={handleChildCategoryChange}
             className="w-full p-2 border rounded"
           >
-            <option value="">Select Child Category</option>
+            <option value="">Sélectionner une catégorie</option>
             {selectedCategory.sub.children.map((childCat) => (
               <option key={childCat.id} value={childCat.name}>
                 {childCat.name}
