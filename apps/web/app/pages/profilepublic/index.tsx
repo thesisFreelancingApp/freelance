@@ -1,8 +1,13 @@
 // Imports
-import ContactCardProfile from "@/app/pages/profilePublic/ContactCard";
-import MainCardProfile from "@/app/pages/profilePublic/MainProfil";
-import Services from "@/app/pages/profilePublic/Services";
+import ContactCardProfile from "@/app/pages/profilepublic/ContactCard";
+import MainCardProfile from "@/app/pages/profilepublic/MainProfil";
+import Services from "@/app/pages/profilepublic/Services";
 import { getUserProfileByUsername } from "@/server.actions/profilePublic/profilePublic.actions";
+import Skills from "@/app/pages/profilepublic/skills";
+import Langues from "@/app/pages/profilepublic/langues";
+import Occupations from "@/app/pages/profilepublic/occupations";
+import Educations from "@/app/pages/profilepublic/educations";
+import Certifications from "@/app/pages/profilepublic/certifications";
 
 // Types
 interface Profile {
@@ -55,8 +60,21 @@ const AnotherPage = async ({ username }: { username: string }) => {
           <ContactCardProfile profile={profile} />
         </div>
       </div>
-      <Services profile={profile} username={username} />
-    </div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <Services profile={profile} username={username} />
+        <div className="md:col-span-1 md:sticky md:top-8">
+          <Langues profile={profile} username={username} />
+          </div>
+          <div className="md:col-span-1 md:sticky md:top-8">
+          <Occupations profile={profile} username={username} />
+          <Skills profile={profile} username={username} />
+          
+        </div>
+        <Educations profile={profile} username={username} />
+        <Certifications profile={profile} username={username} />
+        </div>
+      </div>
+    
   );
 };
 
