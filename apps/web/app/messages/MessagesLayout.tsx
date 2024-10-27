@@ -4,6 +4,7 @@ import {
   getAllChatRooms,
   getMessages,
   sendMessage,
+  markMessagesAsRead,
 } from "@/server.actions/message.actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -101,6 +102,7 @@ export default function MessagesLayout() {
   useEffect(() => {
     if (selectedRoom) {
       fetchMessages(selectedRoom.id);
+      markMessagesAsRead(selectedRoom.id);
     }
   }, [selectedRoom]);
 
@@ -165,10 +167,9 @@ export default function MessagesLayout() {
           setMessages((prev) => [...prev, newMessage]);
           scrollToBottom();
         }
-        fetchChatRooms(); // Update chat room list to show latest message
-      } else if (payload.eventType === "UPDATE") {
-        // Handle message updates (e.g., read status)
-        fetchMessages(selectedRoom!.id);
+        fetchChatRooms();
+      } else if (payload.eventType === "UPDATE" && selectedRoom) {
+        fetchMessages(selectedRoom.id);
       }
     },
     [selectedRoom, fetchChatRooms],
@@ -227,33 +228,33 @@ export default function MessagesLayout() {
   };
 
   return (
-    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex">
+    <div className="container mx-auto p-4 h-[calc(100vh-4rem)] flex gap-4">
       {/* Chat rooms list */}
-      <div className="w-1/3 pr-4 border-r">
-        <h2 className="text-2xl font-bold mb-4">Messages</h2>
-        <ScrollArea className="h-full">
+      <div className="w-1/3 border rounded-lg bg-card">
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-semibold">Messages</h2>
+        </div>
+        <ScrollArea className="h-[calc(100vh-8rem)]">
           {chatRooms.map((room) => (
             <div
               key={room.id}
-              className={`flex items-center p-4 cursor-pointer hover:bg-gray-100 rounded-lg ${
-                selectedRoom?.id === room.id ? "bg-gray-100" : ""
+              className={`flex items-center p-4 cursor-pointer hover:bg-accent transition-colors ${
+                selectedRoom?.id === room.id ? "bg-accent" : ""
               }`}
               onClick={() => setSelectedRoom(room)}
             >
-              <Avatar className="w-12 h-12 mr-4">
-                <AvatarImage
-                  src={room.otherUser?.profilePic || "/placeholder.svg"}
-                />
-                <AvatarFallback>
+              <Avatar className="h-10 w-10 mr-4">
+                <AvatarImage src={room.otherUser?.profilePic || undefined} />
+                <AvatarFallback className="bg-primary/10">
                   {room.otherUser?.firstName?.[0]}
                   {room.otherUser?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <p className="font-semibold">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm text-foreground">
                   {room.otherUser?.firstName} {room.otherUser?.lastName}
                 </p>
-                <p className="text-sm text-gray-600 truncate">
+                <p className="text-xs text-muted-foreground truncate">
                   {room.lastMessage
                     ? room.lastMessage.content
                     : "No messages yet"}
@@ -265,32 +266,44 @@ export default function MessagesLayout() {
       </div>
 
       {/* Messages */}
-      <div className="w-2/3 pl-4 flex flex-col">
+      <div className="flex-1 border rounded-lg bg-card flex flex-col">
         {selectedRoom ? (
           <>
-            <h2 className="text-2xl font-bold mb-4">
-              Chat with {selectedRoom.otherUser?.firstName}{" "}
-              {selectedRoom.otherUser?.lastName}
-            </h2>
-            <ScrollArea className="flex-grow mb-4" ref={scrollAreaRef}>
-              {/* Load More Messages Button/Indicator */}
+            <div className="p-4 border-b flex items-center gap-4">
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src={selectedRoom.otherUser?.profilePic || undefined}
+                />
+                <AvatarFallback className="bg-primary/10">
+                  {selectedRoom.otherUser?.firstName?.[0]}
+                  {selectedRoom.otherUser?.lastName?.[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-semibold">
+                  {selectedRoom.otherUser?.firstName}{" "}
+                  {selectedRoom.otherUser?.lastName}
+                </h2>
+              </div>
+            </div>
+            <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
               {hasMore && (
                 <div ref={loadMoreRef} className="text-center py-2">
                   {isLoadingMore ? (
-                    <p className="text-gray-500">Loading more messages...</p>
+                    <p className="text-muted-foreground text-sm">Loading...</p>
                   ) : (
                     <Button
                       variant="ghost"
+                      size="sm"
                       onClick={() => loadMoreMessages()}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-muted-foreground"
                     >
-                      Load More
+                      Load previous messages
                     </Button>
                   )}
                 </div>
               )}
 
-              {/* Messages */}
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -301,14 +314,11 @@ export default function MessagesLayout() {
                   }`}
                 >
                   {msg.senderId === selectedRoom.otherUser?.id && (
-                    <Avatar className="w-8 h-8">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={
-                          selectedRoom.otherUser?.profilePic ||
-                          "/placeholder.svg"
-                        }
+                        src={selectedRoom.otherUser?.profilePic || undefined}
                       />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-primary/10">
                         {selectedRoom.otherUser?.firstName?.[0]}
                         {selectedRoom.otherUser?.lastName?.[0]}
                       </AvatarFallback>
@@ -317,12 +327,12 @@ export default function MessagesLayout() {
                   <div
                     className={`max-w-[70%] p-3 rounded-lg ${
                       msg.senderId === selectedRoom.otherUser?.id
-                        ? "bg-gray-200"
-                        : "bg-blue-500 text-white"
+                        ? "bg-accent"
+                        : "bg-primary text-primary-foreground"
                     }`}
                   >
-                    <p>{msg.content}</p>
-                    <p className="text-xs mt-1 opacity-70">
+                    <p className="text-sm">{msg.content}</p>
+                    <p className="text-[10px] mt-1 opacity-70">
                       {new Date(msg.createdAt).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -333,21 +343,23 @@ export default function MessagesLayout() {
               ))}
               <div ref={messagesEndRef} />
             </ScrollArea>
-            <form onSubmit={handleSendMessage} className="flex space-x-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-grow"
-              />
-              <Button type="submit">
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
+            <div className="p-4 border-t">
+              <form onSubmit={handleSendMessage} className="flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1"
+                />
+                <Button type="submit" size="icon">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
           </>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">Select a chat to start messaging</p>
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            Select a conversation to start messaging
           </div>
         )}
       </div>

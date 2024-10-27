@@ -230,6 +230,7 @@ export async function getRecentMessages() {
         id: message.id,
         content: message.content,
         createdAt: message.createdAt,
+        isRead: message.isRead,
         sender: message.sender,
         otherUser: otherParticipant,
       };
@@ -251,4 +252,32 @@ export async function getRecentMessages() {
   });
 
   return { messages: recentMessages, unreadCount };
+}
+
+export async function markMessagesAsRead(chatRoomId: string) {
+  const supabase = createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    throw new Error("User not authenticated");
+  }
+
+  try {
+    await prisma.message.updateMany({
+      where: {
+        chatRoomId,
+        NOT: { senderId: user.id },
+        isRead: false,
+      },
+      data: {
+        isRead: true,
+      },
+    });
+  } catch (error) {
+    console.error("Error marking messages as read:", error);
+    throw new Error("Failed to mark messages as read");
+  }
 }

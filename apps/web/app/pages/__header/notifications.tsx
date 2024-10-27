@@ -6,11 +6,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Notification {
   id: string;
@@ -53,65 +52,75 @@ export default function Notifications() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
+          <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
-              {unreadCount}
+            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
+              {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-80" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex justify-between items-center">
-            <span className="font-semibold">Notifications</span>
-            {unreadCount > 0 && (
-              <span className="text-xs text-muted-foreground">
-                {unreadCount} unread
-              </span>
-            )}
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <div className="max-h-[300px] overflow-y-auto">
+      <DropdownMenuContent align="end" className="w-[380px]">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="text-sm font-semibold">Notifications</h2>
+          {unreadCount > 0 && (
+            <span className="text-xs text-muted-foreground">
+              {unreadCount} unread
+            </span>
+          )}
+        </div>
+        <ScrollArea className="h-[calc(80vh-8rem)] py-2">
           {notifications.length === 0 ? (
-            <DropdownMenuItem>No notifications</DropdownMenuItem>
+            <div className="px-4 py-6 text-center text-muted-foreground text-sm">
+              No notifications yet
+            </div>
           ) : (
             notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
-                className="flex flex-col items-start py-2 px-4"
+                className="px-4 py-3 focus:bg-accent cursor-default"
               >
-                <div className="flex justify-between items-center w-full">
-                  <span
-                    className={`text-sm ${notification.read ? "text-muted-foreground" : "font-semibold"}`}
-                  >
-                    {notification.message}
-                  </span>
-                  {!notification.read && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => markAsRead(notification.id)}
-                      className="h-6 px-2 text-xs"
+                <div className="flex flex-col w-full">
+                  <div className="flex justify-between items-start gap-2">
+                    <p
+                      className={`text-sm ${
+                        !notification.read
+                          ? "font-semibold text-foreground"
+                          : "text-muted-foreground"
+                      }`}
                     >
-                      Mark read
-                    </Button>
-                  )}
+                      {notification.message}
+                    </p>
+                    {!notification.read && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          markAsRead(notification.id);
+                        }}
+                        className="h-6 px-2 text-xs hover:bg-secondary"
+                      >
+                        Mark read
+                      </Button>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground mt-1">
+                    {notification.timestamp}
+                  </span>
                 </div>
-                <span className="text-xs text-muted-foreground mt-1">
-                  {notification.timestamp}
-                </span>
               </DropdownMenuItem>
             ))
           )}
-        </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="text-center">
-          <Link href="/notifications" className="w-full text-sm font-medium">
+        </ScrollArea>
+        <div className="p-4 border-t">
+          <Link
+            href="/notifications"
+            className="block text-sm text-center text-primary hover:text-primary/80"
+          >
             View all notifications
           </Link>
-        </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
