@@ -115,6 +115,7 @@ export default function ProfessionalInfoForm() {
     console.log("Profile Data to Submit:", profileData);
 
     try {
+      //@ts-ignore
       const newProfile = await createProfessionalProfile(profileData);
       console.log("Profile created:", newProfile);
       setToastMessage("Profile created successfully!");

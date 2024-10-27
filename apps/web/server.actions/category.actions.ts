@@ -62,7 +62,7 @@ export const searchServices = async (
   return services;
 };
 
-export const getCategories = async () => {
+export const getCategories = async (categoryId: number) => {
   return prisma.categoryHierarchy.findMany({
     where: { level: 1 },
     include: {
