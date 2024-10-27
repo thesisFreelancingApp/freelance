@@ -28,7 +28,7 @@ const MainCardProfile = ({
       : profile.bio;
 
   return (
-    <Card className="col-span-1 border-none shadow-none md:col-span-2 bg-background">
+    <Card className="col-span-1 shadow-none md:col-span-2 bg-background">
       <CardContent className="pt-2">
         <div>
           <h3 className="mb-2 font-semibold">Services</h3>
