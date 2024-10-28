@@ -1,6 +1,7 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
+import { ProfessionalProfile } from "@prisma/client";
 
 interface UserProfile {
   firstName?: string | null;
@@ -11,6 +12,7 @@ interface UserProfile {
   username?: string | null;
   userEmail?: string | null;
   bio?: string | null;
+  professionalProfile?: ProfessionalProfile | null;
 }
 
 export async function getUserProfile(): Promise<UserProfile | null> {

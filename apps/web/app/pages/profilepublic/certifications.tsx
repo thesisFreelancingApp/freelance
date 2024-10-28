@@ -9,13 +9,17 @@ type Profile = {
   username: string;
   title?: string;
   bio?: string;
-  certifications?: string[];
+  certifications?: { title: string }  [];
   professionalProfile?: ProfessionalProfile;
+  seller?: Seller;
 };
 
 type ProfessionalProfile = {
-  certifications?: string[];
+  certifications?: { title: string , institution: string }[];
   // Add other properties as needed
+};
+type Seller = {
+  professionalProfile?: ProfessionalProfile;
 };
 
 const Certifications = ({
@@ -34,8 +38,8 @@ const Certifications = ({
         <div>
           <h3 className="mb-2 font-semibold">Certifications</h3>
           <p className="text-muted-foreground">
-            {profile.professionalProfile?.certifications?.map((certification) => (
-              <Badge key={certification}>{certification}</Badge>
+            {profile.seller?.professionalProfile?.certifications?.map((certification: { title: string , institution: string }) => (
+              <Badge key={certification.title}>{certification.title}</Badge>
             ))}
           </p>
         </div>
