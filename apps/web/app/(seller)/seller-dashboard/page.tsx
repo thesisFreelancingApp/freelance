@@ -56,6 +56,16 @@ import Loader from "@/app/loading";
 import Link from "next/link";
 import { getAllCategories } from "@/server.actions/category/category.actions";
 
+// Add a currency formatter helper at the top of your file
+const formatTND = (amount: number) => {
+  return new Intl.NumberFormat("fr-TN", {
+    style: "currency",
+    currency: "TND",
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3,
+  }).format(amount);
+};
+
 export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,7 +140,7 @@ export default function SellerDashboard() {
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">
-        Welcome back, {overview?.sellerName || "Seller"}!
+        Bienvenue, {overview?.sellerName || "Vendeur"}!
       </h1>
       <Tabs
         value={activeTab}
@@ -138,69 +148,67 @@ export default function SellerDashboard() {
         className="space-y-4"
       >
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="overview">Aperçu</TabsTrigger>
           <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="orders">Active Orders</TabsTrigger>
+          <TabsTrigger value="orders">Commandes</TabsTrigger>
           <TabsTrigger value="messages">Messages</TabsTrigger>
-          <TabsTrigger value="earnings">Earnings</TabsTrigger>
+          <TabsTrigger value="earnings">Revenus</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Earnings
+                  Revenus Totaux
                 </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  ${overview?.totalEarnings.toFixed(2)}
+                  {formatTND(overview?.totalEarnings || 0)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
+                  +20.1% par rapport au mois dernier
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Active Orders
+                  Commandes Actives
                 </CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 from yesterday
-                </p>
+                <p className="text-xs text-muted-foreground">+2 depuis hier</p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Seller Rating
+                  Note Vendeur
                 </CardTitle>
                 <Star className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">4.8</div>
                 <p className="text-xs text-muted-foreground">
-                  +0.2 from last month
+                  +0.2 depuis le mois dernier
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Completion Rate
+                  Taux de Complétion
                 </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">98%</div>
                 <p className="text-xs text-muted-foreground">
-                  +2% from last month
+                  +2% depuis le mois dernier
                 </p>
               </CardContent>
             </Card>
@@ -208,7 +216,7 @@ export default function SellerDashboard() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-4">
               <CardHeader>
-                <CardTitle>Monthly Earnings</CardTitle>
+                <CardTitle>Revenus Mensuels</CardTitle>
               </CardHeader>
               <CardContent className="pl-2">
                 <ResponsiveContainer width="100%" height={350}>
@@ -225,7 +233,7 @@ export default function SellerDashboard() {
                       fontSize={12}
                       tickLine={false}
                       axisLine={false}
-                      tickFormatter={(value) => `$${value}`}
+                      tickFormatter={(value) => `${value} TND`}
                     />
                     <Bar
                       dataKey="total"
@@ -238,9 +246,9 @@ export default function SellerDashboard() {
             </Card>
             <Card className="col-span-3">
               <CardHeader>
-                <CardTitle>Top Performing Services</CardTitle>
+                <CardTitle>Services les Plus Performants</CardTitle>
                 <CardDescription>
-                  Your best-selling gigs this month
+                  Vos meilleurs services ce mois-ci
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -263,7 +271,7 @@ export default function SellerDashboard() {
                         </p>
                       </div>
                       <div className="ml-auto font-medium">
-                        {service.orders} orders
+                        {formatTND(service.orders)}
                       </div>
                     </div>
                   ))}
@@ -275,14 +283,14 @@ export default function SellerDashboard() {
         <TabsContent value="services" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Manage Services</CardTitle>
-              <CardDescription>Create and manage your Services</CardDescription>
+              <CardTitle>Gérer les Services</CardTitle>
+              <CardDescription>Créez et gérez vos services</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex justify-between mb-4">
                 <div className="flex items-center space-x-2">
                   <Input
-                    placeholder="Search services..."
+                    placeholder="Rechercher des services..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-[300px]"
@@ -292,10 +300,10 @@ export default function SellerDashboard() {
                     onValueChange={setServiceFilter}
                   >
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Filter by category" />
+                      <SelectValue placeholder="Filtrer par catégorie" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="all">Toutes les Catégories</SelectItem>
                       {categories.map((category) => (
                         <SelectItem
                           key={category.id}
@@ -309,17 +317,17 @@ export default function SellerDashboard() {
                 </div>
                 <Button asChild>
                   <Link href="/createGig">
-                    <Plus className="mr-2 h-4 w-4" /> Create New Service
+                    <Plus className="mr-2 h-4 w-4" /> Créer un Nouveau Service
                   </Link>
                 </Button>
               </div>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Service Name</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Orders</TableHead>
-                    <TableHead>Rating</TableHead>
+                    <TableHead>Nom du Service</TableHead>
+                    <TableHead>Catégorie</TableHead>
+                    <TableHead>Commandes</TableHead>
+                    <TableHead>Note</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -338,9 +346,9 @@ export default function SellerDashboard() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost">Edit</Button>
+                        <Button variant="ghost">Modifier</Button>
                         <Button variant="ghost" className="text-red-500">
-                          Delete
+                          Supprimer
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -353,18 +361,18 @@ export default function SellerDashboard() {
         <TabsContent value="orders" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Active Orders</CardTitle>
-              <CardDescription>Manage your ongoing services</CardDescription>
+              <CardTitle>Commandes Actives</CardTitle>
+              <CardDescription>Gérez vos services en cours</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Buyer</TableHead>
+                    <TableHead>ID Commande</TableHead>
+                    <TableHead>Acheteur</TableHead>
                     <TableHead>Service</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Due Date</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Date Limite</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -377,7 +385,7 @@ export default function SellerDashboard() {
                       <TableCell>
                         <Badge
                           variant={
-                            order.status === "In Progress"
+                            order.status === "En Cours"
                               ? "default"
                               : "secondary"
                           }
@@ -387,7 +395,7 @@ export default function SellerDashboard() {
                       </TableCell>
                       <TableCell>{order.dueDate}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost">View Details</Button>
+                        <Button variant="ghost">Voir les Détails</Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -400,7 +408,7 @@ export default function SellerDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Messages</CardTitle>
-              <CardDescription>Communicate with your clients</CardDescription>
+              <CardDescription>Communiquez avec vos clients</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -437,7 +445,8 @@ export default function SellerDashboard() {
             </CardContent>
             <CardFooter>
               <Button className="w-full">
-                <MessageSquare className="mr-2 h-4 w-4" /> View All Messages
+                <MessageSquare className="mr-2 h-4 w-4" /> Voir Tous les
+                Messages
               </Button>
             </CardFooter>
           </Card>
@@ -445,36 +454,36 @@ export default function SellerDashboard() {
         <TabsContent value="earnings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Earnings Overview</CardTitle>
-              <CardDescription>Your financial performance</CardDescription>
+              <CardTitle>Aperçu des Revenus</CardTitle>
+              <CardDescription>Votre performance financière</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="mb-2 text-sm font-medium">Total Earnings</h4>
+                  <h4 className="mb-2 text-sm font-medium">Revenus Totaux</h4>
                   <div className="text-2xl font-bold">
-                    ${overview?.totalEarnings.toFixed(2)}
+                    {formatTND(overview?.totalEarnings || 0)}
                   </div>
                   <Progress value={75} className="mt-2" />
                   <p className="mt-2 text-sm text-muted-foreground">
-                    75% of your earnings goal
+                    75% de votre objectif de revenus
                   </p>
                 </div>
                 <div>
                   <h4 className="mb-2 text-sm font-medium">
-                    Pending Clearance
+                    En Attente de Validation
                   </h4>
-                  <div className="text-2xl font-bold">$3,500.00</div>
+                  <div className="text-2xl font-bold">{formatTND(3500.0)}</div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Expected to clear in 7 days
+                    Validation prévue dans 7 jours
                   </p>
                 </div>
                 <div>
                   <h4 className="mb-2 text-sm font-medium">
-                    Available for Withdrawal
+                    Disponible pour Retrait
                   </h4>
-                  <div className="text-2xl font-bold">$12,750.50</div>
-                  <Button className="mt-2">Withdraw Funds</Button>
+                  <div className="text-2xl font-bold">{formatTND(12750.5)}</div>
+                  <Button className="mt-2">Retirer les Fonds</Button>
                 </div>
               </div>
             </CardContent>

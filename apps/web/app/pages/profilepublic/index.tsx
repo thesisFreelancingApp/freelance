@@ -11,6 +11,7 @@ import Certifications from "@/app/pages/profilepublic/certifications";
 
 // Types
 interface Profile {
+  id: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -40,9 +41,10 @@ const AnotherPage = async ({ username }: { username: string }) => {
   }
 
   // Destructure user profile data
-  const { firstName, lastName, profilePic, bio, birthDate, title } =
+  const { id, firstName, lastName, profilePic, bio, birthDate, title } =
     userProfile.profile;
   const profile = {
+    id,
     firstName,
     lastName,
     username,
@@ -64,17 +66,15 @@ const AnotherPage = async ({ username }: { username: string }) => {
         <Services profile={profile} username={username} />
         <div className="md:col-span-1 md:sticky md:top-8">
           <Langues profile={profile} username={username} />
-          </div>
-          <div className="md:col-span-1 md:sticky md:top-8">
+        </div>
+        <div className="md:col-span-1 md:sticky md:top-8">
           <Occupations profile={profile} username={username} />
           <Skills profile={profile} username={username} />
-          
         </div>
         <Educations profile={profile} username={username} />
         <Certifications profile={profile} username={username} />
-        </div>
       </div>
-    
+    </div>
   );
 };
 
