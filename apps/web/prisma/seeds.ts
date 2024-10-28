@@ -24,10 +24,10 @@ async function mainSeed() {
     console.log("----- Database schema updated successfully.");
 
     console.log("----- Seeding Categories...");
-    // await seedCategory();
+    await seedCategory();
 
     console.log("----- Seeding Users...");
-    // await seedUsers();
+    await seedUsers();
 
     console.log("----- Seeding Services...");
     await seedServices();
