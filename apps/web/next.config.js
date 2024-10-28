@@ -2,8 +2,17 @@
 const nextConfig = {
   reactStrictMode: false,
   images: {
-    domains: ["res.cloudinary.com"],
-    domains: ["fiverr-res.cloudinary.com"],
+    remotePatterns: [
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      {
+        protocol: "https",
+        hostname: "fiverr-res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "hlxsztkqfvxjbrwmmfww.supabase.co",
+      },
+    ],
   },
 };
 

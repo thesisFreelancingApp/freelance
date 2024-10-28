@@ -25,7 +25,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ar, fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -76,7 +75,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     e.preventDefault();
     setIsLoading(true);
     try {
-      console.log(profile);
+      // console.log(profile);
       const formattedData = {
         ...profile,
         birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined,

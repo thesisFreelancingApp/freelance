@@ -1,7 +1,7 @@
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { getAllCategories } from "@/server.actions/category/category.actions";
-import { isSellerWithProfessionalProfile } from "@/server.actions/sellers/proinfo/info";
+import { isSellerWithProfessionalProfile } from "@/server.actions/sellers/pro-Infomation.actions";
 import WebHeader from "./DesktopHeader";
 import MobileHeader from "./MobileHeader";
 

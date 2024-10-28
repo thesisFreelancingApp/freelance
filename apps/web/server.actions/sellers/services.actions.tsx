@@ -1,29 +1,13 @@
 "use server";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
-import { Prisma } from "@prisma/client";
 // Définition des types pour les paramètres
-interface ServiceData {
-  name: string;
-  description?: string;
-  images: string[];
-  tags: string[];
-}
+import { Packages, ServiceData } from "@/types";
 
-interface PackageData {
-  name: string;
-  description: string;
-  price: Prisma.Decimal;
-  deliveryTime: number;
-  revisions: number;
-  features: string[];
-}
-
-// Modification pour accepter plusieurs packages
 export async function createServiceWithCategoryAndPackage(
   serviceData: ServiceData,
   categoryId: number,
-  packageData: PackageData[],
+  packageData: Packages[], // Acceptation de plusieurs packages sous forme de tableau
 ) {
   try {
     const {
@@ -31,20 +15,22 @@ export async function createServiceWithCategoryAndPackage(
       error,
     } = await createClient().auth.getUser();
     if (error || !user?.email) {
-      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
       return false;
     }
-    const sellerid = user?.id as string;
+
+    const sellerId = user.id as string; // Typage explicitement défini
     const newService = await prisma.service.create({
       data: {
         name: serviceData.name,
         description: serviceData.description,
-        images: serviceData.images,
+        medias: JSON.parse(JSON.stringify(serviceData.medias)),
+
         tags: serviceData.tags,
-        creatorId: sellerid,
+        creatorId: sellerId,
         categoryId: categoryId,
 
-        // Création de plusieurs packages associés
+        // Création de packages associés
         packages: {
           create: packageData.map((pkg) => ({
             name: pkg.name,

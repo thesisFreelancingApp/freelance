@@ -1,10 +1,15 @@
 import { Prisma } from "@prisma/client";
 
+export interface MediaItem {
+  url: string;
+  type: string;
+}
+
 export interface ServiceData {
   name: string;
-  description?: string;
+  description: string;
   tags: string[];
-  images: string[];
+  medias: MediaItem[]; // Utilisé pour le frontend
 }
 
 export interface Packages {
