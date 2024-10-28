@@ -1,4 +1,4 @@
-import UserProfilePage from "@/app/pages/profilePublic/index";
+import UserProfilePage from "@/app/pages/profilepublic";
 
 const AnotherPage = async ({ params }: { params: { username: string } }) => {
   const { username } = params;
