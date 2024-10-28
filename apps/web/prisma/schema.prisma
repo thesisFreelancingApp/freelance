@@ -40,6 +40,7 @@ model AuthUser {
   updatedAt DateTime         @updatedAt
   sessionLogs  SessionLog[]   @relation("UserSessionLogs") // Relation avec les logs de sessions
   SessionLog SessionLog[]
+    preferences   UserPreferences? // Relation with user preferences
 }
 
 model Account {
@@ -71,6 +72,42 @@ model SessionLog {
   user         AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
   AuthUser AuthUser[] @relation("UserSessionLogs")
 }
+
+
+// Enum for Theme Options
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM // for system-based theme
+}
+
+// Enum for View Options
+enum View {
+  Seller
+  Buyer
+}
+enum Frequency  {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+// Model for User Preferences
+model UserPreferences {
+  id            String           @id @default(uuid())
+  userId        String           @unique
+  theme         Theme            @default(SYSTEM)
+  view          View             @default(Buyer)
+  notifications Boolean          @default(true) // enable or disable notifications
+  language      String           @default("en") // default language
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  showOnlineStatus       Boolean             @default(true)    
+  notificationFrequency  Frequency           @default(DAILY) 
+  // Relations
+  user          AuthUser         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 
 
 // ------------------------
