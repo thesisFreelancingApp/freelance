@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { seedCategory } from "./seeds/categories";
 import { seedUsers } from "./seeds/users";
+import { seedServices } from "./seeds/services";
 
 const prisma = new PrismaClient();
 
@@ -23,13 +24,13 @@ async function mainSeed() {
     console.log("----- Database schema updated successfully.");
 
     console.log("----- Seeding Categories...");
-    await seedCategory();
+    // await seedCategory();
 
     console.log("----- Seeding Users...");
-    await seedUsers();
+    // await seedUsers();
 
-    // console.log("----- Seeding Services...");
-    // await seedServices();
+    console.log("----- Seeding Services...");
+    await seedServices();
 
     // console.log("----- Seeding Rating...");
     // await seedRatings();
