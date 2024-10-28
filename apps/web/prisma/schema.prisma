@@ -455,7 +455,7 @@ model PaymentTransaction {
   transactionId     String           @unique
   paymentMethod     String           // e.g., "Credit Card", "PayPal"
   transactionStatus PaymentStatus    // Enum for different payment statuses
-  transactionReference String?       // External payment gateway reference
+  transactionReference String?       @unique
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 

@@ -22,7 +22,12 @@ export async function createWallet() {
         currency: "TND",
       },
     });
-    return newWallet;
+
+    // Convert Decimal fields to number before returning
+    return {
+      ...newWallet,
+      balance: newWallet.balance.toNumber(),
+    };
   } catch (error) {
     console.error("Erreur lors de la création du wallet:", error);
     throw new Error("Erreur lors de la création du wallet");
@@ -42,12 +47,19 @@ export async function checkWallet() {
     }
 
     const userId = user.id as string;
-
     const existingWallet = await prisma.wallet.findUnique({
       where: { ownerId: userId },
     });
 
-    return existingWallet; // Retourne true si un wallet existe, sinon false
+    // Check if wallet exists before accessing properties
+    if (existingWallet) {
+      return {
+        ...existingWallet,
+        balance: existingWallet.balance.toNumber(),
+      };
+    } else {
+      return null; // or any response you prefer when the wallet doesn't exist
+    }
   } catch (error) {
     console.error("Erreur lors de la vérification du wallet:", error);
     throw new Error("Erreur lors de la vérification du wallet");

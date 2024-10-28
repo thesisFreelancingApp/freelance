@@ -1,27 +1,31 @@
 "use client";
 
+import imageWallet from "@/assets/profile/Wallet.svg";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { initiatePaymentAction } from "@/server.actions/payment/generate.actions";
 import {
   checkWallet,
   createWallet,
 } from "@/server.actions/wallet/wallet.actions";
 import { Loader2, Plus, Wallet } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
-
 interface WalletDetails {
   balance: number;
   currency: string;
+  id: string | undefined;
   transactions: Array<{
     type: string;
     amount: number;
@@ -36,11 +40,13 @@ export default function Component() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isLoading, setIsLoading] = useState(true);
+  const [depositAmount, setDepositAmount] = useState<string>(""); // Montant du dépôt
 
   useEffect(() => {
     const fetchWalletStatus = async () => {
       try {
         const wallet = await checkWallet();
+        // console.log(wallet);
         if (wallet) {
           setWalletDetails(wallet);
         }
@@ -64,6 +70,28 @@ export default function Component() {
         setError("Erreur lors de la création du wallet.");
       }
     });
+  };
+
+  // Fonction pour gérer le dépôt
+  const handleDeposit = async () => {
+    try {
+      const amount = parseInt(depositAmount) * 1000; // Convertir en millimes (si input en TND)
+      if (isNaN(amount) || amount <= 0) {
+        setError("Veuillez entrer un montant valide.");
+        return;
+      }
+
+      const paymentResponse = await initiatePaymentAction({
+        amount,
+        walletId: walletDetails?.id,
+        paymentType: "deposit",
+      });
+      console.log("helo");
+      console.log(paymentResponse, "------------");
+      window.location.href = paymentResponse.payUrl;
+    } catch (err) {
+      setError("Erreur lors de l'initiation du dépôt.");
+    }
   };
 
   return (
@@ -127,13 +155,45 @@ export default function Component() {
           ) : (
             <p className="text-gray-500">Aucune transaction pour le moment.</p>
           )}
+          <Separator className="mt-8" />
           <div className="flex gap-4 mt-6">
-            <Button
-              variant="default"
-              className="text-gray-800 border border-gray-300"
-            >
-              Dépôt
-            </Button>
+            <Dialog>
+              <DialogTrigger>
+                <Button
+                  variant="default"
+                  className="text-gray-800 border border-gray-300"
+                >
+                  Dépôt
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Initiate Deposit</DialogTitle>
+                  <DialogDescription>
+                    Entrez le montant que vous souhaitez déposer dans votre
+                    wallet.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-2">
+                  <Label htmlFor="depositAmount">Montant</Label>
+                  <Input
+                    id="depositAmount"
+                    type="number"
+                    placeholder="Montant en TND"
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                  />
+                </div>
+                <DialogFooter className="sm:justify-start">
+                  <Button
+                    onClick={handleDeposit}
+                    className="w-full mt-4 text-white bg-gray-800"
+                  >
+                    Déposer
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="outline"
               className="text-gray-800 border border-gray-300"
@@ -143,20 +203,17 @@ export default function Component() {
           </div>
         </div>
       ) : (
-        <div className="text-center">
-          <Image
-            src="/placeholder.svg?height=384&width=384"
+        <div className="">
+          <img
+            src={imageWallet.src}
             alt="Illustration du Wallet"
-            width={384}
-            height={384}
+            width={284}
+            height={284}
             className="mx-auto mb-6"
           />
           <p className="mb-6 text-lg text-gray-600">
             Créez votre wallet WaiaHub pour gérer facilement vos finances, payer
-            et encaisser vos prestations en toute sécurité. Notre wallet intégré
-            vous offre un moyen simple et sécurisé d'accéder à nos services, de
-            recevoir des paiements pour vos missions, ou de rémunérer les
-            freelances pour leurs services.
+            et encaisser vos prestations en toute sécurité.
           </p>
           <Dialog>
             <DialogTrigger asChild>
@@ -174,13 +231,12 @@ export default function Component() {
               </DialogHeader>
               <div className="my-4 space-y-4 text-sm text-gray-600">
                 <p>
-                  En rejoignant notre communauté, vous acceptez que nous gérions
-                  et protégions vos données selon notre politique de
-                  confidentialité.
+                  En rejoignant notre communauté, vous acceptez notre politique
+                  de confidentialité.
                 </p>
                 <p>
-                  Vous vous engagez également à respecter les règles de bonne
-                  conduite et les conditions générales de notre plateforme.
+                  Vous vous engagez également à respecter les règles de notre
+                  plateforme.
                 </p>
                 <Link
                   href="/terms-and-conditions"
