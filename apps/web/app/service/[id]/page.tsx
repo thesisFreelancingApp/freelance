@@ -16,6 +16,47 @@ import { Suspense } from "react";
 import Loading from "@/app/loading";
 import { Service, Package } from "@/types/FeaturedServices";
 
+interface ServiceMedia {
+  images?: string[];
+  videos?: string[];
+}
+
+interface ServiceWithRelations {
+  id: string;
+  name: string;
+  description: string | null;
+  medias: ServiceMedia | null;
+  tags: string[];
+  creator: {
+    id: string;
+    profile: {
+      firstName: string | null;
+      lastName: string | null;
+      profilePic: string | null;
+    };
+  };
+  ratings: {
+    id: string;
+    rating: number;
+    review: string | null;
+    createdAt: Date;
+    rater: {
+      firstName: string | null;
+      lastName: string | null;
+      profilePic: string | null;
+    };
+  }[];
+  packages: {
+    id: string;
+    name: string | null;
+    description: string | null;
+    deliveryTime: number | null;
+    price: string | null;
+    revisions: number | null;
+    features: string[];
+  }[];
+}
+
 interface ServicePageProps {
   params: { id: string };
 }
@@ -25,13 +66,20 @@ const formatPrice = (price: string) => {
 };
 
 export default async function ServiceDetailPage({ params }: ServicePageProps) {
-  const service = await getServiceById(params.id);
+  const service = (await getServiceById(params.id)) as ServiceWithRelations;
 
   if (!service) {
     notFound();
   }
 
-  const relatedServices = await getRelatedServices(service.id);
+  const relatedServices = (await getRelatedServices(service.id)) as Service[];
+
+  // Calculate average rating
+  const averageRating =
+    service.ratings.length > 0
+      ? service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+        service.ratings.length
+      : 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -41,16 +89,19 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
             <h1 className="text-3xl font-bold mb-4">{service.name}</h1>
             <div className="flex items-center mb-4">
               <img
-                src={service.creator.profilePic || "/placeholder.svg"}
-                alt={service.creator.name}
+                src={service.creator.profile.profilePic ?? "/placeholder.svg"}
+                alt={service.creator.profile.firstName ?? ""}
                 className="w-12 h-12 rounded-full mr-4"
               />
               <div>
-                <h2 className="font-semibold">{service.creator.name}</h2>
+                <h2 className="font-semibold">
+                  {service.creator.profile.firstName}{" "}
+                  {service.creator.profile.lastName}
+                </h2>
                 <div className="flex items-center">
                   <Star className="w-4 h-4 text-yellow-400 mr-1" />
                   <span>
-                    {service.rating.toFixed(1)} ({service.ratings.length}{" "}
+                    {averageRating.toFixed(1)} ({service.ratings.length}{" "}
                     reviews)
                   </span>
                 </div>
@@ -58,7 +109,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
             </div>
             <Suspense fallback={<Loading />}>
               <div className="mb-8">
-                <ImageCarousel images={service.images} />
+                <ImageCarousel images={service.medias?.images || []} />
               </div>
             </Suspense>
             <Card className="mb-8">
@@ -151,7 +202,10 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                         </CardHeader>
                         <CardContent>
                           <img
-                            src={relatedService.images[0] || "/placeholder.svg"}
+                            src={
+                              relatedService.medias?.images?.[0] ||
+                              "/placeholder.svg"
+                            }
                             alt={relatedService.name}
                             className="w-full h-32 object-cover"
                           />
@@ -167,25 +221,33 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           <div className="md:col-span-1">
             <div className="sticky top-4">
               <Tabs
-                defaultValue={service.packages[0].name.toLowerCase()}
+                defaultValue={
+                  service.packages[0]?.name?.toLowerCase() ?? "basic"
+                }
                 className="w-full"
               >
                 <TabsList className="grid w-full grid-cols-3">
                   {service.packages.map((pkg) => (
-                    <TabsTrigger key={pkg.id} value={pkg.name.toLowerCase()}>
-                      {pkg.name}
+                    <TabsTrigger
+                      key={pkg.id}
+                      value={pkg.name?.toLowerCase() ?? "package"}
+                    >
+                      {pkg.name ?? "Package"}
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 {service.packages.map((pkg) => (
-                  <TabsContent key={pkg.id} value={pkg.name.toLowerCase()}>
+                  <TabsContent
+                    key={pkg.id}
+                    value={pkg.name?.toLowerCase() ?? "package"}
+                  >
                     <Card>
                       <CardHeader>
                         <CardTitle>{pkg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-2xl font-bold mb-4">
-                          ${formatPrice(pkg.price)}
+                          ${formatPrice(pkg.price ?? "0")}
                         </p>
                         <p className="text-sm mb-4">{pkg.description}</p>
                         <div className="flex justify-between text-sm mb-4">
@@ -210,7 +272,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                           ))}
                         </ul>
                         <Button className="w-full">
-                          Continue (${formatPrice(pkg.price)})
+                          Continue (${formatPrice(pkg.price ?? "0")})
                         </Button>
                       </CardContent>
                     </Card>
@@ -220,9 +282,9 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <div className="mt-6">
                 <MessageBox
                   receiverId={service.creator.id}
-                  receiverName={service.creator.name}
+                  receiverName={`${service.creator.profile.firstName} ${service.creator.profile.lastName}`}
                   receiverProfilePic={
-                    service.creator.profilePic || "/placeholder.svg"
+                    service.creator.profile.profilePic || "/placeholder.svg"
                   }
                 />
               </div>
