@@ -76,7 +76,7 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
       };
 
       const result = await createService(dataToSend);
-      console.log("Gig published successfully:", result);
+      // console.log("Gig published successfully:", result);
       setPublishStatus("success");
     } catch (error) {
       console.error("Error publishing gig:", error);
@@ -88,11 +88,11 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <h2 className="text-2xl font-semibold text-primary mb-6">
+    <div className="flex flex-col h-full">
+      <h2 className="mb-6 text-2xl font-semibold text-primary">
         Review and Publish
       </h2>
-      <div className="flex-grow overflow-y-auto pr-4">
+      <div className="flex-grow pr-4 overflow-y-auto">
         <Tabs defaultValue="preview" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="preview">Preview</TabsTrigger>
@@ -108,7 +108,7 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
           <TabsContent value="summary">
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Gig Summary</h3>
+                <h3 className="mb-4 text-lg font-semibold">Gig Summary</h3>
                 <ul className="space-y-2">
                   <li>
                     <strong>Title:</strong> {formData.title}
@@ -152,7 +152,7 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
       <div className="mt-6">
         {publishStatus === "success" && (
           <Alert className="mb-4">
-            <CheckCircle className="h-4 w-4" />
+            <CheckCircle className="w-4 h-4" />
             <AlertTitle>Success</AlertTitle>
             <AlertDescription>
               Your gig has been published successfully!
@@ -161,7 +161,7 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
         )}
         {publishStatus === "error" && (
           <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="w-4 h-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>

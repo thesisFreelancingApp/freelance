@@ -75,9 +75,8 @@ export async function isSellerWithProfessionalProfile() {
     const supabase = createClient();
     const { data: userData, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !userData?.user?.id) {
-      console.error("Error fetching user from Supabase:", authError);
-      return null;
+    if (authError || !userData?.user) {
+      return { isSeller: false, isNotCompleted: false, isAuthenticated: false };
     }
 
     const userId = userData.user.id;

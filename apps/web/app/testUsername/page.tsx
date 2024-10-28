@@ -3,7 +3,7 @@ import { getUserProfile } from "@/server.actions/profilePublic/profilePublic.act
 export default async function ProfilePage() {
   try {
     const userProfile = await getUserProfile();
-    console.log(userProfile);
+    // console.log(userProfile);
     if (!userProfile) {
       throw new Error("User profile not found");
     }

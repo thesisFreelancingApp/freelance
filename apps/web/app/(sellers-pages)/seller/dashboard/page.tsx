@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  getSellerOverview,
-  getSellerServices,
-  getActiveOrders,
-  getSellerMessages,
-} from "@/server.actions/seller-dashboard.actions";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import Loader from "@/app/loading";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,9 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -37,24 +29,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getAllCategories } from "@/server.actions/category/category.actions";
 import {
-  BarChart3,
-  Bell,
+  getActiveOrders,
+  getSellerMessages,
+  getSellerOverview,
+  getSellerServices,
+} from "@/server.actions/seller-dashboard.actions";
+import {
+  DollarSign,
   MessageSquare,
   Package,
   Plus,
-  Search,
   Star,
-  DollarSign,
-  Briefcase,
   Users,
 } from "lucide-react";
-import Loader from "@/app/loading";
 import Link from "next/link";
-import { getAllCategories } from "@/server.actions/category/category.actions";
+import { useEffect, useState } from "react";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 // Add a currency formatter helper at the top of your file
 const formatTND = (amount: number) => {
@@ -138,8 +131,8 @@ export default function SellerDashboard() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">
+    <div className="container py-6 mx-auto">
+      <h1 className="mb-6 text-3xl font-bold">
         Bienvenue, {overview?.sellerName || "Vendeur"}!
       </h1>
       <Tabs
@@ -157,11 +150,11 @@ export default function SellerDashboard() {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Revenus Totaux
                 </CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -173,11 +166,11 @@ export default function SellerDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Commandes Actives
                 </CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+                <Package className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12</div>
@@ -185,11 +178,11 @@ export default function SellerDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Note Vendeur
                 </CardTitle>
-                <Star className="h-4 w-4 text-muted-foreground" />
+                <Star className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">4.8</div>
@@ -199,11 +192,11 @@ export default function SellerDashboard() {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-sm font-medium">
                   Taux de Complétion
                 </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <Users className="w-4 h-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">98%</div>
@@ -317,7 +310,7 @@ export default function SellerDashboard() {
                 </div>
                 <Button asChild>
                   <Link href="/createGig">
-                    <Plus className="mr-2 h-4 w-4" /> Créer un Nouveau Service
+                    <Plus className="w-4 h-4 mr-2" /> Créer un Nouveau Service
                   </Link>
                 </Button>
               </div>
@@ -341,7 +334,7 @@ export default function SellerDashboard() {
                       <TableCell>{service.orders}</TableCell>
                       <TableCell>
                         <div className="flex items-center">
-                          <Star className="mr-1 h-4 w-4 text-yellow-400" />
+                          <Star className="w-4 h-4 mr-1 text-yellow-400" />
                           {service.rating}
                         </div>
                       </TableCell>
@@ -415,7 +408,7 @@ export default function SellerDashboard() {
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className="flex items-start space-x-4 p-4 rounded-lg bg-muted"
+                    className="flex items-start p-4 space-x-4 rounded-lg bg-muted"
                   >
                     <Avatar>
                       <AvatarImage
@@ -444,11 +437,9 @@ export default function SellerDashboard() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full" asChild>
-                <Link href="/messages">
-                  <MessageSquare className="mr-2 h-4 w-4" /> Voir Tous les
-                  Messages
-                </Link>
+              <Button className="w-full">
+                <MessageSquare className="w-4 h-4 mr-2" /> Voir Tous les
+                Messages
               </Button>
             </CardFooter>
           </Card>

@@ -1,18 +1,18 @@
 // Imports - UI Components and Layout
-import GoogleAuthDirect from "@/app/(auth-pages)/google_onetap";
 import Footer from "@/app/pages/__footer";
 import Header from "@/app/pages/__header";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import React from "react";
-
 // Imports - Hooks and Utilities
 import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
+import { PlayIcon } from "@vidstack/react/icons";
 import { ThemeProvider } from "next-themes";
-
 // Imports - Styles and Fonts
 import "@/styles/globals.css";
+import "@vidstack/react/player/styles/base.css";
 // Font Configuration
 import localFont from "next/font/local";
 

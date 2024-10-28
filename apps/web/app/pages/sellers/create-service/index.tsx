@@ -20,7 +20,6 @@ import Step2CategorySelection from "./Step2CategorySelection";
 import Step3PackageInfo from "./Step3PackageInfo";
 import Step4UploadImages from "./Step4UploadImages";
 import Step5Review from "./Step5Review";
-
 export default function FormulaireCreationService({
   categories,
 }: {
@@ -40,13 +39,13 @@ export default function FormulaireCreationService({
     name: "",
     description: "",
     tags: [],
-    images: [],
+    medias: [],
   });
   const [forfaits, setForfaits] = useState<Packages[]>([
     {
       name: "",
       description: "",
-      price: new Prisma.Decimal(0),
+      price: new Prisma.Decimal(0), // Utilisation de number ici
       deliveryTime: 0,
       revisions: 0,
       features: [],
@@ -62,22 +61,27 @@ export default function FormulaireCreationService({
     child: null,
   });
 
-  const mettreAJourEtapeDansUrl = (etape: number) => {
-    const nouvelleUrl = `${window.location.pathname}?step=${etape}`;
-    router.replace(nouvelleUrl);
-  };
+  useEffect(() => {
+    // Mettre à jour l'URL en fonction de l'étape actuelle
+    router.replace(`${window.location.pathname}?step=${etapeCourante}`);
+  }, [etapeCourante]);
 
   const handleSubmit = async () => {
     if (categorieSelectionnee.child) {
       try {
+        // Convertir medias pour correspondre au format InputJsonValue de Prisma
+        const formattedServiceData = {
+          ...donneesService,
+          medias: JSON.parse(JSON.stringify(donneesService.medias)), // Conversion en JSON compatible Prisma
+        };
+
         await createServiceWithCategoryAndPackage(
-          donneesService,
+          formattedServiceData,
           categorieSelectionnee.child.id,
           forfaits,
         );
         alert("Service créé avec succès !");
         setEtapeCourante(nombreEtapes);
-        mettreAJourEtapeDansUrl(nombreEtapes);
       } catch (error) {
         console.error("Erreur lors de la création du service :", error);
       }
@@ -87,24 +91,12 @@ export default function FormulaireCreationService({
   };
 
   const etapeSuivante = () => {
-    setEtapeCourante((prev) => {
-      const prochaineEtape = Math.min(prev + 1, nombreEtapes);
-      mettreAJourEtapeDansUrl(prochaineEtape);
-      return prochaineEtape;
-    });
+    setEtapeCourante((prev) => Math.min(prev + 1, nombreEtapes));
   };
 
   const etapePrecedente = () => {
-    setEtapeCourante((prev) => {
-      const etapePrecedente = Math.max(prev - 1, 1);
-      mettreAJourEtapeDansUrl(etapePrecedente);
-      return etapePrecedente;
-    });
+    setEtapeCourante((prev) => Math.max(prev - 1, 1));
   };
-
-  useEffect(() => {
-    mettreAJourEtapeDansUrl(etapeCourante);
-  }, [etapeCourante]);
 
   const afficherEtape = () => {
     switch (etapeCourante) {
@@ -156,9 +148,7 @@ export default function FormulaireCreationService({
             <div
               key={index}
               className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-semibold ${
-                etapeCourante === index + 1
-                  ? "bg-primary" // Couleur primaire pour l'étape active
-                  : "bg-gray-300" // Couleur neutre pour les autres étapes
+                etapeCourante === index + 1 ? "bg-primary" : "bg-gray-300"
               }`}
             >
               {index + 1}
@@ -170,7 +160,6 @@ export default function FormulaireCreationService({
         <CardDescription>
           Veuillez compléter les détails du service.
         </CardDescription>
-        {/* Barre de progression avec numéros d'étapes */}
       </CardHeader>
 
       <CardContent>{afficherEtape()}</CardContent>
