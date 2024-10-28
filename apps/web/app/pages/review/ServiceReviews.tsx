@@ -1,7 +1,11 @@
 "use client";
 import { Star } from "lucide-react";
 import { useState, useEffect } from "react";
-import { createRating, updateRating, deleteRating } from '@/server.actions/rating.actions'; // Importing deleteRating
+import {
+  createRating,
+  updateRating,
+  deleteRating,
+} from "@/server.actions/rating.actions"; // Importing deleteRating
 
 // Updated Rating interface
 interface Rating {
@@ -10,32 +14,38 @@ interface Rating {
   buyer: {
     id: number;
     profilePic: string | null; // Allow null for profile picture
-    firstName: string | null;  // Allow null for first name
-    lastName: string | null;   // Allow null for last name
+    firstName: string | null; // Allow null for first name
+    lastName: string | null; // Allow null for last name
   };
-  rating: number;               // Rating should always be a number
-  createdAt: string;            // Creation date as a string
-  review: string | null;        // Review can be null
+  rating: number; // Rating should always be a number
+  createdAt: string; // Creation date as a string
+  review: string | null; // Review can be null
 }
 
 interface ServiceReviewsProps {
-  ratings: Rating[];            // Accept an array of Rating objects
-  serviceId: number;           // Accept the service ID
-  buyerId: number;             // Accept the buyer ID to identify the current user
+  ratings: Rating[]; // Accept an array of Rating objects
+  serviceId: number; // Accept the service ID
+  buyerId: number; // Accept the buyer ID to identify the current user
 }
 
 // Update the ServiceReviews component
-const ServiceReviews = ({ ratings, serviceId, buyerId }: ServiceReviewsProps) => {
+const ServiceReviews = ({
+  ratings,
+  serviceId,
+  buyerId,
+}: ServiceReviewsProps) => {
   const [reviewText, setReviewText] = useState(""); // State for review text
-  const [rating, setRating] = useState(0);           // State for rating
+  const [rating, setRating] = useState(0); // State for rating
   const [successMessage, setSuccessMessage] = useState(""); // State for success message
-  const [errorMessage, setErrorMessage] = useState("");     // State for error message
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const [isEditing, setIsEditing] = useState(false); // State for editing mode
   const [currentRatingId, setCurrentRatingId] = useState<number | null>(null); // ID of the rating being edited
 
   useEffect(() => {
     // Check for an existing rating from the buyer for this service
-    const existingRating = ratings.find(r => r.buyer.id === buyerId && r.serviceId === serviceId);
+    const existingRating = ratings.find(
+      (r) => r.buyer.id === buyerId && r.serviceId === serviceId,
+    );
     if (existingRating) {
       setReviewText(existingRating.review || "");
       setRating(existingRating.rating);
@@ -52,7 +62,7 @@ const ServiceReviews = ({ ratings, serviceId, buyerId }: ServiceReviewsProps) =>
 
   const handleSubmitReview = async () => {
     const sellerId = "8592af9f-c51a-4c07-88e4-9d0c5f7d68e4"; // Replace with actual seller ID
-    const buyerId = "3";    // Replace with actual buyer ID
+    const buyerId = "3"; // Replace with actual buyer ID
 
     try {
       if (isEditing && currentRatingId) {
@@ -94,7 +104,7 @@ const ServiceReviews = ({ ratings, serviceId, buyerId }: ServiceReviewsProps) =>
         await deleteRating(currentRatingId); // Call your delete action
         console.log("Review deleted:", currentRatingId);
         setSuccessMessage("Review deleted successfully!");
-        
+
         // Reset state after deletion
         setReviewText("");
         setRating(0);
@@ -146,7 +156,9 @@ const ServiceReviews = ({ ratings, serviceId, buyerId }: ServiceReviewsProps) =>
           </button>
         )}
 
-        {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
+        {successMessage && (
+          <p className="text-green-500 mt-2">{successMessage}</p>
+        )}
         {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
       </div>
     </div>
