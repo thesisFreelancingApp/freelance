@@ -444,9 +444,11 @@ export default function SellerDashboard() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">
-                <MessageSquare className="mr-2 h-4 w-4" /> Voir Tous les
-                Messages
+              <Button className="w-full" asChild>
+                <Link href="/messages">
+                  <MessageSquare className="mr-2 h-4 w-4" /> Voir Tous les
+                  Messages
+                </Link>
               </Button>
             </CardFooter>
           </Card>
