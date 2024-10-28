@@ -3,6 +3,7 @@ import Sidebar from "@/app/pages/profileSettings/Sidebar";
 const items = [
   { path: "/profile", title: "Profil" },
   { path: "/settings", title: "Paramètres" },
+  { path: "/wallet", title: "Mon portefeuille" },
 ];
 
 interface ProfileLayoutProps {
