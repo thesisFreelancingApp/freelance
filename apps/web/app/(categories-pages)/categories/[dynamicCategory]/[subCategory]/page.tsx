@@ -25,11 +25,11 @@
 
 // export default SubCategoryPage;
 
-import Link from "next/link";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getSubCategoryByName } from "@/server.actions/testCat";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSubCategoryByName } from "@/server.actions/category/category-pages.actions";
+import Image from "next/image";
+import Link from "next/link";
 
 // @ts-ignore
 const subCategoryPage = async ({ params }) => {

@@ -58,8 +58,8 @@ import prisma from "@/lib/prismaClient";
 export const getCategoryByName = async (name: string) => {
   try {
     // Replace hyphens with spaces and decode the URL-encoded name
-    const decodedName = decodeURIComponent(name.replace(/-/g, " "));
-
+    const decodedName = decodeURIComponent(name);
+    console.log(decodedName);
     // Fetch the category by name
     const category = await prisma.mainCategories.findFirst({
       where: {

@@ -80,7 +80,7 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/seller-dashboard" className="flex items-center">
+            <Link href="/seller/dashboard" className="flex items-center">
               <LayoutDashboard className="w-4 h-4 mr-2" />
               <span>Tableau de bord vendeur</span>
             </Link>

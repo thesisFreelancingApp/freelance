@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCategoryByName } from "@/server.actions/testCat";
+import { getCategoryByName } from "@/server.actions/category/category-pages.actions";
 import Image from "next/image";
 import Link from "next/link";
 

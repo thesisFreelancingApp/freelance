@@ -2,7 +2,7 @@
 import { DollarSign, Package, CreditCard, Star } from "lucide-react";
 import { Bar, BarChart, ResponsiveContainer } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSellerTotalEarnings } from "@/server.actions/seller-dashboard.actions";
+// import { getSellerTotalEarnings } from "@/server.actions/seller-dashboard.actions";
 
 import {
   Table,
