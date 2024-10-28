@@ -9,7 +9,7 @@ import {
 import { getRecentMessages } from "@/server.actions/message.actions";
 import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -45,20 +45,21 @@ export default function Messages() {
   });
   const supabase = createClient();
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const data = await getRecentMessages();
       setMessagesData(data);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMessages();
 
-    const channel = supabase
-      .channel("messages-notifications")
+    // Subscribe to all message changes
+    const messageChannel = supabase
+      .channel("message-changes")
       .on(
         "postgres_changes",
         {
@@ -71,27 +72,30 @@ export default function Messages() {
           fetchMessages();
         },
       )
+      .subscribe();
+
+    // Subscribe to chat room changes
+    const chatRoomChannel = supabase
+      .channel("chatroom-changes")
       .on(
         "postgres_changes",
         {
-          event: "UPDATE",
+          event: "*",
           schema: "public",
-          table: "Message",
-          filter: "isRead=true",
+          table: "ChatRoom",
         },
         (payload) => {
-          console.log("Message marked as read:", payload);
+          console.log("ChatRoom change received:", payload);
           fetchMessages();
         },
       )
-      .subscribe((status) => {
-        console.log("Notification subscription status:", status);
-      });
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(messageChannel);
+      supabase.removeChannel(chatRoomChannel);
     };
-  }, []);
+  }, [fetchMessages, supabase]);
 
   return (
     <DropdownMenu>

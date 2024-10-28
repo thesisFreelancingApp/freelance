@@ -51,6 +51,7 @@ export async function sendMessage(receiverId: string, content: string) {
       });
     }
 
+    // Create the message with more included data
     const message = await prisma.message.create({
       data: {
         chatRoomId: chatRoom.id,
@@ -67,7 +68,29 @@ export async function sendMessage(receiverId: string, content: string) {
             profilePic: true,
           },
         },
+        chatRoom: {
+          include: {
+            participants: {
+              include: {
+                profile: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    profilePic: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
+    });
+
+    // Update the chatRoom's updatedAt
+    await prisma.chatRoom.update({
+      where: { id: chatRoom.id },
+      data: { updatedAt: new Date() },
     });
 
     return message;
@@ -217,6 +240,21 @@ export async function getRecentMessages() {
     },
   });
 
+  // Get unread count in a separate query for accuracy
+  const unreadCount = await prisma.message.count({
+    where: {
+      chatRoom: {
+        participants: {
+          some: {
+            participantId: user.id,
+          },
+        },
+      },
+      NOT: { senderId: user.id },
+      isRead: false,
+    },
+  });
+
   const recentMessages = recentChatRooms
     .map((chatRoom) => {
       const message = chatRoom.messages[0];
@@ -237,21 +275,10 @@ export async function getRecentMessages() {
     })
     .filter((msg): msg is NonNullable<typeof msg> => msg !== null);
 
-  const unreadCount = await prisma.message.count({
-    where: {
-      chatRoom: {
-        participants: {
-          some: {
-            participantId: user.id,
-          },
-        },
-      },
-      NOT: { senderId: user.id },
-      isRead: false,
-    },
-  });
-
-  return { messages: recentMessages, unreadCount };
+  return {
+    messages: recentMessages,
+    unreadCount,
+  };
 }
 
 export async function markMessagesAsRead(chatRoomId: string) {
