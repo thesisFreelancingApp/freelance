@@ -409,13 +409,13 @@ model MainCategories {
 model Wallet {
   id                String           @id @default(uuid())
   balance           Decimal          @default(0.0) @db.Decimal(12, 2)
-  currency          String           @default("USD")
+  currency          String           @default("TND")
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
   // Relations
-  ownerId           String
-  owner             PersonalProfile  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId           String          @unique
+  owner             PersonalProfile?  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   transactions      Transaction[]
 
   PersonalProfile PersonalProfile[] @relation("ProfileWallet")
@@ -455,7 +455,7 @@ model PaymentTransaction {
   transactionId     String           @unique
   paymentMethod     String           // e.g., "Credit Card", "PayPal"
   transactionStatus PaymentStatus    // Enum for different payment statuses
-  transactionReference String?       // External payment gateway reference
+  transactionReference String?       @unique
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 
