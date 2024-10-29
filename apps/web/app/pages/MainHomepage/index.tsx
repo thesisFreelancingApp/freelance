@@ -4,6 +4,7 @@ import WhyChooseUs from "@/app/pages/MainHomepage/WhyChooseUs";
 import { isAuthenticated } from "@/server.actions/auth/auth.actions";
 import { getCategories } from "@/server.actions/category/category.actions";
 import { getFeaturedServices } from "@/server.actions/services.actions";
+import { Service } from "@/types/FeaturedServices";
 import Hero from "./BannerHero";
 import CategoryList from "./CategoryList";
 import SearchBar from "./SearchBar";
@@ -30,7 +31,7 @@ export default async function Index() {
 
         <TopFreelancers freelancers={freelancers} />
 
-        <FeaturedServices services={services} />
+        <FeaturedServices services={services as Service[]} />
 
         <WhyChooseUs />
       </section>

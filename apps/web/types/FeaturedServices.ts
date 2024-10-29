@@ -38,13 +38,14 @@ export interface Service {
   id: string;
   name: string;
   description: string | null;
-  images: string[];
+  medias: any;
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
   creatorId: string;
+  categoryId: number;
   creator: Creator;
   ratings: Rating[];
   packages: Package[];
-  rating: number; // Average rating calculated from ratings array
+  rating?: number;
 }
