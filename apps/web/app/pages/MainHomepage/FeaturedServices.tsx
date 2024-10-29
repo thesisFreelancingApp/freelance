@@ -24,7 +24,7 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
   return (
     <section className="py-16 bg-secondary/5">
       <div className="container px-6 mx-auto">
-        <div className="flex flex-col items-center text-center mb-12">
+        <div className="flex flex-col items-center mb-12 text-center">
           <h2 className="text-3xl font-bold">Services Recommandés</h2>
           <p className="mt-2 text-muted-foreground">
             Découvrez nos services les mieux notés par la communauté
@@ -38,13 +38,13 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
               key={service.id}
               className="block h-full" // Ensure link takes full height
             >
-              <Card className="flex flex-col h-full group overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+              <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 group hover:shadow-lg hover:border-primary/20">
                 {/* Image Container - Fixed aspect ratio */}
                 <div className="relative w-full pt-[56.25%] overflow-hidden bg-muted">
                   <img
                     src={service.medias?.images?.[0] || "/placeholder.svg"}
                     alt={service.name}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="absolute inset-0 object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
 
@@ -64,12 +64,12 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
                         <User className="w-4 h-4" />
                       </AvatarFallback>
                     </Avatar>
-                    <div className="min-w-0 flex-grow">
-                      <h3 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                    <div className="flex-grow min-w-0">
+                      <h3 className="text-sm font-medium transition-colors line-clamp-2 group-hover:text-primary">
                         {service.name}
                       </h3>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <span className="text-xs text-muted-foreground truncate">
+                        <span className="text-xs truncate text-muted-foreground">
                           {service.creator?.profile?.firstName}{" "}
                           {service.creator?.profile?.lastName}
                         </span>
@@ -92,7 +92,7 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
                   </div>
 
                   {/* Tags - Fixed height container */}
-                  <div className="h-6 flex flex-wrap gap-1 overflow-hidden mb-3">
+                  <div className="flex flex-wrap h-6 gap-1 mb-3 overflow-hidden">
                     {service.tags.slice(0, 3).map((tag, index) => (
                       <Badge
                         key={index}
@@ -105,7 +105,7 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
                   </div>
 
                   {/* Footer - Always at bottom */}
-                  <div className="flex items-center justify-between pt-3 border-t mt-auto">
+                  <div className="flex items-center justify-between pt-3 mt-auto border-t">
                     <div className="flex items-center gap-1.5 text-muted-foreground">
                       <Clock className="w-4 h-4" />
                       <span className="text-xs">
@@ -113,7 +113,7 @@ export const FeaturedServices: React.FC<FeaturedServicesProps> = ({
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs text-muted-foreground block">
+                      <span className="block text-xs text-muted-foreground">
                         À partir de
                       </span>
                       <p className="font-semibold text-primary">

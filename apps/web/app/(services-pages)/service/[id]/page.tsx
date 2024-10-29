@@ -1,20 +1,20 @@
-import { MessageBox } from "@/components/MessageBox";
-import { Button } from "@/components/ui/button";
-import {
-  getServiceById,
-  getRelatedServices,
-} from "@/server.actions/services.actions";
-import { Check, Clock, RefreshCcw, Star } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ServiceReviews from "@/app/pages/review/ServiceReviews";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import ImageCarousel from "@/components/ImageCarousel";
-import { Suspense } from "react";
 import Loading from "@/app/loading";
-import { Service, Package } from "@/types/FeaturedServices";
+import ServiceReviews from "@/app/pages/review/ServiceReviews";
+import ImageCarousel from "@/components/ImageCarousel";
+import { MessageBox } from "@/components/MessageBox";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  getRelatedServices,
+  getServiceById,
+} from "@/server.actions/services.actions";
+import { Service } from "@/types/FeaturedServices";
+import { Check, Clock, RefreshCcw, Star } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 interface ServiceMedia {
   images?: string[];
@@ -82,16 +82,16 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
       : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="container px-4 py-8 mx-auto">
+      <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
-            <h1 className="text-3xl font-bold mb-4">{service.name}</h1>
+            <h1 className="mb-4 text-3xl font-bold">{service.name}</h1>
             <div className="flex items-center mb-4">
               <img
                 src={service.creator.profile.profilePic ?? "/placeholder.svg"}
                 alt={service.creator.profile.firstName ?? ""}
-                className="w-12 h-12 rounded-full mr-4"
+                className="w-12 h-12 mr-4 rounded-full"
               />
               <div>
                 <h2 className="font-semibold">
@@ -99,7 +99,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                   {service.creator.profile.lastName}
                 </h2>
                 <div className="flex items-center">
-                  <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                  <Star className="w-4 h-4 mr-1 text-yellow-400" />
                   <span>
                     {averageRating.toFixed(1)} ({service.ratings.length}{" "}
                     reviews)
@@ -143,12 +143,12 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               <CardContent>
                 {service.ratings.length > 0 ? (
                   service.ratings.map((rating) => (
-                    <div key={rating.id} className="mb-6 pb-4 border-b">
+                    <div key={rating.id} className="pb-4 mb-6 border-b">
                       <div className="flex items-center mb-2">
                         <img
                           src={rating.rater.profilePic || "/placeholder.svg"}
                           alt={`${rating.rater.firstName} ${rating.rater.lastName}`}
-                          className="w-10 h-10 rounded-full mr-3"
+                          className="w-10 h-10 mr-3 rounded-full"
                         />
                         <div>
                           <p className="font-semibold">{`${rating.rater.firstName} ${rating.rater.lastName}`}</p>
@@ -188,7 +188,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 <CardTitle>Related Services</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {relatedServices.map((relatedService) => (
                     <Link
                       href={`/service/${relatedService.id}`}
@@ -207,7 +207,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                               "/placeholder.svg"
                             }
                             alt={relatedService.name}
-                            className="w-full h-32 object-cover"
+                            className="object-cover w-full h-32"
                           />
                         </CardContent>
                       </Card>
@@ -246,11 +246,11 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                         <CardTitle>{pkg.name}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-2xl font-bold mb-4">
+                        <p className="mb-4 text-2xl font-bold">
                           ${formatPrice(pkg.price ?? "0")}
                         </p>
-                        <p className="text-sm mb-4">{pkg.description}</p>
-                        <div className="flex justify-between text-sm mb-4">
+                        <p className="mb-4 text-sm">{pkg.description}</p>
+                        <div className="flex justify-between mb-4 text-sm">
                           <span className="flex items-center">
                             <Clock className="w-4 h-4 mr-2" />{" "}
                             {pkg.deliveryTime} days delivery
@@ -264,16 +264,18 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                           {pkg.features.map((feature, index) => (
                             <li
                               key={index}
-                              className="flex items-center text-sm mb-2"
+                              className="flex items-center mb-2 text-sm"
                             >
                               <Check className="w-4 h-4 mr-2 text-green-500" />
                               {feature}
                             </li>
                           ))}
                         </ul>
-                        <Button className="w-full">
-                          Continue (${formatPrice(pkg.price ?? "0")})
-                        </Button>
+                        <Link href={`/service/${params.id}/${pkg.id}`}>
+                          <Button className="w-full">
+                            Continue (${formatPrice(pkg.price ?? "0")})
+                          </Button>
+                        </Link>
                       </CardContent>
                     </Card>
                   </TabsContent>
