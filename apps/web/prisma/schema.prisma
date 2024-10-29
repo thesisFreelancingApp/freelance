@@ -166,6 +166,8 @@ model Seller {
   Dispute Dispute[] @relation("DisputeInitiatorSeller")
   DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantSeller")
   DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderSeller")
+
+  Order Order[]
 }
 
 
@@ -187,6 +189,8 @@ model Buyer {
   DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantBuyer")
 
   DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderBuyer")
+
+  Order Order[]
 }
 
 // ------------------------
@@ -251,6 +255,8 @@ model Service {
   
 
   Dispute Dispute[] @relation("DisputeService")
+
+  Order Order[]
 }
 
 model ServicePackage {
@@ -313,6 +319,8 @@ model Projects {
   participants   CustomServiceParticipant[]
 
   Dispute Dispute[] @relation("DisputeProject")
+
+  Order Order[]
 }
 
 model CustomServiceParticipant {
@@ -423,7 +431,6 @@ model Wallet {
 }
 
 // Modèle Transaction
-// Modèle Transaction
 model Transaction {
   id                String           @id @default(uuid())
   amount            Decimal          @db.Decimal(12, 2)
@@ -437,6 +444,7 @@ model Transaction {
 
   // Optional relation with PaymentTransaction
   payment           PaymentTransaction?
+    Order Order[]
 }
 
 // Enum pour les types de transaction
@@ -462,6 +470,9 @@ model PaymentTransaction {
 
   // Relations
   transaction       Transaction      @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  
+
+  Order Order[]
 }
 
 // Enum for payment statuses
@@ -502,6 +513,8 @@ model Dispute {
   project           Projects?          @relation("DisputeProject", fields: [projectId], references: [id])
   participants      DisputeParticipant[] // List of participants involved in the dispute
   messages          DisputeMessage[]     // Messages exchanged in the dispute
+
+  Order Order[] @relation("DisputeOrder")
 }
 
 
@@ -535,4 +548,49 @@ model DisputeMessage {
   dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
   senderSeller   Seller?          @relation("DisputeMessageSenderSeller", fields: [senderSellerId], references: [id])
   senderBuyer    Buyer?           @relation("DisputeMessageSenderBuyer", fields: [senderBuyerId], references: [id])
+}
+
+
+model Order {
+  id                  String               @id @default(uuid())
+  totalAmount         Decimal              @db.Decimal(12, 2)
+  currency            String               @default("TND")
+  status              OrderStatus          @default(PENDING)
+  description         String
+
+
+  paymentStatus       PaymentStatus        @default(PENDING)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  // Relationships
+  buyerId             String               // Link to the buyer
+  buyer               Buyer                @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  sellerId            String               
+  seller              Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  serviceId           String?           
+  service             Service?             @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  projectId           String?             
+  project             Projects?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  walletTransactionId String?
+  transaction         Transaction?         @relation(fields: [walletTransactionId], references: [id])
+
+  payTransactionId    String?
+  paymentTransaction  PaymentTransaction?  @relation(fields: [payTransactionId], references: [transactionId])
+
+  dispute             Dispute?             @relation("DisputeOrder", fields: [disputeid], references: [id])
+  disputeid           String?
+}
+
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  IN_PROGRESS
+  IN_REVISION
+  COMPLETED
+  CANCELLED
 }
