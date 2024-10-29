@@ -8,9 +8,15 @@ import Langues from "@/app/pages/profilepublic/langues";
 import Occupations from "@/app/pages/profilepublic/occupations";
 import Educations from "@/app/pages/profilepublic/educations";
 import Certifications from "@/app/pages/profilepublic/certifications";
+// Adjust the path as needed
+
 
 // Types
-interface Profile {
+interface Seller {
+  professionalProfile?: any; // Adjust the type as needed
+}
+
+interface profile {
   id: string;
   firstName: string;
   lastName: string;
@@ -19,10 +25,17 @@ interface Profile {
   bio?: string;
   birthDate?: string;
   title?: string;
+  seller?: Seller; // Add this line
+   // Ensure this matches the imported type
+educations?: { faculty: string }[];
+langues?: { langue: string }[];
+occupations?: { occupation: string }[];
+skills?: { skill: string }[];
+certifications?: { certification: string }[];
 }
 
 interface UserProfile {
-  profile?: Profile;
+  profile?: profile;
 }
 
 // Component
@@ -40,9 +53,9 @@ const AnotherPage = async ({ username }: { username: string }) => {
     return <div>User profile not found</div>;
   }
 
-  // Destructure user profile data
-  const { id, firstName, lastName, profilePic, bio, birthDate, title } =
-    userProfile.profile;
+  const { id, firstName, lastName, profilePic, bio, birthDate, title, seller, } = userProfile.profile;
+  const professionalProfile = seller?.professionalProfile;
+
   const profile = {
     id,
     firstName,
@@ -52,7 +65,27 @@ const AnotherPage = async ({ username }: { username: string }) => {
     bio,
     birthDate,
     title,
+    seller,
+    professionalProfile: professionalProfile || {},
+    educations: professionalProfile?.educations || [],
+    langues: professionalProfile?.langues || [],
+    occupations: professionalProfile?.occupations || [],
+    skills: professionalProfile?.skills || [],
+    certifications: professionalProfile?.certifications || [],
   };
+
+  if (!professionalProfile) {
+    return (
+      <div className="container px-4 py-8 mx-auto space-y-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <MainCardProfile profile={profile} username={username} />
+          <div className="md:col-span-1 md:sticky md:top-8">
+            <ContactCardProfile profile={profile} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container px-4 py-8 mx-auto space-y-8">
@@ -63,15 +96,17 @@ const AnotherPage = async ({ username }: { username: string }) => {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Services profile={profile} username={username} />
+        <Services profile={profile } username={username} />
         <div className="md:col-span-1 md:sticky md:top-8">
-          <Langues profile={profile} username={username} />
+          <Langues profile={profile } username={username} />
         </div>
         <div className="md:col-span-1 md:sticky md:top-8">
-          <Occupations profile={profile} username={username} />
-          <Skills profile={profile} username={username} />
+          <Occupations profile={profile } username={username} />
+          </div>
+          <div className="md:col-span-1 md:sticky md:top-8">
+          <Skills profile={profile } username={username} />
         </div>
-        <Educations profile={profile} username={username} />
+        <Educations profile={profile } username={username} />
         <Certifications profile={profile} username={username} />
       </div>
     </div>

@@ -11,13 +11,17 @@ type Profile = {
   bio?: string;
   skills?: string[];
   professionalProfile?: ProfessionalProfile;
-  languages?: string[];
+  language?: string[];
+  seller?: Seller;
 };
 
 type ProfessionalProfile = {
   skills?: string[];
-  languages?: string[];
+  language?: string[];
   // Add other properties as needed
+};
+type Seller = {
+  professionalProfile?: ProfessionalProfile;
 };
 
 const Langues = ({
@@ -36,7 +40,7 @@ const Langues = ({
         <div>
           <h3 className="mb-2 font-semibold">Langues</h3>
           <p className="text-muted-foreground">
-            {profile.professionalProfile?.languages?.map((language) => (
+            {profile.seller?.professionalProfile?.language?.map((language: string) => (
              <Badge key={language}>{language}</Badge>
             ))}
           </p>
