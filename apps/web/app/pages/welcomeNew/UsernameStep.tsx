@@ -36,7 +36,7 @@ export default function UsernameStep({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    // Allow only lowercase letters and numbers
+
     if (/^[a-z0-9]*$/.test(newValue)) {
       setUsername(newValue);
     }
