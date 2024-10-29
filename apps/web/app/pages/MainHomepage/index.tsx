@@ -8,16 +8,32 @@ import { Service } from "@/types/FeaturedServices";
 import Hero from "./BannerHero";
 import CategoryList from "./CategoryList";
 import SearchBar from "./SearchBar";
-const freelancers = [
-  { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
-  { name: "John Smith", expertise: "Graphic Designer", rating: 4.7 },
-  { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
-];
+import { getAllUserProfile } from "@/server.actions/profilePublic/profilePublic.actions";
+// const freelancers = [
+//   { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
+//   { name: "John Smith", expertise: "Graphic Designer", rating: 4.7 },
+//   { name: "Emma Davis", expertise: "Digital Marketer", rating: 4.8 },
+// ];
+export interface Freelancer {
+  firstName: string;
+  lastName: string;
+  professionalProfile?: {
+    rating: number;
+    occupations?: { title: string }[];
+    skills?: { skill: string }[];
+    certifications?: { certification: string }[];
+    educations?: { faculty: string }[];
+    profilePic: string;
+    
+    
+  };
+  // ... other properties ...
+}
 export default async function Index() {
   const categories = await getCategories();
   const authenticated = await isAuthenticated();
   const services = await getFeaturedServices();
-  // const freelancer = await getFreelancer();
+  const freelancers = await getAllUserProfile();
 
   return (
     <>
