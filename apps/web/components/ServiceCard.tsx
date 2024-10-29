@@ -1,87 +1,134 @@
+import { Card } from "@/components/ui/card";
+import { Star, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { Star, Clock, RefreshCcw } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ServiceCardProps {
   service: {
-    id: number;
+    id: string;
     name: string;
-    images: string[];
+    medias: {
+      images: string[];
+    } | null;
     creator: {
-      firstName: string | null;
-      lastName: string | null;
-      profilePic: string | null;
-      sellerRating: number | null;
+      profile: {
+        firstName: string | null;
+        lastName: string | null;
+        profilePic: string | null;
+      };
     };
-    packages: { price: string; deliveryTime?: number; revisions?: number }[];
+    packages: {
+      price: string;
+      deliveryTime?: number;
+      revisions?: number;
+    }[];
+    ratings?: {
+      rating: number;
+    }[];
+    tags: string[];
     averageRating?: number;
-    tags?: string[];
+    lowestPrice?: number;
+    fastestDelivery?: number;
   };
+  featured?: boolean;
 }
 
-export default function ServiceCard({ service }: ServiceCardProps) {
+export default function ServiceCard({
+  service,
+  featured = false,
+}: ServiceCardProps) {
   const lowestPackage = service.packages[0];
+  const averageRating =
+    service.averageRating?.toFixed(1) ||
+    (service.ratings && service.ratings.length > 0
+      ? (
+          service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+          service.ratings.length
+        ).toFixed(1)
+      : "New");
+
+  const firstImage = service.medias?.images?.[0] || "/placeholder.svg";
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-md">
-      <Link href={`/service/${service.id}`}>
-        <div className="relative h-48">
-          <img
-            src={service.images[0] || "/placeholder.jpg"}
+    <Link href={`/service/${service.id}`} className="block h-full">
+      <Card className="flex flex-col h-full group overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+        {/* Image Container */}
+        <div className="relative w-full pt-[56.25%] overflow-hidden bg-muted">
+          <Image
+            src={firstImage}
             alt={service.name}
-            className="w-full h-full object-cover"
+            fill
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute top-2 right-2">
-            <Badge variant="secondary" className="bg-white/80 text-black">
-              From ${lowestPackage.price}
-            </Badge>
-          </div>
+          {featured && (
+            <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+              Featured
+            </div>
+          )}
         </div>
-        <CardContent className="p-4">
-          <div className="flex items-center mb-2">
-            <Avatar className="h-8 w-8 mr-2">
-              <AvatarImage src={service.creator.profilePic || undefined} />
+
+        {/* Content Container */}
+        <div className="flex flex-col flex-grow p-4">
+          {/* Service Title and Seller Info */}
+          <div className="flex items-start gap-3 mb-3">
+            <Avatar className="w-8 h-8 border-2 border-background shrink-0">
+              <AvatarImage
+                src={service.creator.profile.profilePic || "/placeholder.svg"}
+                alt={service.creator.profile.firstName || "Seller"}
+              />
               <AvatarFallback>
-                {service.creator.firstName?.[0]}
-                {service.creator.lastName?.[0]}
+                <User className="w-4 h-4" />
               </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="text-sm font-medium">
-                {service.creator.firstName} {service.creator.lastName}
-              </p>
-              <div className="flex items-center">
-                <Star className="h-3 w-3 text-yellow-400 mr-1" />
-                <span className="text-xs">
-                  {service.creator.sellerRating?.toFixed(1) || "New"}
+            <div className="min-w-0 flex-grow">
+              <h3 className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                {service.name}
+              </h3>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="text-xs text-muted-foreground truncate">
+                  {service.creator.profile.firstName}{" "}
+                  {service.creator.profile.lastName}
                 </span>
+                <span className="text-xs text-muted-foreground">•</span>
+                <div className="flex items-center shrink-0">
+                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                  <span className="text-xs text-muted-foreground ml-0.5">
+                    {averageRating}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-            {service.name}
-          </h3>
-          <div className="flex items-center text-sm text-muted-foreground mb-2">
-            <Clock className="h-4 w-4 mr-1" />
-            <span>Delivery in {lowestPackage.deliveryTime} days</span>
+
+          {/* Tags */}
+          <div className="h-6 flex flex-wrap gap-1 overflow-hidden mb-3">
+            {service.tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                className="text-xs px-2 py-0.5 bg-secondary/50 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
-          <div className="flex items-center text-sm text-muted-foreground">
-            <RefreshCcw className="h-4 w-4 mr-1" />
-            <span>{lowestPackage.revisions} revisions</span>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-3 border-t mt-auto">
+            <div className="text-xs text-muted-foreground">
+              {lowestPackage.deliveryTime} days delivery
+            </div>
+            <div className="text-right">
+              <span className="text-xs text-muted-foreground block">
+                Starting at
+              </span>
+              <p className="font-semibold text-primary">
+                ${parseFloat(lowestPackage.price).toFixed(2)}
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Link>
-      <CardFooter className="px-4 py-2 bg-secondary/10">
-        <div className="flex flex-wrap gap-1">
-          {service.tags?.slice(0, 3).map((tag, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
         </div>
-      </CardFooter>
-    </Card>
+      </Card>
+    </Link>
   );
 }

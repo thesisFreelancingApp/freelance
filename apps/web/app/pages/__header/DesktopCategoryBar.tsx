@@ -1,20 +1,18 @@
 "use client";
-import { encodeHelper } from "@/hooks/use-Url";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-// import Link from "next/link";
 
-// Définition des types
 interface SubCategory {
   name: string;
+  slug: string;
   children?: SubCategory[];
 }
 
 interface Category {
   name: string;
+  slug: string;
   children: SubCategory[];
 }
 
@@ -26,25 +24,18 @@ interface CategoryBarProps {
   allCategories: Category[];
 }
 
-// SubMenu Component
 const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
-  const router = useRouter();
-
-  // const handleNavigation = (subSubName: string) => {
-  //   router.push(`/categories/${subSubName}`);
-  // };
   return (
     <div className="absolute left-0 z-10 grid w-full grid-cols-4 gap-4 p-4 shadow-lg bg-background top-full">
-      {subCategories.map((subcategory: SubCategory) => (
+      {subCategories.map((subcategory) => (
         <div key={subcategory.name} className="pb-2 border-b">
           <h4 className="font-bold">{subcategory.name}</h4>
           {subcategory.children && (
             <ul className="mt-2 space-y-1 list-none">
-              {subcategory.children.map((subSub: SubCategory) => (
-                <li className="flex items-center">
+              {subcategory.children.map((subSub) => (
+                <li key={subSub.name} className="flex items-center">
                   <Link
-                    key={subSub.name}
-                    href={`/categories/${encodeHelper(subcategory.name)}/${encodeHelper(subSub.name)}`}
+                    href={`/categories/${subcategory.slug}/${subSub.slug}`}
                     className="flex items-center pl-2 group hover:cursor-pointer"
                   >
                     <span>{subSub.name}</span>
@@ -63,7 +54,6 @@ const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
   );
 };
 
-// Menu Component
 export default function CategoryBar({ allCategories }: CategoryBarProps) {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -128,31 +118,13 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
 
   return (
     <div className="relative">
-      {/* Left Chevron */}
-      <button
-        onClick={scrollLeft}
-        className="absolute left-0 z-20 p-2 transform -translate-y-1/2 rounded-full top-1/2"
-        aria-label="Scroll left"
-      >
-        <FaChevronLeft />
-      </button>
-
-      {/* Left gradient overlay */}
-      <div className="absolute left-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-r from-background to-transparent"></div>
-
-      {/* Main Menu */}
       <ul
         className="flex p-4 space-x-6 overflow-x-auto scrollbar-hide"
-        style={{ margin: "0 2rem" }}
         ref={menuRef}
       >
-        {allCategories.map((category: Category, index: number) => (
-          <Link
-            key={category.name}
-            href={`/categories/${encodeHelper(category.name)}`}
-          >
+        {allCategories.map((category, index) => (
+          <Link key={category.name} href={`/categories/${category.slug}`}>
             <li
-              key={category.name}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
               className={`relative cursor-pointer whitespace-nowrap pb-1 ${
@@ -167,10 +139,15 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
         ))}
       </ul>
 
-      {/* Right gradient overlay */}
-      <div className="absolute top-0 right-0 z-10 w-8 h-full pointer-events-none bg-gradient-to-l from-background to-transparent"></div>
+      {/* Navigation arrows */}
+      <button
+        onClick={scrollLeft}
+        className="absolute left-0 z-20 p-2 transform -translate-y-1/2 rounded-full top-1/2"
+        aria-label="Scroll left"
+      >
+        <FaChevronLeft />
+      </button>
 
-      {/* Right Chevron */}
       <button
         onClick={scrollRight}
         className="absolute right-0 z-20 p-2 -translate-y-1/2 rounded-full top-1/2"

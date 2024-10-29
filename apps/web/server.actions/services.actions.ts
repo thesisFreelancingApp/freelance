@@ -382,3 +382,125 @@ export async function getRelatedServices(serviceId: string, limit = 3) {
         : 0,
   }));
 }
+interface FilterOptions {
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: "price_asc" | "price_desc" | "rating" | "delivery_time";
+  deliveryTime?: number;
+  page?: number;
+  limit?: number;
+}
+
+export async function getFilteredServices({
+  categoryId,
+  minPrice,
+  maxPrice,
+  sortBy = "rating",
+  deliveryTime,
+  page = 1,
+  limit = 12,
+}: FilterOptions) {
+  try {
+    const where: any = {};
+
+    // Add category filter
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    // Add price range and delivery time filters
+    if (minPrice || maxPrice || deliveryTime) {
+      where.packages = {
+        some: {
+          AND: [
+            minPrice ? { price: { gte: new Decimal(minPrice) } } : {},
+            maxPrice ? { price: { lte: new Decimal(maxPrice) } } : {},
+            deliveryTime ? { deliveryTime: { lte: deliveryTime } } : {},
+          ],
+        },
+      };
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch services without sorting first
+    const [services, total] = await Promise.all([
+      prisma.service.findMany({
+        where,
+        include: {
+          creator: {
+            include: {
+              profile: true,
+            },
+          },
+          ratings: true,
+          packages: true,
+          category: true,
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.service.count({ where }),
+    ]);
+
+    // Format and sort services after fetching
+    let formattedServices = services.map((service) => {
+      const avgRating =
+        service.ratings.length > 0
+          ? Number(
+              (
+                service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+                service.ratings.length
+              ).toFixed(1),
+            )
+          : 0;
+
+      return {
+        ...service,
+        averageRating: avgRating,
+        lowestPrice: Math.min(
+          ...service.packages.map((p) => Number(p.price || 0)),
+        ),
+        fastestDelivery: Math.min(
+          ...service.packages.map((p) => Number(p.deliveryTime || 0)),
+        ),
+      };
+    });
+
+    // Sort based on different criteria
+    switch (sortBy) {
+      case "price_asc":
+        formattedServices.sort((a, b) => a.lowestPrice - b.lowestPrice);
+        break;
+      case "price_desc":
+        formattedServices.sort((a, b) => b.lowestPrice - a.lowestPrice);
+        break;
+      case "delivery_time":
+        formattedServices.sort((a, b) => a.fastestDelivery - b.fastestDelivery);
+        break;
+      case "rating":
+        formattedServices.sort((a, b) => b.averageRating - a.averageRating);
+        break;
+      default:
+        // Default sorting by creation date
+        formattedServices.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+    }
+
+    return {
+      services: formattedServices,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        currentPage: page,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching filtered services:", error);
+    throw new Error("Failed to fetch services");
+  }
+}

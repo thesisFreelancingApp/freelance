@@ -2,7 +2,7 @@
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -391,6 +391,9 @@ model MainCategories {
   description String?
   level       Int
   parentId    Int?
+  imageUrl    String?       
+  iconUrl     String?         
+  slug        String?         // Add this for URL-friendly names
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   services    Service[] 
