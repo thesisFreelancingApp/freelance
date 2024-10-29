@@ -1,8 +1,8 @@
 "use server";
-import { Decimal } from "@prisma/client/runtime/library";
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
-import { Service } from "@/types/FeaturedServices";
+// import { Service } from "@/types/FeaturedServices";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // // Récupérer un service par ID
 // export const getServiceById = async (id: number) => {
@@ -43,7 +43,7 @@ import { Service } from "@/types/FeaturedServices";
 //   return service;
 // };
 
-// // Créer un nouveau service
+// Créer un nouveau service
 // export const createService = async (data: {
 //   name: string;
 //   description: string;
@@ -110,7 +110,7 @@ import { Service } from "@/types/FeaturedServices";
 //   return service;
 // };
 
-// // Mettre à jour un service
+// Mettre à jour un service
 // export const updateService = async (
 //   id: number,
 //   data: Partial<{
@@ -138,7 +138,7 @@ import { Service } from "@/types/FeaturedServices";
 
 // // Récupérer les services en vedette
 // Récupérer les services en vedette
-export const getFeaturedServices = async (limit = 3): Promise<Service[]> => {
+export const getFeaturedServices = async (limit = 3) => {
   const services = await prisma.service.findMany({
     take: limit,
     include: {
@@ -280,7 +280,7 @@ export const createService = async (data: {
     })),
   };
 };
-export async function getServiceById(id: string): Promise<Service | null> {
+export async function getServiceById(id: string) {
   const service = await prisma.service.findUnique({
     where: { id },
     include: {
@@ -331,10 +331,7 @@ export async function getServiceById(id: string): Promise<Service | null> {
   };
 }
 
-export async function getRelatedServices(
-  serviceId: string,
-  limit = 3,
-): Promise<Service[]> {
+export async function getRelatedServices(serviceId: string, limit = 3) {
   const services = await prisma.service.findMany({
     where: {
       id: { not: serviceId },

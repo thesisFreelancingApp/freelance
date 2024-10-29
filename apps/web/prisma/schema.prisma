@@ -38,6 +38,9 @@ model AuthUser {
   profile   PersonalProfile? @relation("ProfileAuthUser")
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
+  sessionLogs  SessionLog[]   @relation("UserSessionLogs") // Relation avec les logs de sessions
+  SessionLog SessionLog[]
+    preferences   UserPreferences? // Relation with user preferences
 }
 
 model Account {
@@ -53,6 +56,59 @@ model Account {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
+
+model SessionLog {
+  id           String    @id @default(uuid())
+  userId       String
+  ipAddress    String?
+  loginAt      DateTime  @default(now())
+  logoutAt     DateTime?
+  device       String?   // Pour stocker des informations sur le périphérique (ex: "Chrome on Windows")
+  location     String?   // Pour stocker des informations géographiques, si disponibles
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relation avec AuthUser
+  user         AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  AuthUser AuthUser[] @relation("UserSessionLogs")
+}
+
+
+// Enum for Theme Options
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM // for system-based theme
+}
+
+// Enum for View Options
+enum View {
+  Seller
+  Buyer
+}
+enum Frequency  {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+// Model for User Preferences
+model UserPreferences {
+  id            String           @id @default(uuid())
+  userId        String           @unique
+  theme         Theme            @default(SYSTEM)
+  view          View             @default(Buyer)
+  notifications Boolean          @default(true) // enable or disable notifications
+  language      String           @default("en") // default language
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  showOnlineStatus       Boolean             @default(true)    
+  notificationFrequency  Frequency           @default(DAILY) 
+  // Relations
+  user          AuthUser         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
 
 // ------------------------
 // Profils Utilisateurs et Rôles
@@ -71,6 +127,7 @@ model PersonalProfile {
   birthDate             DateTime?
   userEmail             String                @unique
   professionalProfileid String?
+  walletid              String?
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
 
@@ -82,10 +139,14 @@ model PersonalProfile {
   chatRooms             ChatRoomParticipant[] @relation("ProfileChatRooms")
   ratingsGiven          Rating[]              @relation("RatingRater")
   ratingsReceived       Rating[]              @relation("RatingRatee")
-  createdProjects      Projects[]       @relation("CustomServiceCreator")
+  createdProjects       Projects[]       @relation("CustomServiceCreator")
   participantIn         CustomServiceParticipant[]
+  wallet                Wallet?               @relation("ProfileWallet", fields: [walletid], references: [id])
 
 
+
+
+  Wallet Wallet[]
 }
 
 model Seller {
@@ -101,6 +162,10 @@ model Seller {
 
   // Relations
   createdServices       Service[]            @relation("CreatedServices")
+
+  Dispute Dispute[] @relation("DisputeInitiatorSeller")
+  DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantSeller")
+  DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderSeller")
 }
 
 
@@ -116,6 +181,12 @@ model Buyer {
 
   // Relations
   purchasedServices     Service[]           @relation("PurchasedServices")
+
+  Dispute Dispute[] @relation("DisputeInitiatorBuyer")
+
+  DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantBuyer")
+
+  DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderBuyer")
 }
 
 // ------------------------
@@ -160,7 +231,7 @@ model Service {
   id            String           @id @default(uuid())
   name          String
   description   String?
-  images        String[]
+  medias        Json?
   tags          String[]
   creatorId     String
   createdAt     DateTime         @default(now())
@@ -177,17 +248,20 @@ model Service {
   ratings       Rating[]         @relation("ServiceRatings")
   packages      ServicePackage[]
   
+
+  Dispute Dispute[] @relation("DisputeService")
 }
 
 model ServicePackage {
   id            String    @id @default(uuid())
   serviceId     String
-  name          String
-  description   String
-  price         Decimal   @db.Decimal(12, 3)
-  revisions     Int
+  name          String?
+  description   String?
+  deliveryTime  Int?
+  price         Decimal?   @db.Decimal(12, 3)
+  revisions     Int?
   features      String[]
-  deliveryTime  Int
+
 
   // Relations
   service       Service   @relation(fields: [serviceId], references: [id])
@@ -202,7 +276,7 @@ model Rating {
   raterId         String
   rateeId         String
   serviceId       String?
-  projectsId     String?
+  projectsId      String?
   rating          Int
   review          String?
   createdAt       DateTime         @default(now())
@@ -211,7 +285,7 @@ model Rating {
   rater           PersonalProfile  @relation("RatingRater", fields: [raterId], references: [id])
   ratee           PersonalProfile  @relation("RatingRatee", fields: [rateeId], references: [id])
   service         Service?         @relation("ServiceRatings", fields: [serviceId], references: [id])
-  projects   Projects?   @relation(fields: [projectsId], references: [id])
+  projects        Projects?   @relation(fields: [projectsId], references: [id])
 }
 
 // ------------------------
@@ -236,6 +310,8 @@ model Projects {
   creator        PersonalProfile          @relation("CustomServiceCreator", fields: [creatorId], references: [id], onDelete: Cascade)
   ratings        Rating[]
   participants   CustomServiceParticipant[]
+
+  Dispute Dispute[] @relation("DisputeProject")
 }
 
 model CustomServiceParticipant {
@@ -317,9 +393,145 @@ model MainCategories {
   parentId    Int?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-  services             Service[] 
+  services    Service[] 
   // Relations
   parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
   children    MainCategories[] @relation("Hierarchy")
   professionalProfiles ProfessionalProfile[] 
+}
+
+
+
+// ------------------------
+// Walet
+// ------------------------
+
+model Wallet {
+  id                String           @id @default(uuid())
+  balance           Decimal          @default(0.0) @db.Decimal(12, 2)
+  currency          String           @default("TND")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  ownerId           String          @unique
+  owner             PersonalProfile?  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+
+  PersonalProfile PersonalProfile[] @relation("ProfileWallet")
+}
+
+// Modèle Transaction
+// Modèle Transaction
+model Transaction {
+  id                String           @id @default(uuid())
+  amount            Decimal          @db.Decimal(12, 2)
+  type              TransactionType
+  description       String?
+  createdAt         DateTime         @default(now())
+
+  // Relations
+  walletId          String
+  wallet            Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  // Optional relation with PaymentTransaction
+  payment           PaymentTransaction?
+}
+
+// Enum pour les types de transaction
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+  PAYMENT
+}
+
+// ------------------------
+// Modèle PaymentTransaction
+// ------------------------
+
+model PaymentTransaction {
+  id                String           @id @default(uuid())
+  transactionId     String           @unique
+  paymentMethod     String           // e.g., "Credit Card", "PayPal"
+  transactionStatus PaymentStatus    // Enum for different payment statuses
+  transactionReference String?       @unique
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  transaction       Transaction      @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+// Enum for payment statuses
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+
+
+
+// Enum pour le statut des disputes
+enum DisputeStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+// Modèle Dispute
+model Dispute {
+  id             String               @id @default(uuid())
+  serviceId      String?              // Optional link to a specific service
+  projectId      String?              // Optional link to a specific project
+  initiatorSellerId String?           // Seller initiating the dispute
+  initiatorBuyerId String?            // Buyer initiating the dispute
+  description    String
+  status         DisputeStatus        @default(OPEN)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  // Relations
+  initiatorSeller   Seller?            @relation("DisputeInitiatorSeller", fields: [initiatorSellerId], references: [id])
+  initiatorBuyer    Buyer?             @relation("DisputeInitiatorBuyer", fields: [initiatorBuyerId], references: [id])
+  service           Service?           @relation("DisputeService", fields: [serviceId], references: [id])
+  project           Projects?          @relation("DisputeProject", fields: [projectId], references: [id])
+  participants      DisputeParticipant[] // List of participants involved in the dispute
+  messages          DisputeMessage[]     // Messages exchanged in the dispute
+}
+
+
+// Modèle DisputeParticipant pour les participants dans les disputes
+model DisputeParticipant {
+  id             String           @id @default(uuid())
+  disputeId      String
+  participantSellerId String?     // Seller participant
+  participantBuyerId String?      // Buyer participant
+  role           String
+  joinedAt       DateTime         @default(now())
+
+  // Relations
+  dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  participantSeller Seller?       @relation("DisputeParticipantSeller", fields: [participantSellerId], references: [id], onDelete: Cascade)
+  participantBuyer  Buyer?        @relation("DisputeParticipantBuyer", fields: [participantBuyerId], references: [id], onDelete: Cascade)
+}
+
+
+// Modèle DisputeMessage pour les messages dans les disputes
+model DisputeMessage {
+  id             String           @id @default(uuid())
+  disputeId      String
+  senderSellerId String?          // Seller sender
+  senderBuyerId  String?          // Buyer sender
+  content        String
+  createdAt      DateTime         @default(now())
+  isRead         Boolean          @default(false)
+
+  // Relations
+  dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  senderSeller   Seller?          @relation("DisputeMessageSenderSeller", fields: [senderSellerId], references: [id])
+  senderBuyer    Buyer?           @relation("DisputeMessageSenderBuyer", fields: [senderBuyerId], references: [id])
 }

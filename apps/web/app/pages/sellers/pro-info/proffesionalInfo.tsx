@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProfessionalProfile } from "@/server.actions/sellers/proinfo/info"; // Update this path accordingly
+import { createProfessionalProfile } from "@/server.actions/sellers/pro-Infomation.actions"; // Update this path accordingly
 import * as Toast from "@radix-ui/react-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
