@@ -21,6 +21,8 @@ import {
 import CompletionStep from "./CompletionStep";
 import ProfileStep from "./ProfileStep";
 
+import { useRouter } from "next/navigation";
+
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -48,8 +50,14 @@ export default function MultiStepFormPage() {
     null,
   );
   const [errorMessages, setErrorMessages] = React.useState<string[]>([]);
+  const router = useRouter();
+  const stepNames = ["username", "profile", "role-selection", "completion"];
 
-  // Mise à jour de fieldErrors avec string | null pour des messages d'erreur
+  React.useEffect(() => {
+    const stepName = stepNames[currentStep - 1];
+    router.replace(`?step=${stepName}`);
+  }, [currentStep, router]);
+
   const [fieldErrors, setFieldErrors] = React.useState<
     Record<string, string | null>
   >({
@@ -66,7 +74,6 @@ export default function MultiStepFormPage() {
   const validateField = (name: string, value: string | Date | undefined) => {
     const errors: { [key: string]: string | null } = {};
 
-    // Validation basique : champ requis
     if (!value) {
       errors[name] = `Ce champ est requis.`;
     } else {
@@ -160,7 +167,7 @@ export default function MultiStepFormPage() {
             profile={profile}
             setProfile={setProfile}
             fieldErrors={fieldErrors}
-            setFieldErrors={setFieldErrors} // Ajout de setFieldErrors comme prop
+            setFieldErrors={setFieldErrors}
             handleUpdateProfile={handleUpdateProfile}
             handleInputChange={handleInputChange}
             loading={loading}

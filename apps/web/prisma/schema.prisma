@@ -232,8 +232,9 @@ model Service {
   name          String
   description   String?
   medias        Json?
+  isPublic      Boolean          @default(true)
   tags          String[]
-  creatorId     String
+  creatorId     String  
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
 
