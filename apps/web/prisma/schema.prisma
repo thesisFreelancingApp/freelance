@@ -143,10 +143,10 @@ model PersonalProfile {
   participantIn         CustomServiceParticipant[]
   wallet                Wallet?               @relation("ProfileWallet", fields: [walletid], references: [id])
 
-
-
-
   Wallet Wallet[]
+  Projects Projects[] @relation("ProjectParticipants")
+  ProjectParticipantRequest ProjectParticipantRequest[]
+  CreatedProjects Projects[] @relation("CreatedProjects")
 }
 
 model Seller {
@@ -300,28 +300,55 @@ model Rating {
 // ------------------------
 
 model Projects {
-  id             String                   @id @default(uuid())
-  creatorId      String
-  assigneeId     String?
+  id             String   @id @default(uuid())
   title          String
   description    String
-  minBudget      Decimal?                 @db.Decimal(10, 2)
-  maxBudget      Decimal?                 @db.Decimal(10, 2)
-  proposedPrice  Decimal?                 @db.Decimal(10, 2)
+  minBudget      Decimal? @db.Decimal(10, 2)
+  maxBudget      Decimal? @db.Decimal(10, 2)
+  proposedPrice  Decimal? @db.Decimal(10, 2)
   message        String?
-  status         RequestStatus            @default(PENDING)
-  createdAt      DateTime                 @default(now())
-  updatedAt      DateTime                 @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  creatorId      String   // ID du créateur
+
+  // Stocker les objets structurés en tant que JSON
+  sprints        Json?    // Stocke les sprints en format JSON
+  medias         Json?    // Stocke les médias en format JSON
+  requirements   Json?    // Stocke les exigences en format JSON
+  skills         Json?    // Stocke les compétences en format JSON
 
   // Relations
-  creator        PersonalProfile          @relation("CustomServiceCreator", fields: [creatorId], references: [id], onDelete: Cascade)
-  ratings        Rating[]
-  participants   CustomServiceParticipant[]
-
-  Dispute Dispute[] @relation("DisputeProject")
-
-  Order Order[]
+  participantRequests ProjectParticipantRequest[] // Liste des demandes de participation
+  participants        PersonalProfile[]           @relation("ProjectParticipants") // Liste des participants acceptés
+  PersonalProfile     PersonalProfile[]           @relation("CustomServiceCreator")
+  creator             PersonalProfile             @relation("CreatedProjects", fields: [creatorId], references: [id], onDelete: Cascade)
+  Rating              Rating[]
+  CustomServiceParticipant CustomServiceParticipant[]
+  Dispute             Dispute[]                   @relation("DisputeProject")
+  Order               Order[]
 }
+
+
+// Modèle pour les demandes de participation
+model ProjectParticipantRequest {
+  id             String           @id @default(uuid())
+  projectId      String           // ID du projet associé
+  requesterId    String           // ID de l'utilisateur invité
+  status         ParticipationStatus @default(PENDING) // Statut de la demande
+  createdAt      DateTime         @default(now())
+
+  // Relations
+  project        Projects         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requester      PersonalProfile  @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+}
+
+// Enum pour le statut de participation
+enum ParticipationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 
 model CustomServiceParticipant {
   id               String            @id @default(uuid())
