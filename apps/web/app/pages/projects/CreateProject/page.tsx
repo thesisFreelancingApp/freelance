@@ -1,17 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { createProjectAction } from "@/server.actions/project/projects.actions";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import RequirementsStep from "@/app/project/RequirementsStep";
 import MediaStep from "./GalleryStep";
 import OverviewStep from "./OverviewStep";
 import PricingStep from "./PricingStep";
+import RequirementsStep from "./RequirementsStep";
 import StepDetails from "./StepDetails";
 import StepProgress from "./StepProgress";
-
 interface MediaItem {
   url: string;
   type: string;
@@ -30,19 +30,12 @@ interface ProjectForm {
   skills: { value: string }[];
 }
 
-const steps = [
-  "Détail du Projet",
-  "Budget et Durée",
-  "Médias",
-  "Exigences",
-  "Révision",
-];
-
+const steps = ["Détail du Projet", "Budget et Durée", "Médias", "Exigences"];
 export default function CreateProjectPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const { toast } = useToast();
   const form = useForm<ProjectForm>({
     defaultValues: {
       sprints: [
@@ -70,8 +63,39 @@ export default function CreateProjectPage() {
   }, [searchParams]);
 
   const onSubmit = async (data: ProjectForm) => {
-    console.log(data);
-    // Place submission logic here
+    try {
+      console.log("Données soumises :", data);
+
+      // Crée le projet en appelant `createProjectAction`
+      const project = await createProjectAction(data);
+
+      // Vérifiez que le projet a bien été créé avant de rediriger
+      if (project?.id) {
+        // Notification de succès
+        toast({
+          title: "Projet créé avec succès !",
+          description: "Redirection vers l'affectation du projet...",
+        });
+
+        // Redirection après succès
+        router.push(`/projects/assign/${project.id}`);
+      } else {
+        console.error("Le projet n'a pas pu être créé");
+        // Notification d'échec
+        toast({
+          title: "Erreur lors de la création du projet",
+          description: "Veuillez réessayer plus tard.",
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du formulaire :", error);
+      // Notification d'erreur avec message détaillé
+      toast({
+        title: "Erreur inattendue",
+        description:
+          "Une erreur est survenue lors de la soumission du formulaire. Veuillez réessayer.",
+      });
+    }
   };
 
   const handleNextStep = () => {
@@ -115,63 +139,48 @@ export default function CreateProjectPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-6">
+    <div className="p-6 mx-auto space-y-4 max-w-7xl">
       <StepProgress
         steps={steps}
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
       />
 
-      {currentStep === steps.length - 1 ? (
-        // Render full-page revision step
-        <div className="p-6 bg-white rounded-md shadow-md">
-          <StepDetails
-            currentStep={currentStep}
-            projectDetails={projectDetails}
-          />
-          <div className="flex justify-end mt-6">
-            <Button onClick={handleSubmit(onSubmit)}>
-              Soumettre le Projet
-            </Button>
-          </div>
-        </div>
-      ) : (
-        // Render standard step layout
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+      <div className="grid gap-8 md:grid-cols-3">
+        <div className="rounded-lg md:col-span-2">
+          <div className="space-y-4">
             {renderCurrentStep()}
-            <div className="flex flex-col justify-between mt-6 space-y-2 lg:flex-row lg:space-y-0">
+            <div className="flex justify-between mt-4">
               <Button
-                variant="outline"
                 onClick={handlePreviousStep}
+                variant="outline"
                 disabled={currentStep === 0}
               >
                 Retour
               </Button>
-              <div className="flex flex-col space-y-2 lg:flex-row lg:space-y-0 lg:space-x-2">
-                <Button variant="outline">Annuler</Button>
-                <Button
-                  onClick={
-                    currentStep === steps.length - 1
-                      ? handleSubmit(onSubmit)
-                      : handleNextStep
-                  }
-                >
-                  {currentStep === steps.length - 1
-                    ? "Soumettre"
-                    : "Enregistrer & Continuer"}
-                </Button>
-              </div>
+              <Button
+                onClick={
+                  currentStep === steps.length - 1
+                    ? handleSubmit(onSubmit)
+                    : handleNextStep
+                }
+              >
+                {currentStep === steps.length - 1
+                  ? "Soumettre le Projet"
+                  : "Enregistrer & Continuer"}
+              </Button>
             </div>
           </div>
-          <div className="lg:col-span-1">
-            <StepDetails
-              currentStep={currentStep}
-              projectDetails={projectDetails}
-            />
-          </div>
         </div>
-      )}
+
+        {/* Sidebar */}
+        <div className="rounded-lg ">
+          <StepDetails
+            currentStep={currentStep}
+            projectDetails={projectDetails}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,34 +2,49 @@
 import prisma from "@/lib/prismaClient";
 import { createClient } from "@/lib/supabase/server";
 import { Decimal } from "@prisma/client/runtime/library";
+
 interface ProjectData {
   title: string;
   description: string;
-  minBudget: Decimal;
-  maxBudget: Decimal;
-  proposedPrice: Decimal;
+  minBudget: string;
+  maxBudget: string;
+  timeline: string;
+  experienceLevel: string;
+  sprints: { title: string; description: string }[];
+  medias: { url: string; type: string }[];
+  requirements: { title: string; detail: string }[];
+  skills: { value: string }[];
 }
 
 export async function createProjectAction(data: ProjectData) {
   try {
+    // Vérifiez que les champs de budget sont définis
+
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
     if (error || !user.user?.email) {
       console.log("Erreur lors de la récupération de l'utilisateur:", error);
       return null;
     }
-
+    const min = new Decimal(data.minBudget) || 0;
+    const max = new Decimal(data.maxBudget) || 0;
     const userId = user.user.id;
     const project = await prisma.projects.create({
       data: {
         title: data.title,
         description: data.description,
-        minBudget: new Decimal(data.minBudget),
-        maxBudget: new Decimal(data.maxBudget),
-        proposedPrice: new Decimal(data.proposedPrice),
+        minBudget: min,
+        maxBudget: max,
+        // On suppose que le prix proposé est égal à maxBudget
+        proposedPrice: new Decimal(data.maxBudget),
         creator: {
           connect: { id: userId },
         },
+        // Stocker les objets structurés sous forme de JSON
+        sprints: data.sprints,
+        medias: data.medias,
+        requirements: data.requirements,
+        skills: data.skills,
       },
     });
     return project;
@@ -68,7 +83,7 @@ interface SearchUserParams {
   term: string; // The search term, which can be part of email or username
 }
 
-export async function searchUserAction({ term }: SearchUserParams) {
+export async function searchUserAction({ term }: { term: string }) {
   try {
     const users = await prisma.authUser.findMany({
       where: {
@@ -76,6 +91,20 @@ export async function searchUserAction({ term }: SearchUserParams) {
           { email: { contains: term, mode: "insensitive" } },
           { username: { contains: term, mode: "insensitive" } },
         ],
+        profile: {
+          OR: [{ buyer: { isNot: null } }, { seller: { isNot: null } }],
+        },
+      },
+      include: {
+        profile: {
+          select: {
+            buyer: true, // Inclut le profil 'Buyer'
+            seller: true,
+            firstName: true,
+            lastName: true,
+            profilePic: true, // Inclut le profil 'Seller'
+          },
+        },
       },
     });
 
@@ -125,5 +154,112 @@ export async function sendParticipationRequestAction({
   } catch (error) {
     console.error("Error sending participation request:", error);
     throw new Error("Failed to send participation request");
+  }
+}
+
+// Importez Prisma client
+
+// Fonction pour obtenir les projets d'un créateur spécifique
+export async function getMyProjects() {
+  try {
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return null;
+    }
+
+    const userId = user.user.id;
+    const projects = await prisma.projects.findMany({
+      where: {
+        creatorId: userId, // Filtre par ID du créateur
+      },
+
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return projects;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des projets :", error);
+    throw new Error("Impossible de récupérer les projets");
+  }
+}
+
+export async function getProject(id?: string) {
+  try {
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return null;
+    }
+
+    const creatorId = user.user.id;
+    // Si un ID spécifique est fourni, retourne uniquement ce projet
+    if (id) {
+      const project = await prisma.projects.findUnique({
+        where: { id },
+        include: {
+          participantRequests: {
+            include: {
+              requester: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
+          participants: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      });
+      return project || null;
+    }
+
+    // Si un creatorId est fourni sans id, retourne tous les projets créés par cet utilisateur
+    if (creatorId) {
+      const projects = await prisma.projects.findMany({
+        where: { creatorId },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          minBudget: true,
+          maxBudget: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      return projects.length ? projects : null;
+    }
+
+    // Si aucun id ni creatorId n'est fourni, retourne null
+    return null;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des projets :", error);
+    throw new Error("Impossible de récupérer les projets.");
+  }
+}
+
+// server.actions/request.actions.ts
+
+export async function cancelRequest(requestId: string) {
+  try {
+    await prisma.projectParticipantRequest.update({
+      where: { id: requestId },
+      data: { status: "CANCELLED" },
+    });
+  } catch (error) {
+    console.error("Erreur lors de l'annulation de la demande :", error);
+    throw new Error("Impossible d'annuler la demande de participation.");
   }
 }
