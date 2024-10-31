@@ -142,33 +142,6 @@ export default function AssignUserPage({ params }: AssignUserPageProps) {
         </span>
       </div>
 
-      {/* Liste des utilisateurs trouvés */}
-      {users.length > 0 && (
-        <div className="p-3 space-y-3 overflow-y-auto border rounded-lg shadow max-h-64">
-          {users.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => setSelectedUser(user)}
-              className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-200 ${
-                selectedUser?.id === user.id
-                  ? "bg-foreground/10 border"
-                  : "hover:bg-foreground/5"
-              }`}
-            >
-              <img
-                src={user.avatarUrl}
-                alt={user.username}
-                className="w-10 h-10 mr-3 rounded-full "
-              />
-              <div>
-                <p className="font-medium">@ {user.username}</p>
-                <p className="text-sm ">{user.status}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* Section d'aperçu de l'utilisateur sélectionné */}
       {selectedUser && (
         <div className="w-full p-5 border rounded-lg shadow">
@@ -203,6 +176,32 @@ export default function AssignUserPage({ params }: AssignUserPageProps) {
               Sélectionnez un utilisateur pour afficher son aperçu.
             </p>
           )}
+        </div>
+      )}
+      {/* Liste des utilisateurs trouvés */}
+      {users.length > 0 && (
+        <div className="p-3 space-y-3 overflow-y-auto border rounded-lg shadow max-h-64">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              onClick={() => setSelectedUser(user)}
+              className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-200 ${
+                selectedUser?.id === user.id
+                  ? "bg-foreground/10 border"
+                  : "hover:bg-foreground/5"
+              }`}
+            >
+              <img
+                src={user.avatarUrl}
+                alt={user.username}
+                className="w-10 h-10 mr-3 rounded-full "
+              />
+              <div>
+                <p className="font-medium">@ {user.username}</p>
+                <p className="text-sm ">{user.status}</p>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

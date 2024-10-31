@@ -1,4 +1,4 @@
-import ProjectDetailsPage from "@/app/pages/projects/project";
+import ProjectDetailsPage from "@/app/pages/projects/ProjectDetails";
 import { getProject } from "@/server.actions/project/projects.actions";
 import { notFound } from "next/navigation";
 
