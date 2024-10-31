@@ -16,6 +16,7 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Package,
   Settings,
   UserCog,
 } from "lucide-react";
@@ -89,7 +90,7 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
             <>
               <DropdownMenuItem asChild>
                 <Link href={`/${username}`} className="flex items-center">
-                  <BriefcaseBusiness className="w-5 h-5 mr-2" />
+                  <BriefcaseBusiness className="w-4 h-4 mr-2" />
                   <span>Détails Professionnels</span>
                 </Link>
               </DropdownMenuItem>
@@ -112,7 +113,13 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
               <DropdownMenuSeparator />
             </>
           )}
-
+          <DropdownMenuItem asChild>
+            <Link href="/projects/myprojects" className="flex items-center">
+              <Package className="w-4 h-4 mr-2" />
+              <span>Gestion des projets</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/settings" className="flex items-center">
               <Settings className="w-4 h-4 mr-2" />
@@ -140,6 +147,7 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+
           <form action={signOutAction}>
             <DropdownMenuItem asChild>
               <button type="submit" className="flex items-center w-full">
