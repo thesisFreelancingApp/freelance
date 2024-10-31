@@ -116,7 +116,7 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
           <DropdownMenuItem asChild>
             <Link href="/projects/myprojects" className="flex items-center">
               <Package className="w-4 h-4 mr-2" />
-              <span>Mes Projets</span>
+              <span>Gestion des projets</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

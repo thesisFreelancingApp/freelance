@@ -1,4 +1,5 @@
 import ProjectDetailsPage from "@/app/pages/projects/ProjectDetails";
+import { getUserId } from "@/server.actions/auth/auth.actions";
 import { getProject } from "@/server.actions/project/projects.actions";
 import { notFound } from "next/navigation";
 
@@ -6,14 +7,20 @@ interface ProjectPageProps {
   params: { id: string };
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { id } = params;
+export default async function ProjectPage({
+  params: { id },
+}: ProjectPageProps) {
+  const [project, currentUser] = await Promise.all([
+    getProject(id),
+    getUserId(),
+  ]);
 
-  const project = await getProject(id);
+  if (!project) return notFound();
 
-  if (!project) {
-    return notFound();
-  }
-
-  return <ProjectDetailsPage project={project} />;
+  return (
+    <ProjectDetailsPage
+      project={project}
+      currentUserId={currentUser?.userId || null}
+    />
+  );
 }

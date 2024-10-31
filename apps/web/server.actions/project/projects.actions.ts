@@ -160,7 +160,7 @@ export async function sendParticipationRequestAction({
 // Importez Prisma client
 
 // Fonction pour obtenir les projets d'un créateur spécifique
-export async function getMyProjects() {
+export async function getMyProjectsCreated() {
   try {
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
@@ -261,5 +261,69 @@ export async function cancelRequest(requestId: string) {
   } catch (error) {
     console.error("Erreur lors de l'annulation de la demande :", error);
     throw new Error("Impossible d'annuler la demande de participation.");
+  }
+}
+
+export async function getMyParticipatedProjects() {
+  try {
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return null;
+    }
+
+    const userId = user.user.id;
+    const participatedProjects = await prisma.projects.findMany({
+      where: {
+        creatorId: {
+          not: userId, // Exclure les projets dont l'utilisateur est le créateur
+        },
+        participants: {
+          some: {
+            id: userId, // Inclure seulement les projets où l'utilisateur est un participant
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return participatedProjects;
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des projets auxquels l'utilisateur participe :",
+      error,
+    );
+    throw new Error(
+      "Impossible de récupérer les projets auxquels l'utilisateur participe",
+    );
+  }
+}
+// Exemple d'action pour récupérer les invitations de projets
+export async function getMyProjectInvitations() {
+  try {
+    const supabase = createClient();
+    const { data: user, error } = await supabase.auth.getUser();
+    if (error || !user.user?.email) {
+      console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      return null;
+    }
+
+    const userId = user.user.id;
+    const invitations = await prisma.projectParticipantRequest.findMany({
+      where: {
+        requesterId: userId,
+        status: "PENDING", // Invitation en attente
+      },
+      include: {
+        project: true, // Inclut les détails du projet dans l'invitation
+      },
+    });
+
+    return invitations;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des invitations :", error);
+    throw new Error("Impossible de récupérer les invitations");
   }
 }

@@ -1,8 +1,20 @@
 import ProjectManagementPage from "@/app/pages/projects/MyProjects";
-import { getMyProjects } from "@/server.actions/project/projects.actions";
+import {
+  getMyProjectsCreated,
+  getMyParticipatedProjects,
+  getMyProjectInvitations,
+} from "@/server.actions/project/projects.actions";
 
 export default async function ProjectsPage() {
-  const projects = await getMyProjects();
+  const createdProjects = await getMyProjectsCreated();
+  const participatedProjects = await getMyParticipatedProjects();
+  const projectInvitations = await getMyProjectInvitations();
 
-  return <ProjectManagementPage projects={projects ?? []} />;
+  return (
+    <ProjectManagementPage
+      createdProjects={createdProjects ?? []}
+      participatedProjects={participatedProjects ?? []}
+      projectInvitations={projectInvitations ?? []}
+    />
+  );
 }

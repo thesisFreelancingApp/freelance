@@ -13,12 +13,7 @@ import {
 import { ChevronLeft, ClockArrowUp, Search, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, useCallback, useRef, useState } from "react";
-
-interface MediaItem {
-  url: string;
-  type: "image" | "video";
-}
+import { useCallback, useRef, useState } from "react";
 
 interface Project {
   id: string;
@@ -28,6 +23,7 @@ interface Project {
   maxBudget: string | null;
   createdAt: Date;
   updatedAt: Date;
+  createdBy: string;
   requirements: { title: string; detail: string }[];
   skills: { value: string }[];
   sprints: { title: string; description: string }[];
@@ -42,31 +38,54 @@ interface Project {
     requester: { firstName: string; lastName: string; email: string };
     status: string;
   }[];
-  medias: MediaItem[];
+  medias: { url: string; type: "image" | "video" }[];
 }
 
 interface User {
-  profile: any;
+  profile: {
+    firstName: string | null;
+    lastName: string | null;
+    profilePic: string | null;
+    seller?: any;
+    buyer?: any;
+  } | null;
   id: string;
   username: string;
   email: string;
-  status: string;
+  status?: string;
   avatarUrl?: string;
 }
 
-export default function ProjectDetailsPage({ project }: { project: Project }) {
+interface State {
+  searchTerm: string;
+  users: User[];
+  selectedUser: User | null;
+  isRequesting: boolean;
+}
+
+export default function ProjectDetailsPage({
+  project,
+  currentUserId,
+}: {
+  project: Project;
+  currentUserId: string;
+}) {
   const router = useRouter();
   const { toast } = useToast();
+  const [state, setState] = useState<State>({
+    searchTerm: "",
+    users: [],
+    selectedUser: null,
+    isRequesting: false,
+  });
   const [pendingRequests, setPendingRequests] = useState(
     project.participantRequests.filter(
       (request) => request.status === "PENDING",
     ),
   );
-  const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isRequesting, setIsRequesting] = useState(false);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const isCreator = project.createdBy === currentUserId;
 
   const handleCancelRequest = async (requestId: string) => {
     try {
@@ -74,35 +93,36 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
       setPendingRequests((prev) =>
         prev.filter((request) => request.id !== requestId),
       );
-      toast({
-        title: "Demande annulée",
-        description: "La demande de participation a été annulée avec succès.",
-      });
-    } catch (error) {
-      console.error("Erreur lors de l'annulation de la demande :", error);
+      toast({ title: "Demande annulée", description: "Annulation réussie." });
+    } catch {
       toast({
         title: "Erreur",
-        description: "Impossible d'annuler la demande. Veuillez réessayer.",
+        description: "Impossible d'annuler.",
         variant: "destructive",
       });
     }
   };
 
   const handleSearchTermChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const term = e.target.value;
-      setSearchTerm(term);
-      setUsers([]);
-      setSelectedUser(null);
+      setState((prev) => ({
+        ...prev,
+        searchTerm: term,
+        users: [],
+        selectedUser: null,
+      }));
 
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
       debounceTimeout.current = setTimeout(async () => {
         if (term) {
           const foundUsers = await searchUserAction({ term });
-          setUsers(foundUsers);
+          const usersWithStatus = foundUsers.map((user) => ({
+            ...user,
+            status: user.status || "active",
+          }));
+          setState((prev) => ({ ...prev, users: usersWithStatus }));
         }
       }, 500);
     },
@@ -110,24 +130,22 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
   );
 
   const handleSendRequest = async () => {
-    if (!selectedUser) return;
+    if (!state.selectedUser) return;
 
-    setIsRequesting(true);
+    setState((prev) => ({ ...prev, isRequesting: true }));
     try {
       await sendParticipationRequestAction({
-        userId: selectedUser.id,
+        userId: state.selectedUser.id,
         projectId: project.id,
       });
-
-      // Ajout de la nouvelle demande à l'état des demandes en attente
       setPendingRequests((prev) => [
         ...prev,
         {
-          id: `${Date.now()}`, // Id temporaire unique
+          id: `${Date.now()}`,
           requester: {
-            firstName: selectedUser.profile.firstName,
-            lastName: selectedUser.profile.lastName,
-            email: selectedUser.email,
+            firstName: state.selectedUser?.profile?.firstName || "",
+            lastName: state.selectedUser?.profile?.lastName || "",
+            email: state.selectedUser?.email || "",
           },
           status: "PENDING",
         },
@@ -135,30 +153,29 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
 
       toast({
         title: "Demande envoyée",
-        description: `Une demande a été envoyée à ${selectedUser.username}.`,
+        description: `Envoyée à ${state.selectedUser.username}.`,
       });
-      setSearchTerm("");
-      setSelectedUser(null);
-      setUsers([]);
-    } catch (error) {
-      console.error(
-        "Erreur lors de l'envoi de la demande de participation :",
-        error,
-      );
+      setState((prev) => ({
+        ...prev,
+        searchTerm: "",
+        selectedUser: null,
+        users: [],
+      }));
+    } catch {
       toast({
         title: "Erreur",
-        description: "La demande de participation n'a pas pu être envoyée.",
+        description: "Échec de l'envoi.",
         variant: "destructive",
       });
     } finally {
-      setIsRequesting(false);
+      setState((prev) => ({ ...prev, isRequesting: false }));
     }
   };
 
   return (
     <div className="container p-6 mx-auto space-y-6">
       <Button
-        onClick={() => router.back()}
+        onClick={() => router.push(`/projects/myprojects`)}
         variant="outline"
         size="sm"
         className="mb-4"
@@ -168,6 +185,7 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
       </Button>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {/* Détails du projet */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>{project.title}</CardTitle>
@@ -185,7 +203,6 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
                 Créé le: {new Date(project.createdAt).toLocaleDateString()}
               </span>
             </div>
-
             {project.sprints.length > 0 && (
               <ProjectSection title="Sprints" items={project.sprints} />
             )}
@@ -233,101 +250,22 @@ export default function ProjectDetailsPage({ project }: { project: Project }) {
           </CardContent>
         </Card>
 
+        {/* Section d'invitation si créateur, liste des participants sinon */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inviter des Utilisateurs</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="search">Rechercher des utilisateurs</Label>
-                  <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="search"
-                      placeholder="Email ou nom d'utilisateur"
-                      value={searchTerm}
-                      onChange={handleSearchTermChange}
-                      className="pl-8"
-                    />
-                  </div>
-                </div>
-                {users.length > 0 && (
-                  <ul className="space-y-2">
-                    {users.map((user) => (
-                      <div
-                        key={user.id}
-                        onClick={() => setSelectedUser(user)}
-                        className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-200 ${
-                          selectedUser?.id === user.id
-                            ? "bg-foreground/10 border"
-                            : "hover:bg-foreground/5"
-                        }`}
-                      >
-                        <img
-                          src={user.profile.profilePic}
-                          alt={user.username}
-                          className="w-10 h-10 mr-3 rounded-full "
-                        />
-                        <div>
-                          <p className="font-medium">@ {user.username}</p>
-                          <p className="text-sm ">{user.status}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </ul>
-                )}
-                {selectedUser && (
-                  <Button
-                    onClick={handleSendRequest}
-                    disabled={isRequesting}
-                    className="w-full"
-                  >
-                    {isRequesting ? "Envoi en cours..." : "Envoyer une demande"}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Demandes en Attente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {pendingRequests.length > 0 ? (
-                <ul className="space-y-2">
-                  {pendingRequests.map((request) => (
-                    <li
-                      key={request.id}
-                      className="flex items-center justify-between p-2 border rounded-md bg-background "
-                    >
-                      <div className="flex items-center space-x-2">
-                        <ClockArrowUp className="ml-2 size-4 text-primary" />
-                        <span className="text-sm font-bold">
-                          {request.requester.firstName}{" "}
-                          {request.requester.lastName}
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleCancelRequest(request.id)}
-                      >
-                        <X className="w-4 h-4" />
-                        <span className="sr-only">Annuler la demande</span>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Aucune demande en attente.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          {isCreator ? (
+            <CreatorSection
+              state={state}
+              pendingRequests={pendingRequests}
+              onSearchChange={handleSearchTermChange}
+              onSelectUser={(user: User) =>
+                setState((prev) => ({ ...prev, selectedUser: user }))
+              }
+              onCancelRequest={handleCancelRequest}
+              onSendRequest={handleSendRequest}
+            />
+          ) : (
+            <ParticipantList participants={project.participants} />
+          )}
         </div>
       </div>
     </div>
@@ -361,5 +299,160 @@ function ProjectSection({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function ParticipantList({
+  participants,
+}: {
+  participants: Project["participants"];
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Participants</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {participants.length > 0 ? (
+          <ul className="space-y-2">
+            {participants.map((participant) => (
+              <li
+                key={participant.id}
+                className="flex items-center p-2 space-x-3 rounded-md bg-foreground/5"
+              >
+                <Image
+                  src="/default-avatar.png"
+                  alt={participant.firstName}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+                <div>
+                  <p className="text-sm font-medium">
+                    {participant.firstName} {participant.lastName}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {participant.email}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Aucun participant inscrit.
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CreatorSection({
+  state,
+  pendingRequests,
+  onSearchChange,
+  onSelectUser,
+  onCancelRequest,
+  onSendRequest,
+}: {
+  state: State;
+  pendingRequests: Project["participantRequests"];
+  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelectUser: (user: User) => void;
+  onCancelRequest: (requestId: string) => void;
+  onSendRequest: () => void;
+}) {
+  const { searchTerm, users, selectedUser, isRequesting } = state;
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Inviter des Utilisateurs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Label htmlFor="search">Rechercher des utilisateurs</Label>
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="search"
+                placeholder="Email ou nom d'utilisateur"
+                value={searchTerm}
+                onChange={onSearchChange}
+                className="pl-8"
+              />
+            </div>
+            {users.length > 0 && (
+              <ul className="space-y-2">
+                {users.map((user) => (
+                  <div
+                    key={user.id}
+                    onClick={() => onSelectUser(user)}
+                    className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-200 ${selectedUser?.id === user.id ? "bg-foreground/10 border" : "hover:bg-foreground/5"}`}
+                  >
+                    <img
+                      src={user.profile?.profilePic || "/default-avatar.png"}
+                      alt={user.username}
+                      className="w-10 h-10 mr-3 rounded-full"
+                    />
+                    <div>
+                      <p className="font-medium">@ {user.username}</p>
+                      <p className="text-sm ">{user.status}</p>
+                    </div>
+                  </div>
+                ))}
+              </ul>
+            )}
+            {selectedUser && (
+              <Button
+                onClick={onSendRequest}
+                disabled={isRequesting}
+                className="w-full"
+              >
+                {isRequesting ? "Envoi en cours..." : "Envoyer une demande"}
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Demandes en Attente</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {pendingRequests.length > 0 ? (
+            <ul className="space-y-2">
+              {pendingRequests.map((request) => (
+                <li
+                  key={request.id}
+                  className="flex items-center justify-between p-2 border rounded-md bg-background"
+                >
+                  <div className="flex items-center space-x-2">
+                    <ClockArrowUp className="ml-2 size-4 text-primary" />
+                    <span className="text-sm font-bold">
+                      {request.requester.firstName} {request.requester.lastName}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onCancelRequest(request.id)}
+                  >
+                    <X className="w-4 h-4" />
+                    <span className="sr-only">Annuler la demande</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aucune demande en attente.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }
