@@ -17,43 +17,47 @@ export default function TrustIndicators() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-24 bg-gradient-to-b from-background to-muted/20">
       <div className="container px-4 mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           viewport={{ once: true }}
-          className="text-center mb-10"
+          className="text-center mb-16"
         >
-          <h2 className="text-2xl font-semibold mb-2">
-            Ils nous font confiance
-          </h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-3xl font-bold mb-4">Ils nous font confiance</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Des partenaires de confiance qui soutiennent notre vision
           </p>
         </motion.div>
 
-        <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
           {partners.map((partner, index) => (
             <motion.div
               key={partner.name}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative w-[160px] h-[60px] flex items-center justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.2,
+                ease: "easeOut",
+              }}
+              viewport={{ once: true }}
+              className="group relative h-24 flex items-center justify-center"
             >
-              <Image
-                src={partner.logo}
-                alt={partner.name}
-                fill
-                className="object-contain filter grayscale opacity-60 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100"
-              />
+              <div className="relative w-[200px] h-full">
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  fill
+                  className="object-contain filter grayscale opacity-70 transition-all duration-500 
+                    group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                />
+              </div>
             </motion.div>
           ))}
         </div>

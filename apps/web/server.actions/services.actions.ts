@@ -504,3 +504,68 @@ export async function getFilteredServices({
     throw new Error("Failed to fetch services");
   }
 }
+
+// Add this function for search
+export async function searchServices(query: string) {
+  console.log(
+    "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh----------------",
+    query,
+  );
+
+  try {
+    const services = await prisma.service.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { description: { contains: query, mode: "insensitive" } },
+          { tags: { hasSome: [query] } },
+        ],
+      },
+      include: {
+        creator: {
+          include: {
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                profilePic: true,
+              },
+            },
+          },
+        },
+        ratings: true,
+        packages: true,
+        category: true,
+      },
+    });
+    console.log(services, "services");
+    // Format services
+    const formattedServices = services.map((service) => {
+      const avgRating =
+        service.ratings.length > 0
+          ? Number(
+              (
+                service.ratings.reduce((acc, curr) => acc + curr.rating, 0) /
+                service.ratings.length
+              ).toFixed(1),
+            )
+          : 0;
+
+      return {
+        ...service,
+        averageRating: avgRating,
+        lowestPrice: Math.min(
+          ...service.packages.map((p) => Number(p.price || 0)),
+        ),
+        fastestDelivery: Math.min(
+          ...service.packages.map((p) => Number(p.deliveryTime || 0)),
+        ),
+      };
+    });
+
+    return formattedServices;
+  } catch (error) {
+    console.error("Error searching services:", error);
+    throw new Error("Failed to search services");
+  }
+}

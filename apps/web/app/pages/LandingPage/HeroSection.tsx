@@ -184,14 +184,6 @@ export default function HeroSection() {
                 travailler avec des clients du monde entier tout en restant en
                 Tunisie."
               </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="gap-2 bg-white text-primary hover:bg-white/90"
-              >
-                <PlayCircle className="w-4 h-4" />
-                Voir son histoire
-              </Button>
             </div>
           </motion.div>
         </div>

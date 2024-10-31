@@ -7,7 +7,7 @@ const steps = [
   {
     title: "Créez votre profil",
     description: "Mettez en avant vos compétences et votre expérience",
-    image: "/how-it-works/profile.jpg",
+    image: "/how-it-works/profile.webp",
     features: [
       "Portfolio personnalisé",
       "Badges de compétences",
@@ -17,13 +17,13 @@ const steps = [
   {
     title: "Trouvez des projets",
     description: "Parcourez des opportunités adaptées à vos compétences",
-    image: "/how-it-works/projects.jpg",
+    image: "/how-it-works/projects.webp",
     features: ["Projets vérifiés", "Paiement sécurisé", "Support dédié"],
   },
   {
     title: "Commencez à travailler",
     description: "Collaborez efficacement et développez votre activité",
-    image: "/how-it-works/work.jpg",
+    image: "/how-it-works/work.webp",
     features: [
       "Outils de collaboration",
       "Suivi de projet",
