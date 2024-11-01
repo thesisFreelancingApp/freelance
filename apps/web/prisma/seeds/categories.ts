@@ -2,19 +2,38 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const allCategories = [
+// Update the interface for categories
+interface CategorySeed {
+  id: number;
+  name: string;
+  level: number;
+  description: string;
+  parent_id?: number;
+  imageUrl?: string;
+  iconUrl?: string;
+  slug?: string;
+}
+
+// Example of updated category data
+const allCategories: CategorySeed[] = [
   {
     id: 1,
     name: "Graphisme & Design",
     level: 1,
     description:
       "Services de conception graphique et de design pour divers besoins visuels.",
+    imageUrl: "/categories/design/banner.jpg",
+    iconUrl: "/categories/design/icon.svg",
+    slug: "graphisme-design",
   },
   {
     id: 2,
     name: "Programmation & Tech",
     level: 1,
     description: "Services de développement logiciel, web et technologique.",
+    imageUrl: "/categories/programming/banner.jpg",
+    iconUrl: "/categories/programming/icon.svg",
+    slug: "programmation-tech",
   },
   {
     id: 3,
@@ -22,6 +41,9 @@ const allCategories = [
     level: 1,
     description:
       "Stratégies et services de marketing en ligne pour promouvoir les entreprises.",
+    imageUrl: "/categories/marketing/banner.jpg",
+    iconUrl: "/categories/marketing/icon.svg",
+    slug: "marketing-digital",
   },
   {
     id: 4,
@@ -29,6 +51,9 @@ const allCategories = [
     level: 1,
     description:
       "Services de production vidéo et d'animation pour divers projets.",
+    imageUrl: "/categories/video/banner.jpg",
+    iconUrl: "/categories/video/icon.svg",
+    slug: "video-animation",
   },
   {
     id: 5,
@@ -36,6 +61,9 @@ const allCategories = [
     level: 1,
     description:
       "Services d'écriture, de rédaction et de traduction dans diverses langues.",
+    imageUrl: "/categories/writing/banner.jpg",
+    iconUrl: "/categories/writing/icon.svg",
+    slug: "redaction-traduction",
   },
   {
     id: 6,
@@ -43,12 +71,18 @@ const allCategories = [
     level: 1,
     description:
       "Services liés à la production musicale et au traitement audio.",
+    imageUrl: "/categories/music/banner.jpg",
+    iconUrl: "/categories/music/icon.svg",
+    slug: "musique-audio",
   },
   {
     id: 7,
     name: "Business",
     level: 1,
     description: "Services de conseil et de soutien aux entreprises.",
+    imageUrl: "/categories/business/banner.jpg",
+    iconUrl: "/categories/business/icon.svg",
+    slug: "business",
   },
   {
     id: 8,
@@ -56,6 +90,9 @@ const allCategories = [
     level: 1,
     description:
       "Services financiers et de comptabilité pour particuliers et entreprises.",
+    imageUrl: "/categories/finance/banner.jpg",
+    iconUrl: "/categories/finance/icon.svg",
+    slug: "finance",
   },
   {
     id: 9,
@@ -63,18 +100,27 @@ const allCategories = [
     level: 1,
     description:
       "Services utilisant l'intelligence artificielle pour diverses applications.",
+    imageUrl: "/categories/ai/banner.jpg",
+    iconUrl: "/categories/ai/icon.svg",
+    slug: "services-ia",
   },
   {
     id: 10,
     name: "Croissance personnelle",
     level: 1,
     description: "Services de développement personnel et de bien-être.",
+    imageUrl: "/categories/personal-growth/banner.jpg",
+    iconUrl: "/categories/personal-growth/icon.svg",
+    slug: "croissance-personnelle",
   },
   {
     id: 11,
     name: "Consultations",
     level: 1,
     description: "Services de conseil dans divers domaines d'expertise.",
+    imageUrl: "/categories/consulting/banner.jpg",
+    iconUrl: "/categories/consulting/icon.svg",
+    slug: "consultations",
   },
   {
     id: 12,
@@ -82,6 +128,9 @@ const allCategories = [
     level: 1,
     description:
       "Services de photographie professionnelle pour différents besoins.",
+    imageUrl: "/categories/photography/banner.jpg",
+    iconUrl: "/categories/photography/icon.svg",
+    slug: "photographie",
   },
 
   // Sous-catégories pour "Graphisme & Design"
@@ -91,6 +140,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Création de logos et d'identités visuelles pour les marques.",
+    imageUrl: "/categories/design/logo/banner.jpg",
+    iconUrl: "/categories/design/logo/icon.svg",
+    slug: "logo-identite-visuelle",
   },
   {
     id: 14,
@@ -98,6 +150,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Création d'œuvres d'art et d'illustrations personnalisées.",
+    imageUrl: "/categories/design/illustration/banner.jpg",
+    iconUrl: "/categories/design/illustration/icon.svg",
+    slug: "art-illustration",
   },
   {
     id: 15,
@@ -106,6 +161,9 @@ const allCategories = [
     parent_id: 1,
     description:
       "Conception d'interfaces pour sites web et applications mobiles.",
+    imageUrl: "/categories/design/web-mobile/banner.jpg",
+    iconUrl: "/categories/design/web-mobile/icon.svg",
+    slug: "webdesign-mobile-design",
   },
   {
     id: 16,
@@ -113,6 +171,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Design de produits et d'éléments pour les jeux vidéo.",
+    imageUrl: "/categories/design/gaming/banner.jpg",
+    iconUrl: "/categories/design/gaming/icon.svg",
+    slug: "produit-gaming",
   },
   {
     id: 17,
@@ -120,6 +181,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Conception de supports imprimés.",
+    imageUrl: "/categories/design/printing/banner.jpg",
+    iconUrl: "/categories/design/printing/icon.svg",
+    slug: "design-impression",
   },
   {
     id: 18,
@@ -127,6 +191,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Création de visuels pour divers supports.",
+    imageUrl: "/categories/design/visual/banner.jpg",
+    iconUrl: "/categories/design/visual/icon.svg",
+    slug: "design-visuel",
   },
   {
     id: 19,
@@ -134,6 +201,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Design de supports marketing.",
+    imageUrl: "/categories/design/marketing/banner.jpg",
+    iconUrl: "/categories/design/marketing/icon.svg",
+    slug: "conception-marketing",
   },
   {
     id: 20,
@@ -141,6 +211,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Conception d'emballages et de couvertures.",
+    imageUrl: "/categories/design/packaging/banner.jpg",
+    iconUrl: "/categories/design/packaging/icon.svg",
+    slug: "packaging-couvertures",
   },
   {
     id: 21,
@@ -148,6 +221,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Services de conception architecturale.",
+    imageUrl: "/categories/architecture/banner.jpg",
+    iconUrl: "/categories/architecture/icon.svg",
+    slug: "architecture-conception-batiments",
   },
   {
     id: 22,
@@ -155,6 +231,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Design de mode et d'objets promotionnels.",
+    imageUrl: "/categories/fashion/banner.jpg",
+    iconUrl: "/categories/fashion/icon.svg",
+    slug: "mode-goodies",
   },
   {
     id: 23,
@@ -162,6 +241,9 @@ const allCategories = [
     level: 2,
     parent_id: 1,
     description: "Conception en 3D pour divers projets.",
+    imageUrl: "/categories/design/3d/banner.jpg",
+    iconUrl: "/categories/design/3d/icon.svg",
+    slug: "3d-design",
   },
 
   // Sous-catégories pour "Programmation & Tech"
@@ -171,6 +253,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Création et développement de sites web.",
+    imageUrl: "/categories/programming/web-development/banner.jpg",
+    iconUrl: "/categories/programming/web-development/icon.svg",
+    slug: "developpement-sites-web",
   },
   {
     id: 25,
@@ -179,6 +264,9 @@ const allCategories = [
     parent_id: 2,
     description:
       "Développement de solutions basées sur l'intelligence artificielle.",
+    imageUrl: "/categories/programming/ai/banner.jpg",
+    iconUrl: "/categories/programming/ai/icon.svg",
+    slug: "developpement-ia",
   },
   {
     id: 26,
@@ -186,6 +274,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Création de chatbots intelligents.",
+    imageUrl: "/categories/programming/chatbots/banner.jpg",
+    iconUrl: "/categories/programming/chatbots/icon.svg",
+    slug: "developpement-chatbots",
   },
   {
     id: 27,
@@ -193,6 +284,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Création de jeux vidéo.",
+    imageUrl: "/categories/programming/games/banner.jpg",
+    iconUrl: "/categories/programming/games/icon.svg",
+    slug: "developpement-jeux",
   },
   {
     id: 28,
@@ -200,6 +294,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Création d'applications pour smartphones et tablettes.",
+    imageUrl: "/categories/programming/mobile-apps/banner.jpg",
+    iconUrl: "/categories/programming/mobile-apps/icon.svg",
+    slug: "developpement-applications-mobiles",
   },
   {
     id: 29,
@@ -208,6 +305,9 @@ const allCategories = [
     parent_id: 2,
     description:
       "Services liés au cloud computing et à la sécurité informatique.",
+    imageUrl: "/categories/programming/cloud-security/banner.jpg",
+    iconUrl: "/categories/programming/cloud-security/icon.svg",
+    slug: "cloud-cybersécurité",
   },
   {
     id: 30,
@@ -215,6 +315,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Services de data science et de machine learning.",
+    imageUrl: "/categories/programming/data-science/banner.jpg",
+    iconUrl: "/categories/programming/data-science/icon.svg",
+    slug: "data-science-ml",
   },
   {
     id: 31,
@@ -222,6 +325,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Création de logiciels sur mesure.",
+    imageUrl: "/categories/programming/custom-software/banner.jpg",
+    iconUrl: "/categories/programming/custom-software/icon.svg",
+    slug: "developpement-logiciels",
   },
   {
     id: 32,
@@ -229,6 +335,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Développement lié à la blockchain et aux cryptomonnaies.",
+    imageUrl: "/categories/programming/blockchain/banner.jpg",
+    iconUrl: "/categories/programming/blockchain/icon.svg",
+    slug: "blockchain-cryptomonnaies",
   },
   {
     id: 33,
@@ -236,6 +345,9 @@ const allCategories = [
     level: 2,
     parent_id: 2,
     description: "Autres services de programmation et technologie.",
+    imageUrl: "/categories/programming/other/banner.jpg",
+    iconUrl: "/categories/programming/other/icon.svg",
+    slug: "divers-programmation-tech",
   },
 
   // Sous-catégories pour "Marketing digital"
@@ -245,6 +357,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Optimisation pour les moteurs de recherche.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "referencement",
   },
   {
     id: 35,
@@ -252,6 +367,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Gestion et stratégie sur les réseaux sociaux.",
+    imageUrl: "/categories/marketing/social-media/banner.jpg",
+    iconUrl: "/categories/marketing/social-media/icon.svg",
+    slug: "gestion-reseaux-sociaux",
   },
   {
     id: 36,
@@ -259,6 +377,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Diverses méthodes et techniques de marketing digital.",
+    imageUrl: "/categories/marketing/digital-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/digital-marketing/icon.svg",
+    slug: "methodes-techniques-marketing-digital",
   },
   {
     id: 37,
@@ -266,6 +387,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Analyse de données et élaboration de stratégies marketing.",
+    imageUrl: "/categories/marketing/marketing-strategy/banner.jpg",
+    iconUrl: "/categories/marketing/marketing-strategy/icon.svg",
+    slug: "analyses-strategie-marketing",
   },
   {
     id: 38,
@@ -273,6 +397,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Marketing spécifique à certaines plateformes.",
+    imageUrl: "/categories/marketing/channel-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/channel-marketing/icon.svg",
+    slug: "marketing-spécifique-chaine",
   },
   {
     id: 39,
@@ -280,6 +407,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Marketing adapté à des secteurs ou objectifs particuliers.",
+    imageUrl: "/categories/marketing/targeted-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/targeted-marketing/icon.svg",
+    slug: "marketing-spécifique-secteur-objectif",
   },
   {
     id: 40,
@@ -287,6 +417,9 @@ const allCategories = [
     level: 2,
     parent_id: 3,
     description: "Autres services de marketing digital.",
+    imageUrl: "/categories/marketing/other/banner.jpg",
+    iconUrl: "/categories/marketing/other/icon.svg",
+    slug: "divers-marketing-digital",
   },
 
   // Sous-catégories pour "Vidéo & Animation"
@@ -296,6 +429,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Services d'édition et de post-production vidéo.",
+    imageUrl: "/categories/video/video-editing/banner.jpg",
+    iconUrl: "/categories/video/video-editing/icon.svg",
+    slug: "edition-post-production-video",
   },
   {
     id: 42,
@@ -303,6 +439,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Création d'animations pour divers projets.",
+    imageUrl: "/categories/video/animation/banner.jpg",
+    iconUrl: "/categories/video/animation/icon.svg",
+    slug: "animation",
   },
   {
     id: 43,
@@ -310,6 +449,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Services de production vidéo.",
+    imageUrl: "/categories/video/audio-visual-production/banner.jpg",
+    iconUrl: "/categories/video/audio-visual-production/icon.svg",
+    slug: "production-audiovisuelle",
   },
   {
     id: 44,
@@ -317,6 +459,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Création de vidéos explicatives et pédagogiques.",
+    imageUrl: "/categories/video/explanatory-videos/banner.jpg",
+    iconUrl: "/categories/video/explanatory-videos/icon.svg",
+    slug: "videos-explicatives",
   },
   {
     id: 45,
@@ -324,6 +469,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Création de vidéos utilisant l'intelligence artificielle.",
+    imageUrl: "/categories/video/ai-generated-videos/banner.jpg",
+    iconUrl: "/categories/video/ai-generated-videos/icon.svg",
+    slug: "video-ai",
   },
   {
     id: 46,
@@ -331,6 +479,9 @@ const allCategories = [
     level: 2,
     parent_id: 4,
     description: "Autres services liés à la vidéo et à l'animation.",
+    imageUrl: "/categories/video/other/banner.jpg",
+    iconUrl: "/categories/video/other/icon.svg",
+    slug: "divers-video-animation",
   },
 
   // Sous-catégories pour "Rédaction & Traduction"
@@ -340,6 +491,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Services de rédaction de contenu divers.",
+    imageUrl: "/categories/writing/content-creation/banner.jpg",
+    iconUrl: "/categories/writing/content-creation/icon.svg",
+    slug: "redaction-contenu",
   },
   {
     id: 48,
@@ -347,6 +501,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Services de relecture et de feedback sur les textes.",
+    imageUrl: "/categories/writing/proofreading/banner.jpg",
+    iconUrl: "/categories/writing/proofreading/icon.svg",
+    slug: "revision-feedback",
   },
   {
     id: 49,
@@ -354,6 +511,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Services liés à la publication de livres et d'ebooks.",
+    imageUrl: "/categories/writing/publishing/banner.jpg",
+    iconUrl: "/categories/writing/publishing/icon.svg",
+    slug: "publication-livres-ebooks",
   },
   {
     id: 50,
@@ -361,6 +521,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Services de rédaction pour le personal branding.",
+    imageUrl: "/categories/writing/personal-branding/banner.jpg",
+    iconUrl: "/categories/writing/personal-branding/icon.svg",
+    slug: "personal-branding",
   },
   {
     id: 51,
@@ -368,6 +531,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Autres services de rédaction et traduction.",
+    imageUrl: "/categories/writing/other/banner.jpg",
+    iconUrl: "/categories/writing/other/icon.svg",
+    slug: "divers-redaction-traduction",
   },
   {
     id: 52,
@@ -375,6 +541,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Rédaction de contenu orienté ventes et marketing.",
+    imageUrl: "/categories/writing/sales-marketing/banner.jpg",
+    iconUrl: "/categories/writing/sales-marketing/icon.svg",
+    slug: "redaction-contenu-ventes-marketing",
   },
   {
     id: 53,
@@ -382,6 +551,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Services de traduction et de transcription.",
+    imageUrl: "/categories/writing/translation/banner.jpg",
+    iconUrl: "/categories/writing/translation/icon.svg",
+    slug: "traduction-transcription",
   },
   {
     id: 54,
@@ -389,6 +561,9 @@ const allCategories = [
     level: 2,
     parent_id: 5,
     description: "Rédaction de contenu spécialisé pour différentes industries.",
+    imageUrl: "/categories/writing/industry-specific/banner.jpg",
+    iconUrl: "/categories/writing/industry-specific/icon.svg",
+    slug: "contenu-specialise-industrie",
   },
 
   // Sous-catégories pour "Musique & Audio"
@@ -398,6 +573,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Services de production et de composition musicale.",
+    imageUrl: "/categories/music/music-production/banner.jpg",
+    iconUrl: "/categories/music/music-production/icon.svg",
+    slug: "production-composition-musicale",
   },
   {
     id: 56,
@@ -405,6 +583,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Services d'ingénierie audio et de post-production sonore.",
+    imageUrl: "/categories/music/audio-engineering/banner.jpg",
+    iconUrl: "/categories/music/audio-engineering/icon.svg",
+    slug: "ingenierie-audio-post-production",
   },
   {
     id: 57,
@@ -412,6 +593,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Services de voix off et de narration.",
+    imageUrl: "/categories/music/voice-over/banner.jpg",
+    iconUrl: "/categories/music/voice-over/icon.svg",
+    slug: "voix-off-narration",
   },
   {
     id: 58,
@@ -419,6 +603,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Services liés au streaming audio.",
+    imageUrl: "/categories/music/streaming-audio/banner.jpg",
+    iconUrl: "/categories/music/streaming-audio/icon.svg",
+    slug: "streaming-audio",
   },
   {
     id: 59,
@@ -426,6 +613,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Services de DJ.",
+    imageUrl: "/categories/music/djing/banner.jpg",
+    iconUrl: "/categories/music/djing/icon.svg",
+    slug: "djing",
   },
   {
     id: 60,
@@ -433,6 +623,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Création de design sonore.",
+    imageUrl: "/categories/music/sound-design/banner.jpg",
+    iconUrl: "/categories/music/sound-design/icon.svg",
+    slug: "sound-design",
   },
   {
     id: 61,
@@ -440,6 +633,9 @@ const allCategories = [
     level: 2,
     parent_id: 6,
     description: "Cours de musique et services de transcription musicale.",
+    imageUrl: "/categories/music/music-theory/banner.jpg",
+    iconUrl: "/categories/music/music-theory/icon.svg",
+    slug: "cours-transcriptions",
   },
 
   // Sous-catégories pour "Business"
@@ -449,6 +645,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services de gestion et de conseil aux entreprises.",
+    imageUrl: "/categories/business/business-management/banner.jpg",
+    iconUrl: "/categories/business/business-management/icon.svg",
+    slug: "gestion-entreprises",
   },
   {
     id: 63,
@@ -456,6 +655,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Applications de l'IA dans le monde des affaires.",
+    imageUrl: "/categories/ai/ai-in-business/banner.jpg",
+    iconUrl: "/categories/ai/ai-in-business/icon.svg",
+    slug: "ia-pour-entreprises",
   },
   {
     id: 64,
@@ -463,6 +665,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services juridiques pour les entreprises.",
+    imageUrl: "/categories/legal/legal-services/banner.jpg",
+    iconUrl: "/categories/legal/legal-services/icon.svg",
+    slug: "services-juridiques",
   },
   {
     id: 65,
@@ -470,6 +675,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services de gestion pour le commerce électronique.",
+    imageUrl: "/categories/business/e-commerce/banner.jpg",
+    iconUrl: "/categories/business/e-commerce/icon.svg",
+    slug: "gestion-e-commerce",
   },
   {
     id: 66,
@@ -477,6 +685,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services d'analyse de données et de veille économique.",
+    imageUrl: "/categories/business/data-analysis/banner.jpg",
+    iconUrl: "/categories/business/data-analysis/icon.svg",
+    slug: "data-veille-economique",
   },
   {
     id: 67,
@@ -484,6 +695,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services liés aux ventes et au service client.",
+    imageUrl: "/categories/business/customer-service/banner.jpg",
+    iconUrl: "/categories/business/customer-service/icon.svg",
+    slug: "ventes-service-client",
   },
   {
     id: 68,
@@ -491,6 +705,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Services administratifs généraux.",
+    imageUrl: "/categories/business/general-administration/banner.jpg",
+    iconUrl: "/categories/business/general-administration/icon.svg",
+    slug: "general-administratif",
   },
   {
     id: 69,
@@ -498,6 +715,9 @@ const allCategories = [
     level: 2,
     parent_id: 7,
     description: "Autres services liés au business.",
+    imageUrl: "/categories/business/other/banner.jpg",
+    iconUrl: "/categories/business/other/icon.svg",
+    slug: "divers-business",
   },
 
   // Sous-catégories pour "Finance"
@@ -507,6 +727,9 @@ const allCategories = [
     level: 2,
     parent_id: 8,
     description: "Services de comptabilité pour particuliers et entreprises.",
+    imageUrl: "/categories/finance/accounting/banner.jpg",
+    iconUrl: "/categories/finance/accounting/icon.svg",
+    slug: "services-comptabilite",
   },
   {
     id: 71,
@@ -514,6 +737,9 @@ const allCategories = [
     level: 2,
     parent_id: 8,
     description: "Services financiers pour les entreprises.",
+    imageUrl: "/categories/finance/corporate-finance/banner.jpg",
+    iconUrl: "/categories/finance/corporate-finance/icon.svg",
+    slug: "finance-entreprise",
   },
   {
     id: 72,
@@ -521,6 +747,9 @@ const allCategories = [
     level: 2,
     parent_id: 8,
     description: "Services d'analyse et de planification financière.",
+    imageUrl: "/categories/finance/financial-planning/banner.jpg",
+    iconUrl: "/categories/finance/financial-planning/icon.svg",
+    slug: "analyse-planification-financiere",
   },
   {
     id: 73,
@@ -528,6 +757,9 @@ const allCategories = [
     level: 2,
     parent_id: 8,
     description: "Services de gestion financière personnelle.",
+    imageUrl: "/categories/finance/personal-finance/banner.jpg",
+    iconUrl: "/categories/finance/personal-finance/icon.svg",
+    slug: "budget-personnel-gestion-patrimoine",
   },
   {
     id: 74,
@@ -535,6 +767,9 @@ const allCategories = [
     level: 2,
     parent_id: 8,
     description: "Services liés à la collecte de fonds.",
+    imageUrl: "/categories/finance/fundraising/banner.jpg",
+    iconUrl: "/categories/finance/fundraising/icon.svg",
+    slug: "collecte-fonds",
   },
 
   // Sous-catégories pour "Services d'IA"
@@ -544,6 +779,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Développement de solutions basées sur l'IA.",
+    imageUrl: "/categories/ai/ai-development/banner.jpg",
+    iconUrl: "/categories/ai/ai-development/icon.svg",
+    slug: "developpement-ia",
   },
   {
     id: 76,
@@ -551,6 +789,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Services de gestion et d'analyse de données pour l'IA.",
+    imageUrl: "/categories/ai/data-science/banner.jpg",
+    iconUrl: "/categories/ai/data-science/icon.svg",
+    slug: "data",
   },
   {
     id: 77,
@@ -558,6 +799,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Services artistiques utilisant l'IA.",
+    imageUrl: "/categories/ai/ai-artists/banner.jpg",
+    iconUrl: "/categories/ai/ai-artists/icon.svg",
+    slug: "artistes-ia",
   },
   {
     id: 78,
@@ -565,6 +809,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Applications de l'IA dans le monde des affaires.",
+    imageUrl: "/categories/ai/ai-in-business/banner.jpg",
+    iconUrl: "/categories/ai/ai-in-business/icon.svg",
+    slug: "ia-pour-entreprises",
   },
   {
     id: 79,
@@ -572,6 +819,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Services de création vidéo utilisant l'IA.",
+    imageUrl: "/categories/video/ai-generated-videos/banner.jpg",
+    iconUrl: "/categories/video/ai-generated-videos/icon.svg",
+    slug: "video-ai",
   },
   {
     id: 80,
@@ -579,6 +829,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Services audio utilisant l'IA.",
+    imageUrl: "/categories/music/ai-generated-music/banner.jpg",
+    iconUrl: "/categories/music/ai-generated-music/icon.svg",
+    slug: "audio-ai",
   },
   {
     id: 81,
@@ -586,6 +839,9 @@ const allCategories = [
     level: 2,
     parent_id: 9,
     description: "Création de contenu assistée par l'IA.",
+    imageUrl: "/categories/writing/ai-generated-content/banner.jpg",
+    iconUrl: "/categories/writing/ai-generated-content/icon.svg",
+    slug: "contenu-ia",
   },
 
   // Sous-catégories pour "Croissance personnelle"
@@ -595,6 +851,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Services de coaching et de développement personnel.",
+    imageUrl: "/categories/personal-growth/personal-coaching/banner.jpg",
+    iconUrl: "/categories/personal-growth/personal-coaching/icon.svg",
+    slug: "developpement-personnel",
   },
   {
     id: 83,
@@ -602,6 +861,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Conseils en mode et style personnel.",
+    imageUrl: "/categories/fashion/personal-style/banner.jpg",
+    iconUrl: "/categories/fashion/personal-style/icon.svg",
+    slug: "mode-style",
   },
   {
     id: 84,
@@ -609,6 +871,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Services liés au bien-être et à la forme physique.",
+    imageUrl: "/categories/wellness/fitness/banner.jpg",
+    iconUrl: "/categories/wellness/fitness/icon.svg",
+    slug: "bien-etre-fitness",
   },
   {
     id: 85,
@@ -616,6 +881,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Services liés aux jeux vidéo.",
+    imageUrl: "/categories/gaming/video-games/banner.jpg",
+    iconUrl: "/categories/gaming/video-games/icon.svg",
+    slug: "jeux-video",
   },
   {
     id: 86,
@@ -623,6 +891,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Services liés aux loisirs et aux hobbies.",
+    imageUrl: "/categories/leisure/hobbies/banner.jpg",
+    iconUrl: "/categories/leisure/hobbies/icon.svg",
+    slug: "loisirs-hobbies",
   },
   {
     id: 87,
@@ -630,6 +901,9 @@ const allCategories = [
     level: 2,
     parent_id: 10,
     description: "Autres services de croissance personnelle.",
+    imageUrl: "/categories/personal-growth/other/banner.jpg",
+    iconUrl: "/categories/personal-growth/other/icon.svg",
+    slug: "divers-croissance-personnelle",
   },
 
   // Sous-catégories pour "Consultations"
@@ -639,6 +913,9 @@ const allCategories = [
     level: 2,
     parent_id: 11,
     description: "Services de conseil aux entreprises.",
+    imageUrl: "/categories/consulting/business-consulting/banner.jpg",
+    iconUrl: "/categories/consulting/business-consulting/icon.svg",
+    slug: "conseillers-entreprise",
   },
   {
     id: 89,
@@ -646,6 +923,9 @@ const allCategories = [
     level: 2,
     parent_id: 11,
     description: "Services de conseil en marketing.",
+    imageUrl: "/categories/marketing/marketing-strategy/banner.jpg",
+    iconUrl: "/categories/marketing/marketing-strategy/icon.svg",
+    slug: "strategie-marketing",
   },
   {
     id: 90,
@@ -653,6 +933,9 @@ const allCategories = [
     level: 2,
     parent_id: 11,
     description: "Services d'accompagnement et de conseil personnalisé.",
+    imageUrl: "/categories/consulting/personal-consulting/banner.jpg",
+    iconUrl: "/categories/consulting/personal-consulting/icon.svg",
+    slug: "accompagnement-conseils",
   },
   {
     id: 91,
@@ -661,6 +944,9 @@ const allCategories = [
     parent_id: 11,
     description:
       "Services de conseil en technologies et solutions informatiques.",
+    imageUrl: "/categories/technology/it-consulting/banner.jpg",
+    iconUrl: "/categories/technology/it-consulting/icon.svg",
+    slug: "conseil-technologie",
   },
   {
     id: 92,
@@ -668,6 +954,9 @@ const allCategories = [
     level: 2,
     parent_id: 11,
     description: "Services de mentorat dans divers domaines.",
+    imageUrl: "/categories/consulting/mentorship/banner.jpg",
+    iconUrl: "/categories/consulting/mentorship/icon.svg",
+    slug: "mentorat",
   },
 
   // Sous-catégories pour "Photographie"
@@ -678,6 +967,9 @@ const allCategories = [
     parent_id: 12,
     description:
       "Services de photographie de produits et d'activités de loisirs.",
+    imageUrl: "/categories/photography/product-photography/banner.jpg",
+    iconUrl: "/categories/photography/product-photography/icon.svg",
+    slug: "produits-loisirs",
   },
   {
     id: 94,
@@ -685,6 +977,9 @@ const allCategories = [
     level: 2,
     parent_id: 12,
     description: "Services de photographie de personnes et de scènes.",
+    imageUrl: "/categories/photography/portrait-photography/banner.jpg",
+    iconUrl: "/categories/photography/portrait-photography/icon.svg",
+    slug: "personnes-scenes",
   },
   {
     id: 95,
@@ -692,6 +987,9 @@ const allCategories = [
     level: 2,
     parent_id: 12,
     description: "Services de photographie spécifiques à certaines localités.",
+    imageUrl: "/categories/photography/local-photography/banner.jpg",
+    iconUrl: "/categories/photography/local-photography/icon.svg",
+    slug: "photographies-locales",
   },
   {
     id: 96,
@@ -699,6 +997,9 @@ const allCategories = [
     level: 2,
     parent_id: 12,
     description: "Autres services de photographie.",
+    imageUrl: "/categories/photography/other/banner.jpg",
+    iconUrl: "/categories/photography/other/icon.svg",
+    slug: "divers-photographie",
   },
 
   // Niveau 3 pour "Logo et identité visuelle"
@@ -708,6 +1009,9 @@ const allCategories = [
     level: 3,
     parent_id: 13,
     description: "Création de logos uniques et mémorables.",
+    imageUrl: "/categories/design/logo/banner.jpg",
+    iconUrl: "/categories/design/logo/icon.svg",
+    slug: "design-logo",
   },
   {
     id: 98,
@@ -715,6 +1019,9 @@ const allCategories = [
     level: 3,
     parent_id: 13,
     description: "Développement de chartes graphiques complètes.",
+    imageUrl: "/categories/design/graphic-design/banner.jpg",
+    iconUrl: "/categories/design/graphic-design/icon.svg",
+    slug: "charte-graphique",
   },
   {
     id: 99,
@@ -722,6 +1029,9 @@ const allCategories = [
     level: 3,
     parent_id: 13,
     description: "Conception de cartes de visite et autres supports imprimés.",
+    imageUrl: "/categories/design/business-cards/banner.jpg",
+    iconUrl: "/categories/design/business-cards/icon.svg",
+    slug: "cartes-visite-print",
   },
   {
     id: 100,
@@ -729,6 +1039,9 @@ const allCategories = [
     level: 3,
     parent_id: 13,
     description: "Création et sélection de polices et typographies.",
+    imageUrl: "/categories/design/typography/banner.jpg",
+    iconUrl: "/categories/design/typography/icon.svg",
+    slug: "polices-typographie",
   },
   {
     id: 101,
@@ -736,6 +1049,9 @@ const allCategories = [
     level: 3,
     parent_id: 13,
     description: "Outils pour créer des logos personnalisés.",
+    imageUrl: "/categories/design/logo-design/banner.jpg",
+    iconUrl: "/categories/design/logo-design/icon.svg",
+    slug: "outil-creation-logo",
   },
 
   // Niveau 3 pour "Art et illustration"
@@ -745,6 +1061,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création d'illustrations personnalisées.",
+    imageUrl: "/categories/design/illustration/banner.jpg",
+    iconUrl: "/categories/design/illustration/icon.svg",
+    slug: "illustrations",
   },
   {
     id: 103,
@@ -752,6 +1071,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création artistique assistée par l'IA.",
+    imageUrl: "/categories/ai/ai-artists/banner.jpg",
+    iconUrl: "/categories/ai/ai-artists/icon.svg",
+    slug: "artistes-ia",
   },
   {
     id: 104,
@@ -759,6 +1081,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création d'avatars personnalisés avec l'IA.",
+    imageUrl: "/categories/ai/ai-avatar-creation/banner.jpg",
+    iconUrl: "/categories/ai/ai-avatar-creation/icon.svg",
+    slug: "avatar-ia",
   },
   {
     id: 105,
@@ -766,6 +1091,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Illustrations spécialisées pour livres jeunesse.",
+    imageUrl: "/categories/writing/illustrations-for-children/banner.jpg",
+    iconUrl: "/categories/writing/illustrations-for-children/icon.svg",
+    slug: "illustrations-livres-enfants",
   },
   {
     id: 106,
@@ -773,6 +1101,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création de portraits et caricatures personnalisés.",
+    imageUrl: "/categories/design/portraits-caricatures/banner.jpg",
+    iconUrl: "/categories/design/portraits-caricatures/icon.svg",
+    slug: "portraits-caricatures",
   },
   {
     id: 107,
@@ -780,6 +1111,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création de bandes dessinées et comics.",
+    imageUrl: "/categories/design/comics-bd/banner.jpg",
+    iconUrl: "/categories/design/comics-bd/icon.svg",
+    slug: "bd-comics",
   },
   {
     id: 108,
@@ -787,6 +1121,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Conception de motifs répétitifs pour divers usages.",
+    imageUrl: "/categories/design/patterns/banner.jpg",
+    iconUrl: "/categories/design/patterns/icon.svg",
+    slug: "creation-motifs",
   },
   {
     id: 109,
@@ -794,6 +1131,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création de designs de tatouages personnalisés.",
+    imageUrl: "/categories/design/tattoo-design/banner.jpg",
+    iconUrl: "/categories/design/tattoo-design/icon.svg",
+    slug: "dessin-tatouage",
   },
   {
     id: 110,
@@ -801,6 +1141,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création de storyboards pour films et animations.",
+    imageUrl: "/categories/video/storyboards/banner.jpg",
+    iconUrl: "/categories/video/storyboards/icon.svg",
+    slug: "storyboards",
   },
   {
     id: 111,
@@ -808,6 +1151,9 @@ const allCategories = [
     level: 3,
     parent_id: 14,
     description: "Création d'art numérique pour NFT.",
+    imageUrl: "/categories/design/nft-art/banner.jpg",
+    iconUrl: "/categories/design/nft-art/icon.svg",
+    slug: "art-nft",
   },
 
   // Niveau 3 pour "Webdesign et mobile design"
@@ -817,6 +1163,9 @@ const allCategories = [
     level: 3,
     parent_id: 15,
     description: "Conception d'interfaces pour sites web.",
+    imageUrl: "/categories/design/web-design/banner.jpg",
+    iconUrl: "/categories/design/web-design/icon.svg",
+    slug: "webdesign",
   },
   {
     id: 113,
@@ -824,6 +1173,9 @@ const allCategories = [
     level: 3,
     parent_id: 15,
     description: "Conception d'interfaces pour applications mobiles.",
+    imageUrl: "/categories/design/mobile-design/banner.jpg",
+    iconUrl: "/categories/design/mobile-design/icon.svg",
+    slug: "mobile-design",
   },
   {
     id: 114,
@@ -831,6 +1183,9 @@ const allCategories = [
     level: 3,
     parent_id: 15,
     description: "Conception de l'expérience utilisateur.",
+    imageUrl: "/categories/design/ux-design/banner.jpg",
+    iconUrl: "/categories/design/ux-design/icon.svg",
+    slug: "ux-design",
   },
   {
     id: 115,
@@ -838,6 +1193,9 @@ const allCategories = [
     level: 3,
     parent_id: 15,
     description: "Conception de pages d'atterrissage efficaces.",
+    imageUrl: "/categories/design/landing-page/banner.jpg",
+    iconUrl: "/categories/design/landing-page/icon.svg",
+    slug: "design-landing-page",
   },
   {
     id: 116,
@@ -845,6 +1203,9 @@ const allCategories = [
     level: 3,
     parent_id: 15,
     description: "Création d'icônes et pictogrammes personnalisés.",
+    imageUrl: "/categories/design/icons-pictograms/banner.jpg",
+    iconUrl: "/categories/design/icons-pictograms/icon.svg",
+    slug: "icones-pictogrammes",
   },
 
   // Niveau 3 pour "Produit & Gaming"
@@ -854,6 +1215,9 @@ const allCategories = [
     level: 3,
     parent_id: 16,
     description: "Design de produits industriels et de consommation.",
+    imageUrl: "/categories/design/industrial-design/banner.jpg",
+    iconUrl: "/categories/design/industrial-design/icon.svg",
+    slug: "conception-industrielle-produits",
   },
   {
     id: 118,
@@ -861,6 +1225,9 @@ const allCategories = [
     level: 3,
     parent_id: 16,
     description: "Création de personnages 3D pour jeux et animations.",
+    imageUrl: "/categories/design/3d-modeling/banner.jpg",
+    iconUrl: "/categories/design/3d-modeling/icon.svg",
+    slug: "modelisation-personnage-3d",
   },
   {
     id: 119,
@@ -868,6 +1235,9 @@ const allCategories = [
     level: 3,
     parent_id: 16,
     description: "Création d'art pour jeux vidéo.",
+    imageUrl: "/categories/design/game-art/banner.jpg",
+    iconUrl: "/categories/design/game-art/icon.svg",
+    slug: "game-art",
   },
   {
     id: 120,
@@ -875,6 +1245,9 @@ const allCategories = [
     level: 3,
     parent_id: 16,
     description: "Création de visuels pour streamers et créateurs de contenu.",
+    imageUrl: "/categories/design/streamers-art/banner.jpg",
+    iconUrl: "/categories/design/streamers-art/icon.svg",
+    slug: "graphisme-streamers",
   },
 
   // Niveau 3 pour "Design d'impression"
@@ -884,6 +1257,9 @@ const allCategories = [
     level: 3,
     parent_id: 17,
     description: "Conception de flyers promotionnels.",
+    imageUrl: "/categories/design/flyers/banner.jpg",
+    iconUrl: "/categories/design/flyers/icon.svg",
+    slug: "flyer",
   },
   {
     id: 122,
@@ -891,6 +1267,9 @@ const allCategories = [
     level: 3,
     parent_id: 17,
     description: "Conception de brochures informatives.",
+    imageUrl: "/categories/design/brochures/banner.jpg",
+    iconUrl: "/categories/design/brochures/icon.svg",
+    slug: "brochure",
   },
   {
     id: 123,
@@ -898,6 +1277,9 @@ const allCategories = [
     level: 3,
     parent_id: 17,
     description: "Création d'affiches percutantes.",
+    imageUrl: "/categories/design/posters/banner.jpg",
+    iconUrl: "/categories/design/posters/icon.svg",
+    slug: "affiche",
   },
   {
     id: 124,
@@ -905,6 +1287,9 @@ const allCategories = [
     level: 3,
     parent_id: 17,
     description: "Design de catalogues de produits.",
+    imageUrl: "/categories/design/catalogs/banner.jpg",
+    iconUrl: "/categories/design/catalogs/icon.svg",
+    slug: "conception-catalogue",
   },
   {
     id: 125,
@@ -912,6 +1297,9 @@ const allCategories = [
     level: 3,
     parent_id: 17,
     description: "Conception de menus pour restaurants.",
+    imageUrl: "/categories/design/restaurant-menus/banner.jpg",
+    iconUrl: "/categories/design/restaurant-menus/icon.svg",
+    slug: "menu",
   },
 
   // Niveau 3 pour "Design visuel"
@@ -921,6 +1309,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Services de retouche et d'amélioration d'images.",
+    imageUrl: "/categories/photography/retouching/banner.jpg",
+    iconUrl: "/categories/photography/retouching/icon.svg",
+    slug: "retouche-image",
   },
   {
     id: 127,
@@ -928,6 +1319,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Retouche et amélioration d'images assistées par l'IA.",
+    imageUrl: "/categories/photography/ai-assisted-editing/banner.jpg",
+    iconUrl: "/categories/photography/ai-assisted-editing/icon.svg",
+    slug: "traitement-images-par-ia",
   },
   {
     id: 128,
@@ -935,6 +1329,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Création de supports visuels pour présentations.",
+    imageUrl: "/categories/design/presentation-design/banner.jpg",
+    iconUrl: "/categories/design/presentation-design/icon.svg",
+    slug: "support-presentation",
   },
   {
     id: 129,
@@ -942,6 +1339,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Suppression professionnelle d'arrière-plans d'images.",
+    imageUrl: "/categories/photography/background-removal/banner.jpg",
+    iconUrl: "/categories/photography/background-removal/icon.svg",
+    slug: "suppression-arriere-plan",
   },
   {
     id: 130,
@@ -949,6 +1349,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Création d'infographies informatives et attrayantes.",
+    imageUrl: "/categories/design/infographics/banner.jpg",
+    iconUrl: "/categories/design/infographics/icon.svg",
+    slug: "infographie",
   },
   {
     id: 131,
@@ -956,6 +1359,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Conversion d'images en graphiques vectoriels.",
+    imageUrl: "/categories/design/vector-graphics/banner.jpg",
+    iconUrl: "/categories/design/vector-graphics/icon.svg",
+    slug: "trace-vectoriel",
   },
   {
     id: 132,
@@ -963,6 +1369,9 @@ const allCategories = [
     level: 3,
     parent_id: 18,
     description: "Conception de CV visuellement attrayants.",
+    imageUrl: "/categories/design/cv-design/banner.jpg",
+    iconUrl: "/categories/design/cv-design/icon.svg",
+    slug: "mise-en-page-cv",
   },
 
   // Niveau 3 pour "Conception marketing"
@@ -972,6 +1381,9 @@ const allCategories = [
     level: 3,
     parent_id: 19,
     description: "Création de visuels pour les réseaux sociaux.",
+    imageUrl: "/categories/design/social-media-design/banner.jpg",
+    iconUrl: "/categories/design/social-media-design/icon.svg",
+    slug: "design-reseaux-sociaux",
   },
   {
     id: 134,
@@ -979,6 +1391,9 @@ const allCategories = [
     level: 3,
     parent_id: 19,
     description: "Conception de publications et bannières pour médias sociaux.",
+    imageUrl: "/categories/design/social-media-ads/banner.jpg",
+    iconUrl: "/categories/design/social-media-ads/icon.svg",
+    slug: "publications-bannieres-sociales",
   },
   {
     id: 135,
@@ -986,6 +1401,9 @@ const allCategories = [
     level: 3,
     parent_id: 19,
     description: "Création de designs pour campagnes e-mail.",
+    imageUrl: "/categories/design/email-design/banner.jpg",
+    iconUrl: "/categories/design/email-design/icon.svg",
+    slug: "design-e-mail",
   },
   {
     id: 136,
@@ -993,6 +1411,9 @@ const allCategories = [
     level: 3,
     parent_id: 19,
     description: "Conception de bannières publicitaires pour le web.",
+    imageUrl: "/categories/design/web-ads/banner.jpg",
+    iconUrl: "/categories/design/web-ads/icon.svg",
+    slug: "bannieres-web",
   },
   {
     id: 137,
@@ -1000,6 +1421,9 @@ const allCategories = [
     level: 3,
     parent_id: 19,
     description: "Création de signalétique pour entreprises et événements.",
+    imageUrl: "/categories/design/signage/banner.jpg",
+    iconUrl: "/categories/design/signage/icon.svg",
+    slug: "signaletique",
   },
 
   // Niveau 3 pour "Packaging & Couvertures"
@@ -1009,6 +1433,9 @@ const allCategories = [
     level: 3,
     parent_id: 20,
     description: "Design d'emballages et d'étiquettes de produits.",
+    imageUrl: "/categories/design/packaging/banner.jpg",
+    iconUrl: "/categories/design/packaging/icon.svg",
+    slug: "emballage-conception-etiquettes",
   },
 
   // Niveau 3 pour "Architecture et conception de bâtiments"
@@ -1018,6 +1445,9 @@ const allCategories = [
     level: 3,
     parent_id: 21,
     description: "Services d'architecture et de design d'intérieur.",
+    imageUrl: "/categories/architecture/interior-design/banner.jpg",
+    iconUrl: "/categories/architecture/interior-design/icon.svg",
+    slug: "architecture-conception-batiments",
   },
   {
     id: 140,
@@ -1025,6 +1455,9 @@ const allCategories = [
     level: 3,
     parent_id: 21,
     description: "Conception d'aménagements paysagers.",
+    imageUrl: "/categories/architecture/landscape-design/banner.jpg",
+    iconUrl: "/categories/architecture/landscape-design/icon.svg",
+    slug: "amenagement-paysager",
   },
   {
     id: 141,
@@ -1032,6 +1465,9 @@ const allCategories = [
     level: 3,
     parent_id: 21,
     description: "Services de génie civil pour la construction.",
+    imageUrl: "/categories/architecture/civil-engineering/banner.jpg",
+    iconUrl: "/categories/architecture/civil-engineering/icon.svg",
+    slug: "genie-civil",
   },
 
   // Niveau 3 pour "Mode et goodies"
@@ -1041,6 +1477,9 @@ const allCategories = [
     level: 3,
     parent_id: 22,
     description: "Conception de t-shirts et d'objets promotionnels.",
+    imageUrl: "/categories/fashion/t-shirts-goodies/banner.jpg",
+    iconUrl: "/categories/fashion/t-shirts-goodies/icon.svg",
+    slug: "t-shirts-goodies",
   },
   {
     id: 143,
@@ -1048,6 +1487,9 @@ const allCategories = [
     level: 3,
     parent_id: 22,
     description: "Services de stylisme et de conseil en mode.",
+    imageUrl: "/categories/fashion/styling/banner.jpg",
+    iconUrl: "/categories/fashion/styling/icon.svg",
+    slug: "stylisme",
   },
   {
     id: 144,
@@ -1055,6 +1497,9 @@ const allCategories = [
     level: 3,
     parent_id: 22,
     description: "Conception de bijoux personnalisés.",
+    imageUrl: "/categories/fashion/jewelry-design/banner.jpg",
+    iconUrl: "/categories/fashion/jewelry-design/icon.svg",
+    slug: "creation-bijoux",
   },
 
   // Niveau 3 pour "3D design"
@@ -1064,6 +1509,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Modélisation 3D pour l'architecture.",
+    imageUrl: "/categories/design/3d-modeling/banner.jpg",
+    iconUrl: "/categories/design/3d-modeling/icon.svg",
+    slug: "architecture-3d",
   },
   {
     id: 146,
@@ -1071,6 +1519,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Conception 3D pour le design industriel.",
+    imageUrl: "/categories/design/industrial-design/banner.jpg",
+    iconUrl: "/categories/design/industrial-design/icon.svg",
+    slug: "design-industriel",
   },
   {
     id: 147,
@@ -1078,6 +1529,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Conception 3D pour l'industrie textile.",
+    imageUrl: "/categories/design/textile-design/banner.jpg",
+    iconUrl: "/categories/design/textile-design/icon.svg",
+    slug: "design-textile",
   },
   {
     id: 148,
@@ -1085,6 +1539,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Modélisation 3D de personnages pour l'impression.",
+    imageUrl: "/categories/design/3d-printing/banner.jpg",
+    iconUrl: "/categories/design/3d-printing/icon.svg",
+    slug: "impression-3d-personnages",
   },
   {
     id: 149,
@@ -1092,6 +1549,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Création de paysages en 3D.",
+    imageUrl: "/categories/design/3d-art/banner.jpg",
+    iconUrl: "/categories/design/3d-art/icon.svg",
+    slug: "paysage-3d",
   },
   {
     id: 150,
@@ -1099,6 +1559,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Création d'art 3D pour jeux vidéo.",
+    imageUrl: "/categories/design/3d-game-art/banner.jpg",
+    iconUrl: "/categories/design/3d-game-art/icon.svg",
+    slug: "game-art-3d",
   },
   {
     id: 151,
@@ -1106,6 +1569,9 @@ const allCategories = [
     level: 3,
     parent_id: 23,
     description: "Conception 3D de bijoux.",
+    imageUrl: "/categories/design/3d-jewelry/banner.jpg",
+    iconUrl: "/categories/design/3d-jewelry/icon.svg",
+    slug: "creation-bijoux-3d",
   },
 
   // Niveau 3 pour "Développement de sites web"
@@ -1115,6 +1581,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de sites web professionnels pour entreprises.",
+    imageUrl: "/categories/programming/web-development/banner.jpg",
+    iconUrl: "/categories/programming/web-development/icon.svg",
+    slug: "sites-web-entreprises",
   },
   {
     id: 153,
@@ -1122,6 +1591,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de boutiques en ligne.",
+    imageUrl: "/categories/business/e-commerce/banner.jpg",
+    iconUrl: "/categories/business/e-commerce/icon.svg",
+    slug: "developpement-e-commerce",
   },
   {
     id: 154,
@@ -1129,6 +1601,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Développement de pages d'atterrissage efficaces.",
+    imageUrl: "/categories/design/landing-page/banner.jpg",
+    iconUrl: "/categories/design/landing-page/icon.svg",
+    slug: "landing-pages",
   },
   {
     id: 155,
@@ -1136,6 +1611,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de sites web pour le dropshipping.",
+    imageUrl: "/categories/business/dropshipping/banner.jpg",
+    iconUrl: "/categories/business/dropshipping/icon.svg",
+    slug: "sites-web-dropshipping",
   },
   {
     id: 156,
@@ -1143,6 +1621,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Développement de sites web de A à Z.",
+    imageUrl: "/categories/programming/full-stack-development/banner.jpg",
+    iconUrl: "/categories/programming/full-stack-development/icon.svg",
+    slug: "creation-site-web-complet",
   },
   {
     id: 157,
@@ -1150,6 +1631,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de plateformes web personnalisées.",
+    imageUrl: "/categories/programming/web-development/banner.jpg",
+    iconUrl: "/categories/programming/web-development/icon.svg",
+    slug: "plateformes-web",
   },
   {
     id: 158,
@@ -1157,6 +1641,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Développement de sites WordPress.",
+    imageUrl: "/categories/programming/wordpress/banner.jpg",
+    iconUrl: "/categories/programming/wordpress/icon.svg",
+    slug: "wordpress",
   },
   {
     id: 159,
@@ -1164,6 +1651,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de boutiques en ligne avec Shopify.",
+    imageUrl: "/categories/business/shopify/banner.jpg",
+    iconUrl: "/categories/business/shopify/icon.svg",
+    slug: "shopify",
   },
   {
     id: 160,
@@ -1171,6 +1661,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Développement de sites web avec Wix.",
+    imageUrl: "/categories/business/wix/banner.jpg",
+    iconUrl: "/categories/business/wix/icon.svg",
+    slug: "wix",
   },
   {
     id: 161,
@@ -1178,6 +1671,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Création de sites web sur mesure.",
+    imageUrl: "/categories/programming/custom-software/banner.jpg",
+    iconUrl: "/categories/programming/custom-software/icon.svg",
+    slug: "sites-web-personnalises",
   },
   {
     id: 162,
@@ -1185,6 +1681,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Développement de sites web avec GoDaddy.",
+    imageUrl: "/categories/business/godaddy/banner.jpg",
+    iconUrl: "/categories/business/godaddy/icon.svg",
+    slug: "godaddy",
   },
   {
     id: 163,
@@ -1192,6 +1691,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Services de maintenance et mise à jour de sites web.",
+    imageUrl: "/categories/programming/web-maintenance/banner.jpg",
+    iconUrl: "/categories/programming/web-maintenance/icon.svg",
+    slug: "maintenance-site-web",
   },
   {
     id: 164,
@@ -1199,6 +1701,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Personnalisation avancée de sites web existants.",
+    imageUrl: "/categories/programming/website-customization/banner.jpg",
+    iconUrl: "/categories/programming/website-customization/icon.svg",
+    slug: "personnalisation-site-web",
   },
   {
     id: 165,
@@ -1206,6 +1711,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Identification et correction de bugs sur les sites web.",
+    imageUrl: "/categories/programming/bug-fixing/banner.jpg",
+    iconUrl: "/categories/programming/bug-fixing/icon.svg",
+    slug: "correction-bugs",
   },
   {
     id: 166,
@@ -1213,6 +1721,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Services de sauvegarde et migration de sites web.",
+    imageUrl: "/categories/programming/website-migration/banner.jpg",
+    iconUrl: "/categories/programming/website-migration/icon.svg",
+    slug: "sauvegarde-migration-site-web",
   },
   {
     id: 167,
@@ -1220,6 +1731,9 @@ const allCategories = [
     level: 3,
     parent_id: 24,
     description: "Amélioration des performances des sites web.",
+    imageUrl: "/categories/programming/website-optimization/banner.jpg",
+    iconUrl: "/categories/programming/website-optimization/icon.svg",
+    slug: "optimisation-vitesse-site-web",
   },
 
   // Niveau 3 pour "Développement de l'IA"
@@ -1229,6 +1743,9 @@ const allCategories = [
     level: 3,
     parent_id: 25,
     description: "Développement de chatbots intelligents.",
+    imageUrl: "/categories/ai/chatbots/banner.jpg",
+    iconUrl: "/categories/ai/chatbots/icon.svg",
+    slug: "chatbots-ia",
   },
   {
     id: 169,
@@ -1236,6 +1753,9 @@ const allCategories = [
     level: 3,
     parent_id: 25,
     description: "Création d'applications basées sur l'IA.",
+    imageUrl: "/categories/ai/ai-applications/banner.jpg",
+    iconUrl: "/categories/ai/ai-applications/icon.svg",
+    slug: "applications-ia",
   },
   {
     id: 170,
@@ -1243,6 +1763,9 @@ const allCategories = [
     level: 3,
     parent_id: 25,
     description: "Intégration de solutions d'IA dans des systèmes existants.",
+    imageUrl: "/categories/ai/ai-integrations/banner.jpg",
+    iconUrl: "/categories/ai/ai-integrations/icon.svg",
+    slug: "integrations-ia",
   },
   {
     id: 171,
@@ -1250,6 +1773,9 @@ const allCategories = [
     level: 3,
     parent_id: 25,
     description: "Développement d'agents intelligents pour diverses tâches.",
+    imageUrl: "/categories/ai/ai-agents/banner.jpg",
+    iconUrl: "/categories/ai/ai-agents/icon.svg",
+    slug: "agents-ia",
   },
   {
     id: 172,
@@ -1257,6 +1783,9 @@ const allCategories = [
     level: 3,
     parent_id: 25,
     description: "Optimisation et mise au point de modèles d'IA.",
+    imageUrl: "/categories/ai/ai-optimization/banner.jpg",
+    iconUrl: "/categories/ai/ai-optimization/icon.svg",
+    slug: "mise-au-point-ia",
   },
 
   // Niveau 3 pour "Développement de chatbots"
@@ -1266,6 +1795,9 @@ const allCategories = [
     level: 3,
     parent_id: 26,
     description: "Création de chatbots pour l'assistance clientèle.",
+    imageUrl: "/categories/ai/chatbots-for-customer-service/banner.jpg",
+    iconUrl: "/categories/ai/chatbots-for-customer-service/icon.svg",
+    slug: "chatbots-service-client",
   },
   {
     id: 174,
@@ -1273,6 +1805,9 @@ const allCategories = [
     level: 3,
     parent_id: 26,
     description: "Développement de chatbots pour augmenter les ventes.",
+    imageUrl: "/categories/ai/ai-sales-chatbots/banner.jpg",
+    iconUrl: "/categories/ai/ai-sales-chatbots/icon.svg",
+    slug: "chatbots-vente",
   },
   {
     id: 175,
@@ -1280,6 +1815,9 @@ const allCategories = [
     level: 3,
     parent_id: 26,
     description: "Création de chatbots pour les plateformes sociales.",
+    imageUrl: "/categories/ai/social-media-chatbots/banner.jpg",
+    iconUrl: "/categories/ai/social-media-chatbots/icon.svg",
+    slug: "chatbots-reseaux-sociaux",
   },
 
   // Niveau 3 pour "Développement de jeux"
@@ -1289,6 +1827,9 @@ const allCategories = [
     level: 3,
     parent_id: 27,
     description: "Développement de jeux pour smartphones et tablettes.",
+    imageUrl: "/categories/gaming/mobile-games/banner.jpg",
+    iconUrl: "/categories/gaming/mobile-games/icon.svg",
+    slug: "jeux-mobiles",
   },
   {
     id: 177,
@@ -1296,6 +1837,9 @@ const allCategories = [
     level: 3,
     parent_id: 27,
     description: "Création de jeux pour ordinateurs personnels.",
+    imageUrl: "/categories/gaming/pc-games/banner.jpg",
+    iconUrl: "/categories/gaming/pc-games/icon.svg",
+    slug: "jeux-pc",
   },
   {
     id: 178,
@@ -1303,6 +1847,9 @@ const allCategories = [
     level: 3,
     parent_id: 27,
     description: "Développement de jeux en réalité augmentée et virtuelle.",
+    imageUrl: "/categories/gaming/ar-vr-games/banner.jpg",
+    iconUrl: "/categories/gaming/ar-vr-games/icon.svg",
+    slug: "jeux-ar-vr",
   },
   {
     id: 179,
@@ -1310,6 +1857,9 @@ const allCategories = [
     level: 3,
     parent_id: 27,
     description: "Création de jeux en HTML5 pour navigateurs web.",
+    imageUrl: "/categories/programming/html5-games/banner.jpg",
+    iconUrl: "/categories/programming/html5-games/icon.svg",
+    slug: "html5-games",
   },
 
   // Niveau 3 pour "Développement d'applications mobiles"
@@ -1319,6 +1869,9 @@ const allCategories = [
     level: 3,
     parent_id: 28,
     description: "Développement d'applications pour iOS.",
+    imageUrl: "/categories/programming/ios-development/banner.jpg",
+    iconUrl: "/categories/programming/ios-development/icon.svg",
+    slug: "applications-ios",
   },
   {
     id: 181,
@@ -1326,6 +1879,9 @@ const allCategories = [
     level: 3,
     parent_id: 28,
     description: "Création d'applications pour Android.",
+    imageUrl: "/categories/programming/android-development/banner.jpg",
+    iconUrl: "/categories/programming/android-development/icon.svg",
+    slug: "applications-android",
   },
   {
     id: 182,
@@ -1333,6 +1889,9 @@ const allCategories = [
     level: 3,
     parent_id: 28,
     description: "Développement d'applications multi-plateformes.",
+    imageUrl: "/categories/programming/cross-platform-development/banner.jpg",
+    iconUrl: "/categories/programming/cross-platform-development/icon.svg",
+    slug: "developpement-applications-multi-plateformes",
   },
   {
     id: 183,
@@ -1340,6 +1899,9 @@ const allCategories = [
     level: 3,
     parent_id: 28,
     description: "Création d'applications en réalité augmentée et virtuelle.",
+    imageUrl: "/categories/programming/ar-vr-apps/banner.jpg",
+    iconUrl: "/categories/programming/ar-vr-apps/icon.svg",
+    slug: "applications-ar-vr",
   },
 
   // Niveau 3 pour "Cloud et cybersécurité"
@@ -1349,6 +1911,9 @@ const allCategories = [
     level: 3,
     parent_id: 29,
     description: "Implémentation et gestion de services cloud.",
+    imageUrl: "/categories/programming/cloud-computing/banner.jpg",
+    iconUrl: "/categories/programming/cloud-computing/icon.svg",
+    slug: "services-cloud",
   },
   {
     id: 185,
@@ -1356,6 +1921,9 @@ const allCategories = [
     level: 3,
     parent_id: 29,
     description: "Sécurisation d'applications web et mobiles.",
+    imageUrl: "/categories/programming/app-security/banner.jpg",
+    iconUrl: "/categories/programming/app-security/icon.svg",
+    slug: "securite-applications",
   },
   {
     id: 186,
@@ -1363,6 +1931,9 @@ const allCategories = [
     level: 3,
     parent_id: 29,
     description: "Réalisation de tests de sécurité et de pénétration.",
+    imageUrl: "/categories/programming/penetration-testing/banner.jpg",
+    iconUrl: "/categories/programming/penetration-testing/icon.svg",
+    slug: "tests-penetration",
   },
   {
     id: 187,
@@ -1370,6 +1941,9 @@ const allCategories = [
     level: 3,
     parent_id: 29,
     description: "Mise en place de systèmes de gestion des identités.",
+    imageUrl: "/categories/programming/identity-management/banner.jpg",
+    iconUrl: "/categories/programming/identity-management/icon.svg",
+    slug: "gestion-identites",
   },
 
   // Niveau 3 pour "Data Science & ML"
@@ -1379,6 +1953,9 @@ const allCategories = [
     level: 3,
     parent_id: 30,
     description: "Analyse approfondie de données pour en tirer des insights.",
+    imageUrl: "/categories/programming/data-analysis/banner.jpg",
+    iconUrl: "/categories/programming/data-analysis/icon.svg",
+    slug: "analyse-donnees",
   },
   {
     id: 189,
@@ -1386,6 +1963,9 @@ const allCategories = [
     level: 3,
     parent_id: 30,
     description: "Développement de modèles de machine learning.",
+    imageUrl: "/categories/programming/machine-learning/banner.jpg",
+    iconUrl: "/categories/programming/machine-learning/icon.svg",
+    slug: "machine-learning",
   },
   {
     id: 190,
@@ -1393,6 +1973,9 @@ const allCategories = [
     level: 3,
     parent_id: 30,
     description: "Création de réseaux de neurones profonds.",
+    imageUrl: "/categories/programming/deep-learning/banner.jpg",
+    iconUrl: "/categories/programming/deep-learning/icon.svg",
+    slug: "deep-learning",
   },
   {
     id: 191,
@@ -1400,6 +1983,9 @@ const allCategories = [
     level: 3,
     parent_id: 30,
     description: "Traitement du langage naturel.",
+    imageUrl: "/categories/programming/natural-language-processing/banner.jpg",
+    iconUrl: "/categories/programming/natural-language-processing/icon.svg",
+    slug: "nlp",
   },
 
   // Niveau 3 pour "Développement de logiciels"
@@ -1409,6 +1995,9 @@ const allCategories = [
     level: 3,
     parent_id: 31,
     description: "Développement d'applications pour ordinateurs de bureau.",
+    imageUrl: "/categories/programming/desktop-apps/banner.jpg",
+    iconUrl: "/categories/programming/desktop-apps/icon.svg",
+    slug: "applications-bureau",
   },
   {
     id: 193,
@@ -1416,6 +2005,9 @@ const allCategories = [
     level: 3,
     parent_id: 31,
     description: "Création de logiciels pour systèmes embarqués.",
+    imageUrl: "/categories/programming/embedded-software/banner.jpg",
+    iconUrl: "/categories/programming/embedded-software/icon.svg",
+    slug: "logiciels-embarques",
   },
   {
     id: 194,
@@ -1423,6 +2015,9 @@ const allCategories = [
     level: 3,
     parent_id: 31,
     description: "Développement de solutions logicielles pour entreprises.",
+    imageUrl: "/categories/programming/enterprise-software/banner.jpg",
+    iconUrl: "/categories/programming/enterprise-software/icon.svg",
+    slug: "logiciels-entreprise",
   },
   {
     id: 195,
@@ -1430,6 +2025,9 @@ const allCategories = [
     level: 3,
     parent_id: 31,
     description: "Intégration de différents systèmes logiciels.",
+    imageUrl: "/categories/programming/system-integration/banner.jpg",
+    iconUrl: "/categories/programming/system-integration/icon.svg",
+    slug: "integration-systemes",
   },
 
   // Niveau 3 pour "Blockchain et cryptomonnaies"
@@ -1439,6 +2037,9 @@ const allCategories = [
     level: 3,
     parent_id: 32,
     description: "Développement de contrats intelligents.",
+    imageUrl: "/categories/programming/blockchain/banner.jpg",
+    iconUrl: "/categories/programming/blockchain/icon.svg",
+    slug: "smart-contracts",
   },
   {
     id: 197,
@@ -1446,6 +2047,9 @@ const allCategories = [
     level: 3,
     parent_id: 32,
     description: "Création d'applications décentralisées.",
+    imageUrl: "/categories/programming/dapps/banner.jpg",
+    iconUrl: "/categories/programming/dapps/icon.svg",
+    slug: "dapps",
   },
   {
     id: 198,
@@ -1453,6 +2057,9 @@ const allCategories = [
     level: 3,
     parent_id: 32,
     description: "Développement de tokens et gestion d'ICO.",
+    imageUrl: "/categories/programming/tokens-ico/banner.jpg",
+    iconUrl: "/categories/programming/tokens-ico/icon.svg",
+    slug: "tokens-ico",
   },
   {
     id: 199,
@@ -1460,6 +2067,9 @@ const allCategories = [
     level: 3,
     parent_id: 32,
     description: "Création de portefeuilles pour cryptomonnaies.",
+    imageUrl: "/categories/programming/wallets/banner.jpg",
+    iconUrl: "/categories/programming/wallets/icon.svg",
+    slug: "wallets",
   },
 
   // Niveau 3 pour "Divers" (Programmation & Tech)
@@ -1469,6 +2079,9 @@ const allCategories = [
     level: 3,
     parent_id: 33,
     description: "Création de scripts et automatisation de tâches.",
+    imageUrl: "/categories/programming/automation/banner.jpg",
+    iconUrl: "/categories/programming/automation/icon.svg",
+    slug: "scripts-automatisation",
   },
   {
     id: 201,
@@ -1476,6 +2089,9 @@ const allCategories = [
     level: 3,
     parent_id: 33,
     description: "Services de conversion entre différents formats de fichiers.",
+    imageUrl: "/categories/programming/file-conversion/banner.jpg",
+    iconUrl: "/categories/programming/file-conversion/icon.svg",
+    slug: "conversion-fichiers",
   },
   {
     id: 202,
@@ -1483,6 +2099,9 @@ const allCategories = [
     level: 3,
     parent_id: 33,
     description: "Création de plugins et extensions pour diverses plateformes.",
+    imageUrl: "/categories/programming/plugins/banner.jpg",
+    iconUrl: "/categories/programming/plugins/icon.svg",
+    slug: "developpement-plugins",
   },
 
   // Niveau 3 pour "Référencement"
@@ -1492,6 +2111,9 @@ const allCategories = [
     level: 3,
     parent_id: 34,
     description: "Optimisation du contenu et de la structure des pages web.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "seo-on-page",
   },
   {
     id: 204,
@@ -1499,6 +2121,9 @@ const allCategories = [
     level: 3,
     parent_id: 34,
     description: "Stratégies de création de liens et de présence en ligne.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "seo-off-page",
   },
   {
     id: 205,
@@ -1506,6 +2131,9 @@ const allCategories = [
     level: 3,
     parent_id: 34,
     description: "Optimisation pour les recherches locales.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "seo-local",
   },
   {
     id: 206,
@@ -1514,6 +2142,9 @@ const allCategories = [
     parent_id: 34,
     description:
       "Optimisation technique des sites web pour les moteurs de recherche.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "seo-technique",
   },
 
   // Niveau 3 pour "Réseaux sociaux"
@@ -1523,6 +2154,9 @@ const allCategories = [
     level: 3,
     parent_id: 35,
     description: "Gestion et animation de comptes sur les réseaux sociaux.",
+    imageUrl: "/categories/marketing/social-media/banner.jpg",
+    iconUrl: "/categories/marketing/social-media/icon.svg",
+    slug: "gestion-reseaux-sociaux",
   },
   {
     id: 208,
@@ -1531,6 +2165,9 @@ const allCategories = [
     parent_id: 35,
     description:
       "Création et gestion de campagnes publicitaires sur les réseaux sociaux.",
+    imageUrl: "/categories/marketing/social-media/banner.jpg",
+    iconUrl: "/categories/marketing/social-media/icon.svg",
+    slug: "publicite-reseaux-sociaux",
   },
   {
     id: 209,
@@ -1539,6 +2176,9 @@ const allCategories = [
     parent_id: 35,
     description:
       "Élaboration de stratégies de contenu pour les réseaux sociaux.",
+    imageUrl: "/categories/marketing/social-media/banner.jpg",
+    iconUrl: "/categories/marketing/social-media/icon.svg",
+    slug: "strategie-contenu-reseaux-sociaux",
   },
   {
     id: 210,
@@ -1547,6 +2187,9 @@ const allCategories = [
     parent_id: 35,
     description:
       "Analyse des performances et des tendances sur les réseaux sociaux.",
+    imageUrl: "/categories/marketing/social-media/banner.jpg",
+    iconUrl: "/categories/marketing/social-media/icon.svg",
+    slug: "analyse-medias-sociaux",
   },
 
   // Niveau 3 pour "Méthodes & Techniques"
@@ -1556,6 +2199,9 @@ const allCategories = [
     level: 3,
     parent_id: 36,
     description: "Création et gestion de campagnes de marketing par e-mail.",
+    imageUrl: "/categories/marketing/email-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/email-marketing/icon.svg",
+    slug: "marketing-par-e-mail",
   },
   {
     id: 212,
@@ -1563,6 +2209,9 @@ const allCategories = [
     level: 3,
     parent_id: 36,
     description: "Stratégies de création et de diffusion de contenu marketing.",
+    imageUrl: "/categories/marketing/content-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/content-marketing/icon.svg",
+    slug: "marketing-contenu",
   },
   {
     id: 213,
@@ -1570,6 +2219,9 @@ const allCategories = [
     level: 3,
     parent_id: 36,
     description: "Mise en place et gestion de programmes d'affiliation.",
+    imageUrl: "/categories/marketing/affiliate-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/affiliate-marketing/icon.svg",
+    slug: "marketing-affiliation",
   },
   {
     id: 214,
@@ -1578,6 +2230,9 @@ const allCategories = [
     parent_id: 36,
     description:
       "Collaboration avec des influenceurs pour promouvoir des produits ou services.",
+    imageUrl: "/categories/marketing/influencer-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/influencer-marketing/icon.svg",
+    slug: "marketing-influence",
   },
 
   // Niveau 3 pour "Analyses et stratégie"
@@ -1587,6 +2242,9 @@ const allCategories = [
     level: 3,
     parent_id: 37,
     description: "Analyse des données pour optimiser les stratégies marketing.",
+    imageUrl: "/categories/marketing/marketing-analytics/banner.jpg",
+    iconUrl: "/categories/marketing/marketing-analytics/icon.svg",
+    slug: "analyse-donnees-marketing",
   },
   {
     id: 216,
@@ -1594,6 +2252,9 @@ const allCategories = [
     level: 3,
     parent_id: 37,
     description: "Élaboration de plans de campagnes marketing.",
+    imageUrl: "/categories/marketing/campaign-planning/banner.jpg",
+    iconUrl: "/categories/marketing/campaign-planning/icon.svg",
+    slug: "planification-campagnes",
   },
   {
     id: 217,
@@ -1602,6 +2263,9 @@ const allCategories = [
     parent_id: 37,
     description:
       "Réalisation de tests A/B pour optimiser les performances marketing.",
+    imageUrl: "/categories/marketing/ab-testing/banner.jpg",
+    iconUrl: "/categories/marketing/ab-testing/icon.svg",
+    slug: "tests-a-b",
   },
   {
     id: 218,
@@ -1610,6 +2274,9 @@ const allCategories = [
     parent_id: 37,
     description:
       "Conduite d'études de marché pour guider les stratégies marketing.",
+    imageUrl: "/categories/business/market-research/banner.jpg",
+    iconUrl: "/categories/business/market-research/icon.svg",
+    slug: "etudes-marche",
   },
 
   // Niveau 3 pour "Spécifique à la chaîne"
@@ -1619,6 +2286,9 @@ const allCategories = [
     level: 3,
     parent_id: 38,
     description: "Stratégies de marketing spécifiques à YouTube.",
+    imageUrl: "/categories/marketing/youtube-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/youtube-marketing/icon.svg",
+    slug: "marketing-youtube",
   },
   {
     id: 220,
@@ -1626,6 +2296,9 @@ const allCategories = [
     level: 3,
     parent_id: 38,
     description: "Techniques de marketing adaptées à Instagram.",
+    imageUrl: "/categories/marketing/instagram-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/instagram-marketing/icon.svg",
+    slug: "marketing-instagram",
   },
   {
     id: 221,
@@ -1633,6 +2306,9 @@ const allCategories = [
     level: 3,
     parent_id: 38,
     description: "Stratégies de marketing pour TikTok.",
+    imageUrl: "/categories/marketing/tiktok-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/tiktok-marketing/icon.svg",
+    slug: "marketing-tiktok",
   },
   {
     id: 222,
@@ -1640,6 +2316,9 @@ const allCategories = [
     level: 3,
     parent_id: 38,
     description: "Marketing B2B sur LinkedIn.",
+    imageUrl: "/categories/marketing/linkedin-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/linkedin-marketing/icon.svg",
+    slug: "marketing-linkedin",
   },
 
   // Niveau 3 pour "Spécifique à un secteur ou objectif"
@@ -1649,6 +2328,9 @@ const allCategories = [
     level: 3,
     parent_id: 39,
     description: "Stratégies marketing pour les entreprises B2B.",
+    imageUrl: "/categories/marketing/b2b-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/b2b-marketing/icon.svg",
+    slug: "marketing-b2b",
   },
   {
     id: 224,
@@ -1656,6 +2338,9 @@ const allCategories = [
     level: 3,
     parent_id: 39,
     description: "Techniques de marketing spécifiques au e-commerce.",
+    imageUrl: "/categories/marketing/e-commerce-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/e-commerce-marketing/icon.svg",
+    slug: "marketing-e-commerce",
   },
   {
     id: 225,
@@ -1663,6 +2348,9 @@ const allCategories = [
     level: 3,
     parent_id: 39,
     description: "Stratégies de marketing pour les entreprises locales.",
+    imageUrl: "/categories/marketing/local-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/local-marketing/icon.svg",
+    slug: "marketing-local",
   },
   {
     id: 226,
@@ -1670,6 +2358,9 @@ const allCategories = [
     level: 3,
     parent_id: 39,
     description: "Techniques de marketing adaptées aux appareils mobiles.",
+    imageUrl: "/categories/marketing/mobile-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/mobile-marketing/icon.svg",
+    slug: "marketing-mobile",
   },
 
   // Niveau 3 pour "Divers" (Marketing digital)
@@ -1679,6 +2370,9 @@ const allCategories = [
     level: 3,
     parent_id: 40,
     description: "Rédaction de textes persuasifs pour le marketing.",
+    imageUrl: "/categories/writing/copywriting/banner.jpg",
+    iconUrl: "/categories/writing/copywriting/icon.svg",
+    slug: "copywriting",
   },
   {
     id: 228,
@@ -1686,6 +2380,9 @@ const allCategories = [
     level: 3,
     parent_id: 40,
     description: "Développement et gestion de l'image de marque.",
+    imageUrl: "/categories/marketing/branding/banner.jpg",
+    iconUrl: "/categories/marketing/branding/icon.svg",
+    slug: "branding",
   },
   {
     id: 229,
@@ -1693,6 +2390,9 @@ const allCategories = [
     level: 3,
     parent_id: 40,
     description: "Stratégies de marketing pour les podcasts.",
+    imageUrl: "/categories/marketing/podcast-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/podcast-marketing/icon.svg",
+    slug: "marketing-podcast",
   },
   {
     id: 230,
@@ -1700,6 +2400,9 @@ const allCategories = [
     level: 3,
     parent_id: 40,
     description: "Techniques de growth hacking et de marketing de croissance.",
+    imageUrl: "/categories/marketing/growth-hacking/banner.jpg",
+    iconUrl: "/categories/marketing/growth-hacking/icon.svg",
+    slug: "marketing-croissance",
   },
 
   // Niveau 3 pour "Édition et post-production"
@@ -1709,6 +2412,9 @@ const allCategories = [
     level: 3,
     parent_id: 41,
     description: "Services de montage et d'édition vidéo.",
+    imageUrl: "/categories/video/video-editing/banner.jpg",
+    iconUrl: "/categories/video/video-editing/icon.svg",
+    slug: "montage-video",
   },
   {
     id: 232,
@@ -1716,6 +2422,9 @@ const allCategories = [
     level: 3,
     parent_id: 41,
     description: "Étalonnage et correction des couleurs pour vidéos.",
+    imageUrl: "/categories/video/color-correction/banner.jpg",
+    iconUrl: "/categories/video/color-correction/icon.svg",
+    slug: "correction-couleurs-video",
   },
   {
     id: 233,
@@ -1723,6 +2432,9 @@ const allCategories = [
     level: 3,
     parent_id: 41,
     description: "Création d'effets visuels pour vidéos.",
+    imageUrl: "/categories/video/visual-effects/banner.jpg",
+    iconUrl: "/categories/video/visual-effects/icon.svg",
+    slug: "effets-visuels-video",
   },
   {
     id: 234,
@@ -1730,6 +2442,9 @@ const allCategories = [
     level: 3,
     parent_id: 41,
     description: "Ajout de sous-titres et de captions aux vidéos.",
+    imageUrl: "/categories/video/subtitles/banner.jpg",
+    iconUrl: "/categories/video/subtitles/icon.svg",
+    slug: "sous-titrage-video",
   },
 
   // Niveau 3 pour "Animation"
@@ -1739,6 +2454,9 @@ const allCategories = [
     level: 3,
     parent_id: 42,
     description: "Création d'animations en deux dimensions.",
+    imageUrl: "/categories/video/2d-animation/banner.jpg",
+    iconUrl: "/categories/video/2d-animation/icon.svg",
+    slug: "animation-2d",
   },
   {
     id: 236,
@@ -1746,6 +2464,9 @@ const allCategories = [
     level: 3,
     parent_id: 42,
     description: "Production d'animations en trois dimensions.",
+    imageUrl: "/categories/video/3d-animation/banner.jpg",
+    iconUrl: "/categories/video/3d-animation/icon.svg",
+    slug: "animation-3d",
   },
   {
     id: 237,
@@ -1753,6 +2474,9 @@ const allCategories = [
     level: 3,
     parent_id: 42,
     description: "Création de graphiques animés.",
+    imageUrl: "/categories/video/motion-graphics/banner.jpg",
+    iconUrl: "/categories/video/motion-graphics/icon.svg",
+    slug: "motion-graphics",
   },
   {
     id: 238,
@@ -1760,6 +2484,9 @@ const allCategories = [
     level: 3,
     parent_id: 42,
     description: "Réalisation d'animations en stop motion.",
+    imageUrl: "/categories/video/stop-motion/banner.jpg",
+    iconUrl: "/categories/video/stop-motion/icon.svg",
+    slug: "stop-motion",
   },
 
   // Niveau 3 pour "Production audiovisuelle"
@@ -1769,6 +2496,9 @@ const allCategories = [
     level: 3,
     parent_id: 43,
     description: "Services de réalisation de vidéos.",
+    imageUrl: "/categories/video/video-production/banner.jpg",
+    iconUrl: "/categories/video/video-production/icon.svg",
+    slug: "realisation-video",
   },
   {
     id: 240,
@@ -1776,6 +2506,9 @@ const allCategories = [
     level: 3,
     parent_id: 43,
     description: "Services de captation vidéo.",
+    imageUrl: "/categories/video/video-shooting/banner.jpg",
+    iconUrl: "/categories/video/video-shooting/icon.svg",
+    slug: "prise-vue-video",
   },
   {
     id: 241,
@@ -1783,6 +2516,9 @@ const allCategories = [
     level: 3,
     parent_id: 43,
     description: "Gestion de la production audiovisuelle.",
+    imageUrl: "/categories/video/audio-visual-production/banner.jpg",
+    iconUrl: "/categories/video/audio-visual-production/icon.svg",
+    slug: "production-audiovisuelle",
   },
   {
     id: 242,
@@ -1790,6 +2526,9 @@ const allCategories = [
     level: 3,
     parent_id: 43,
     description: "Écriture de scénarios pour productions vidéo.",
+    imageUrl: "/categories/video/scriptwriting/banner.jpg",
+    iconUrl: "/categories/video/scriptwriting/icon.svg",
+    slug: "scenarisation-video",
   },
 
   // Niveau 3 pour "Vidéos explicatives"
@@ -1799,6 +2538,9 @@ const allCategories = [
     level: 3,
     parent_id: 44,
     description: "Création de vidéos explicatives avec animations.",
+    imageUrl: "/categories/video/animated-explanatory-videos/banner.jpg",
+    iconUrl: "/categories/video/animated-explanatory-videos/icon.svg",
+    slug: "videos-explicatives-animées",
   },
   {
     id: 244,
@@ -1806,6 +2548,9 @@ const allCategories = [
     level: 3,
     parent_id: 44,
     description: "Réalisation d'animations sur tableau blanc.",
+    imageUrl: "/categories/video/whiteboard-animations/banner.jpg",
+    iconUrl: "/categories/video/whiteboard-animations/icon.svg",
+    slug: "whiteboard-animations",
   },
   {
     id: 245,
@@ -1813,6 +2558,9 @@ const allCategories = [
     level: 3,
     parent_id: 44,
     description: "Production de vidéos éducatives et de formation.",
+    imageUrl: "/categories/video/training-videos/banner.jpg",
+    iconUrl: "/categories/video/training-videos/icon.svg",
+    slug: "videos-formation",
   },
   {
     id: 246,
@@ -1820,6 +2568,9 @@ const allCategories = [
     level: 3,
     parent_id: 44,
     description: "Création de tutoriels vidéo étape par étape.",
+    imageUrl: "/categories/video/how-to-videos/banner.jpg",
+    iconUrl: "/categories/video/how-to-videos/icon.svg",
+    slug: "tutoriels-video",
   },
 
   // Niveau 3 pour "Vidéo d'IA"
@@ -1829,6 +2580,9 @@ const allCategories = [
     level: 3,
     parent_id: 45,
     description: "Création de vidéos assistée par l'intelligence artificielle.",
+    imageUrl: "/categories/video/ai-generated-videos/banner.jpg",
+    iconUrl: "/categories/video/ai-generated-videos/icon.svg",
+    slug: "video-ai",
   },
   {
     id: 248,
@@ -1836,6 +2590,9 @@ const allCategories = [
     level: 3,
     parent_id: 45,
     description: "Utilisation de l'IA pour l'édition et le montage vidéo.",
+    imageUrl: "/categories/video/ai-video-editing/banner.jpg",
+    iconUrl: "/categories/video/ai-video-editing/icon.svg",
+    slug: "edition-video-par-ia",
   },
   {
     id: 249,
@@ -1843,6 +2600,9 @@ const allCategories = [
     level: 3,
     parent_id: 45,
     description: "Amélioration de la qualité vidéo grâce à l'IA.",
+    imageUrl: "/categories/video/ai-video-enhancement/banner.jpg",
+    iconUrl: "/categories/video/ai-video-enhancement/icon.svg",
+    slug: "amelioration-video-par-ia",
   },
   {
     id: 250,
@@ -1850,6 +2610,9 @@ const allCategories = [
     level: 3,
     parent_id: 45,
     description: "Analyse du contenu vidéo par intelligence artificielle.",
+    imageUrl: "/categories/video/ai-video-analysis/banner.jpg",
+    iconUrl: "/categories/video/ai-video-analysis/icon.svg",
+    slug: "analyse-video-par-ia",
   },
 
   // Niveau 3 pour "Divers" (Vidéo & Animation)
@@ -1859,6 +2622,9 @@ const allCategories = [
     level: 3,
     parent_id: 46,
     description: "Création d'introductions et de conclusions vidéo.",
+    imageUrl: "/categories/video/intro-outro/banner.jpg",
+    iconUrl: "/categories/video/intro-outro/icon.svg",
+    slug: "intros-outros",
   },
   {
     id: 252,
@@ -1866,6 +2632,9 @@ const allCategories = [
     level: 3,
     parent_id: 46,
     description: "Services de conversion entre différents formats vidéo.",
+    imageUrl: "/categories/video/video-conversion/banner.jpg",
+    iconUrl: "/categories/video/video-conversion/icon.svg",
+    slug: "conversion-formats-video",
   },
 
   {
@@ -1874,6 +2643,9 @@ const allCategories = [
     level: 3,
     parent_id: 46,
     description: "Services de restauration de vidéos anciennes ou endommagées.",
+    imageUrl: "/categories/video/video-restoration/banner.jpg",
+    iconUrl: "/categories/video/video-restoration/icon.svg",
+    slug: "restauration-video",
   },
   {
     id: 254,
@@ -1881,6 +2653,9 @@ const allCategories = [
     level: 3,
     parent_id: 46,
     description: "Production de vidéos avec paroles pour chansons.",
+    imageUrl: "/categories/music/lyric-videos/banner.jpg",
+    iconUrl: "/categories/music/lyric-videos/icon.svg",
+    slug: "creation-lyric-videos",
   },
 
   // Niveau 3 pour "Rédaction de contenu"
@@ -1890,6 +2665,9 @@ const allCategories = [
     level: 3,
     parent_id: 47,
     description: "Rédaction d'articles de blog engageants.",
+    imageUrl: "/categories/writing/blog-writing/banner.jpg",
+    iconUrl: "/categories/writing/blog-writing/icon.svg",
+    slug: "articles-blog",
   },
   {
     id: 256,
@@ -1897,6 +2675,9 @@ const allCategories = [
     level: 3,
     parent_id: 47,
     description: "Écriture de descriptions de produits convaincantes.",
+    imageUrl: "/categories/writing/product-descriptions/banner.jpg",
+    iconUrl: "/categories/writing/product-descriptions/icon.svg",
+    slug: "descriptions-produits",
   },
   {
     id: 257,
@@ -1904,6 +2685,9 @@ const allCategories = [
     level: 3,
     parent_id: 47,
     description: "Création de contenu optimisé pour les moteurs de recherche.",
+    imageUrl: "/categories/marketing/seo/banner.jpg",
+    iconUrl: "/categories/marketing/seo/icon.svg",
+    slug: "redaction-seo",
   },
   {
     id: 258,
@@ -1911,6 +2695,9 @@ const allCategories = [
     level: 3,
     parent_id: 47,
     description: "Rédaction de documents techniques et manuels.",
+    imageUrl: "/categories/writing/technical-writing/banner.jpg",
+    iconUrl: "/categories/writing/technical-writing/icon.svg",
+    slug: "redaction-technique",
   },
 
   // Niveau 3 pour "Révision et feedback"
@@ -1920,6 +2707,9 @@ const allCategories = [
     level: 3,
     parent_id: 48,
     description: "Services de relecture et de correction de textes.",
+    imageUrl: "/categories/writing/proofreading/banner.jpg",
+    iconUrl: "/categories/writing/proofreading/icon.svg",
+    slug: "relecture-correction",
   },
   {
     id: 260,
@@ -1927,6 +2717,9 @@ const allCategories = [
     level: 3,
     parent_id: 48,
     description: "Édition et amélioration de contenu existant.",
+    imageUrl: "/categories/writing/content-editing/banner.jpg",
+    iconUrl: "/categories/writing/content-editing/icon.svg",
+    slug: "edition-contenu",
   },
   {
     id: 261,
@@ -1934,6 +2727,9 @@ const allCategories = [
     level: 3,
     parent_id: 48,
     description: "Fourniture de feedback constructif sur le contenu.",
+    imageUrl: "/categories/writing/content-feedback/banner.jpg",
+    iconUrl: "/categories/writing/content-feedback/icon.svg",
+    slug: "feedback-contenu",
   },
   {
     id: 262,
@@ -1942,6 +2738,9 @@ const allCategories = [
     parent_id: 48,
     description:
       "Vérification de l'exactitude des informations dans le contenu.",
+    imageUrl: "/categories/writing/fact-checking/banner.jpg",
+    iconUrl: "/categories/writing/fact-checking/icon.svg",
+    slug: "verification-faits",
   },
 
   // Niveau 3 pour "Publication de livres et ebooks"
@@ -1951,6 +2750,9 @@ const allCategories = [
     level: 3,
     parent_id: 49,
     description: "Services d'écriture de livres complets.",
+    imageUrl: "/categories/writing/book-writing/banner.jpg",
+    iconUrl: "/categories/writing/book-writing/icon.svg",
+    slug: "ecriture-livres",
   },
   {
     id: 264,
@@ -1958,6 +2760,9 @@ const allCategories = [
     level: 3,
     parent_id: 49,
     description: "Services d'édition et de révision de livres.",
+    imageUrl: "/categories/writing/book-editing/banner.jpg",
+    iconUrl: "/categories/writing/book-editing/icon.svg",
+    slug: "edition-livres",
   },
   {
     id: 265,
@@ -1965,6 +2770,9 @@ const allCategories = [
     level: 3,
     parent_id: 49,
     description: "Mise en forme et formatage d'ebooks.",
+    imageUrl: "/categories/writing/ebook-formatting/banner.jpg",
+    iconUrl: "/categories/writing/ebook-formatting/icon.svg",
+    slug: "formatage-ebooks",
   },
   {
     id: 266,
@@ -1972,6 +2780,9 @@ const allCategories = [
     level: 3,
     parent_id: 49,
     description: "Création de couvertures attrayantes pour livres et ebooks.",
+    imageUrl: "/categories/design/book-cover-design/banner.jpg",
+    iconUrl: "/categories/design/book-cover-design/icon.svg",
+    slug: "conception-couvertures-livres",
   },
 
   // Niveau 3 pour "Personal branding"
@@ -1981,6 +2792,9 @@ const allCategories = [
     level: 3,
     parent_id: 50,
     description: "Rédaction de biographies pour le personal branding.",
+    imageUrl: "/categories/writing/professional-biographies/banner.jpg",
+    iconUrl: "/categories/writing/professional-biographies/icon.svg",
+    slug: "biographies-professionnelles",
   },
   {
     id: 268,
@@ -1988,6 +2802,10 @@ const allCategories = [
     level: 3,
     parent_id: 50,
     description: "Optimisation de profils LinkedIn.",
+    imageUrl:
+      "/categories/social-media/linkedin-profile-optimization/banner.jpg",
+    iconUrl: "/categories/social-media/linkedin-profile-optimization/icon.svg",
+    slug: "profils-linkedin",
   },
   {
     id: 269,
@@ -1995,6 +2813,9 @@ const allCategories = [
     level: 3,
     parent_id: 50,
     description: "Rédaction de déclarations de mission personnelle.",
+    imageUrl: "/categories/writing/personal-mission-statements/banner.jpg",
+    iconUrl: "/categories/writing/personal-mission-statements/icon.svg",
+    slug: "declarations-mission-personnelle",
   },
   {
     id: 270,
@@ -2002,6 +2823,9 @@ const allCategories = [
     level: 3,
     parent_id: 50,
     description: "Création de récits personnels pour le branding.",
+    imageUrl: "/categories/marketing/branding/banner.jpg",
+    iconUrl: "/categories/marketing/branding/icon.svg",
+    slug: "storytelling-personnel",
   },
 
   // Niveau 3 pour "Divers" (Rédaction & Traduction)
@@ -2011,6 +2835,9 @@ const allCategories = [
     level: 3,
     parent_id: 51,
     description: "Services de transcription audio et vidéo.",
+    imageUrl: "/categories/writing/transcription/banner.jpg",
+    iconUrl: "/categories/writing/transcription/icon.svg",
+    slug: "transcription",
   },
   {
     id: 272,
@@ -2018,6 +2845,9 @@ const allCategories = [
     level: 3,
     parent_id: 51,
     description: "Écriture de discours percutants.",
+    imageUrl: "/categories/writing/public-speaking/banner.jpg",
+    iconUrl: "/categories/writing/public-speaking/icon.svg",
+    slug: "redaction-discours",
   },
   {
     id: 273,
@@ -2025,6 +2855,9 @@ const allCategories = [
     level: 3,
     parent_id: 51,
     description: "Rédaction de contenu pour l'expérience utilisateur.",
+    imageUrl: "/categories/design/ux-writing/banner.jpg",
+    iconUrl: "/categories/design/ux-writing/icon.svg",
+    slug: "redaction-ux",
   },
   {
     id: 274,
@@ -2032,6 +2865,9 @@ const allCategories = [
     level: 3,
     parent_id: 51,
     description: "Services de rédaction créative pour divers projets.",
+    imageUrl: "/categories/writing/creative-writing/banner.jpg",
+    iconUrl: "/categories/writing/creative-writing/icon.svg",
+    slug: "redaction-creative",
   },
 
   // Niveau 3 pour "Rédaction de contenu de ventes et marketing"
@@ -2041,6 +2877,9 @@ const allCategories = [
     level: 3,
     parent_id: 52,
     description: "Rédaction de textes publicitaires percutants.",
+    imageUrl: "/categories/writing/advertising-copywriting/banner.jpg",
+    iconUrl: "/categories/writing/advertising-copywriting/icon.svg",
+    slug: "copywriting-publicitaire",
   },
   {
     id: 276,
@@ -2048,6 +2887,9 @@ const allCategories = [
     level: 3,
     parent_id: 52,
     description: "Création de pages de vente convaincantes.",
+    imageUrl: "/categories/writing/sales-page-writing/banner.jpg",
+    iconUrl: "/categories/writing/sales-page-writing/icon.svg",
+    slug: "redaction-pages-vente",
   },
   {
     id: 277,
@@ -2055,6 +2897,9 @@ const allCategories = [
     level: 3,
     parent_id: 52,
     description: "Écriture d'e-mails marketing efficaces.",
+    imageUrl: "/categories/writing/email-marketing/banner.jpg",
+    iconUrl: "/categories/writing/email-marketing/icon.svg",
+    slug: "redaction-e-mails-marketing",
   },
   {
     id: 278,
@@ -2062,6 +2907,9 @@ const allCategories = [
     level: 3,
     parent_id: 52,
     description: "Rédaction de scripts pour les équipes de vente.",
+    imageUrl: "/categories/writing/sales-scripts/banner.jpg",
+    iconUrl: "/categories/writing/sales-scripts/icon.svg",
+    slug: "scripts-vente",
   },
 
   // Niveau 3 pour "Traduction & Transcription"
@@ -2071,6 +2919,9 @@ const allCategories = [
     level: 3,
     parent_id: 53,
     description: "Services de traduction pour divers types de documents.",
+    imageUrl: "/categories/writing/translation/banner.jpg",
+    iconUrl: "/categories/writing/translation/icon.svg",
+    slug: "traduction-generale",
   },
   {
     id: 280,
@@ -2078,6 +2929,9 @@ const allCategories = [
     level: 3,
     parent_id: 53,
     description: "Traduction de documents techniques et spécialisés.",
+    imageUrl: "/categories/writing/technical-translation/banner.jpg",
+    iconUrl: "/categories/writing/technical-translation/icon.svg",
+    slug: "traduction-technique",
   },
   {
     id: 281,
@@ -2085,6 +2939,9 @@ const allCategories = [
     level: 3,
     parent_id: 53,
     description: "Traduction de documents juridiques.",
+    imageUrl: "/categories/legal/juridical-translation/banner.jpg",
+    iconUrl: "/categories/legal/juridical-translation/icon.svg",
+    slug: "traduction-juridique",
   },
   {
     id: 282,
@@ -2092,6 +2949,9 @@ const allCategories = [
     level: 3,
     parent_id: 53,
     description: "Adaptation de contenu pour des marchés spécifiques.",
+    imageUrl: "/categories/writing/localization/banner.jpg",
+    iconUrl: "/categories/writing/localization/icon.svg",
+    slug: "localisation",
   },
 
   // Niveau 3 pour "Contenu spécifique à l'industrie"
@@ -2101,6 +2961,9 @@ const allCategories = [
     level: 3,
     parent_id: 54,
     description: "Rédaction de contenu pour l'industrie médicale.",
+    imageUrl: "/categories/writing/medical-content/banner.jpg",
+    iconUrl: "/categories/writing/medical-content/icon.svg",
+    slug: "contenu-medical",
   },
   {
     id: 284,
@@ -2108,6 +2971,9 @@ const allCategories = [
     level: 3,
     parent_id: 54,
     description: "Création de contenu pour le secteur financier.",
+    imageUrl: "/categories/writing/financial-content/banner.jpg",
+    iconUrl: "/categories/writing/financial-content/icon.svg",
+    slug: "contenu-financier",
   },
   {
     id: 285,
@@ -2115,6 +2981,9 @@ const allCategories = [
     level: 3,
     parent_id: 54,
     description: "Rédaction de contenu sur les technologies.",
+    imageUrl: "/categories/programming/technology-content/banner.jpg",
+    iconUrl: "/categories/programming/technology-content/icon.svg",
+    slug: "contenu-technologique",
   },
   {
     id: 286,
@@ -2122,6 +2991,9 @@ const allCategories = [
     level: 3,
     parent_id: 54,
     description: "Création de contenu pour le secteur de l'éducation.",
+    imageUrl: "/categories/writing/educational-content/banner.jpg",
+    iconUrl: "/categories/writing/educational-content/icon.svg",
+    slug: "contenu-educatif",
   },
 
   // Niveau 3 pour "Production et composition musicale"
@@ -2131,6 +3003,9 @@ const allCategories = [
     level: 3,
     parent_id: 55,
     description: "Création de compositions musicales originales.",
+    imageUrl: "/categories/music/original-music-composition/banner.jpg",
+    iconUrl: "/categories/music/original-music-composition/icon.svg",
+    slug: "composition-musique-originale",
   },
   {
     id: 288,
@@ -2138,6 +3013,9 @@ const allCategories = [
     level: 3,
     parent_id: 55,
     description: "Production de beats pour divers genres musicaux.",
+    imageUrl: "/categories/music/beat-production/banner.jpg",
+    iconUrl: "/categories/music/beat-production/icon.svg",
+    slug: "production-beats",
   },
   {
     id: 289,
@@ -2145,6 +3023,9 @@ const allCategories = [
     level: 3,
     parent_id: 55,
     description: "Services d'arrangement musical.",
+    imageUrl: "/categories/music/music-arrangement/banner.jpg",
+    iconUrl: "/categories/music/music-arrangement/icon.svg",
+    slug: "arrangement-musical",
   },
   {
     id: 290,
@@ -2152,6 +3033,9 @@ const allCategories = [
     level: 3,
     parent_id: 55,
     description: "Création de jingles et de musique pour la publicité.",
+    imageUrl: "/categories/music/advertising-music/banner.jpg",
+    iconUrl: "/categories/music/advertising-music/icon.svg",
+    slug: "jingles-musique-publicitaire",
   },
 
   // Niveau 3 pour "Ingénierie audio et post-production"
@@ -2161,6 +3045,9 @@ const allCategories = [
     level: 3,
     parent_id: 56,
     description: "Services de mixage audio professionnel.",
+    imageUrl: "/categories/music/audio-mixing/banner.jpg",
+    iconUrl: "/categories/music/audio-mixing/icon.svg",
+    slug: "mixage-audio",
   },
   {
     id: 292,
@@ -2169,6 +3056,9 @@ const allCategories = [
     parent_id: 56,
     description:
       "Mastering audio pour obtenir un son de qualité professionnelle.",
+    imageUrl: "/categories/music/audio-mastering/banner.jpg",
+    iconUrl: "/categories/music/audio-mastering/icon.svg",
+    slug: "mastering-audio",
   },
   {
     id: 293,
@@ -2176,6 +3066,9 @@ const allCategories = [
     level: 3,
     parent_id: 56,
     description: "Restauration d'enregistrements audio anciens ou endommagés.",
+    imageUrl: "/categories/music/audio-restoration/banner.jpg",
+    iconUrl: "/categories/music/audio-restoration/icon.svg",
+    slug: "restauration-audio",
   },
   {
     id: 294,
@@ -2183,6 +3076,9 @@ const allCategories = [
     level: 3,
     parent_id: 56,
     description: "Création d'effets sonores et de design sonore.",
+    imageUrl: "/categories/music/sound-design/banner.jpg",
+    iconUrl: "/categories/music/sound-design/icon.svg",
+    slug: "sound-design",
   },
 
   // Niveau 3 pour "Voix off et narration"
@@ -2192,6 +3088,9 @@ const allCategories = [
     level: 3,
     parent_id: 57,
     description: "Services de voix off pour publicités et présentations.",
+    imageUrl: "/categories/voice-over/commercial-voice-over/banner.jpg",
+    iconUrl: "/categories/voice-over/commercial-voice-over/icon.svg",
+    slug: "voix-off-commerciale",
   },
   {
     id: 296,
@@ -2199,6 +3098,9 @@ const allCategories = [
     level: 3,
     parent_id: 57,
     description: "Narration professionnelle pour livres audio.",
+    imageUrl: "/categories/voice-over/book-narration/banner.jpg",
+    iconUrl: "/categories/voice-over/book-narration/icon.svg",
+    slug: "narration-livres-audio",
   },
   {
     id: 297,
@@ -2206,6 +3108,9 @@ const allCategories = [
     level: 3,
     parent_id: 57,
     description: "Voix off pour contenus éducatifs et formations en ligne.",
+    imageUrl: "/categories/voice-over/e-learning-voice-over/banner.jpg",
+    iconUrl: "/categories/voice-over/e-learning-voice-over/icon.svg",
+    slug: "voix-off-e-learning",
   },
   {
     id: 298,
@@ -2213,6 +3118,9 @@ const allCategories = [
     level: 3,
     parent_id: 57,
     description: "Services de doublage pour films et séries.",
+    imageUrl: "/categories/voice-over/dubbing/banner.jpg",
+    iconUrl: "/categories/voice-over/dubbing/icon.svg",
+    slug: "doublage",
   },
 
   // Niveau 3 pour "Streaming et audio"
@@ -2222,6 +3130,9 @@ const allCategories = [
     level: 3,
     parent_id: 58,
     description: "Services de production et d'édition de podcasts.",
+    imageUrl: "/categories/audio/podcast-production/banner.jpg",
+    iconUrl: "/categories/audio/podcast-production/icon.svg",
+    slug: "production-podcasts",
   },
   {
     id: 300,
@@ -2229,6 +3140,9 @@ const allCategories = [
     level: 3,
     parent_id: 58,
     description: "Édition audio pour plateformes de streaming.",
+    imageUrl: "/categories/audio/streaming-audio-editing/banner.jpg",
+    iconUrl: "/categories/audio/streaming-audio-editing/icon.svg",
+    slug: "montage-audio-streaming",
   },
   {
     id: 301,
@@ -2236,6 +3150,9 @@ const allCategories = [
     level: 3,
     parent_id: 58,
     description: "Création d'introductions et de conclusions pour podcasts.",
+    imageUrl: "/categories/audio/podcast-intro-outro/banner.jpg",
+    iconUrl: "/categories/audio/podcast-intro-outro/icon.svg",
+    slug: "creation-intros-outros-podcasts",
   },
   {
     id: 302,
@@ -2244,6 +3161,9 @@ const allCategories = [
     parent_id: 58,
     description:
       "Optimisation de la qualité audio pour le streaming en direct.",
+    imageUrl: "/categories/audio/streaming-audio-optimization/banner.jpg",
+    iconUrl: "/categories/audio/streaming-audio-optimization/icon.svg",
+    slug: "optimisation-audio-streaming",
   },
 
   // Niveau 3 pour "DJing"
@@ -2253,6 +3173,9 @@ const allCategories = [
     level: 3,
     parent_id: 59,
     description: "Création de mix DJ sur mesure.",
+    imageUrl: "/categories/music/dj-mix/banner.jpg",
+    iconUrl: "/categories/music/dj-mix/icon.svg",
+    slug: "mix-dj-personnalise",
   },
   {
     id: 304,
@@ -2260,6 +3183,9 @@ const allCategories = [
     level: 3,
     parent_id: 59,
     description: "Création de remixes et de mashups musicaux.",
+    imageUrl: "/categories/music/remix-mashup/banner.jpg",
+    iconUrl: "/categories/music/remix-mashup/icon.svg",
+    slug: "remix-mashups",
   },
   {
     id: 305,
@@ -2267,6 +3193,9 @@ const allCategories = [
     level: 3,
     parent_id: 59,
     description: "Services de DJ pour événements en ligne.",
+    imageUrl: "/categories/music/virtual-dj/banner.jpg",
+    iconUrl: "/categories/music/virtual-dj/icon.svg",
+    slug: "dj-evenements-virtuels",
   },
   {
     id: 306,
@@ -2274,6 +3203,9 @@ const allCategories = [
     level: 3,
     parent_id: 59,
     description: "Production de sets DJ enregistrés.",
+    imageUrl: "/categories/music/dj-sets/banner.jpg",
+    iconUrl: "/categories/music/dj-sets/icon.svg",
+    slug: "production-sets-dj",
   },
 
   // Niveau 3 pour "Sound design"
@@ -2283,6 +3215,9 @@ const allCategories = [
     level: 3,
     parent_id: 60,
     description: "Création d'effets sonores pour jeux vidéo.",
+    imageUrl: "/categories/music/game-sound-design/banner.jpg",
+    iconUrl: "/categories/music/game-sound-design/icon.svg",
+    slug: "sound-design-jeux-video",
   },
   {
     id: 308,
@@ -2290,6 +3225,9 @@ const allCategories = [
     level: 3,
     parent_id: 60,
     description: "Conception sonore pour productions cinématographiques.",
+    imageUrl: "/categories/music/film-sound-design/banner.jpg",
+    iconUrl: "/categories/music/film-sound-design/icon.svg",
+    slug: "sound-design-films",
   },
   {
     id: 309,
@@ -2297,6 +3235,9 @@ const allCategories = [
     level: 3,
     parent_id: 60,
     description: "Création d'ambiances sonores pour divers médias.",
+    imageUrl: "/categories/music/ambient-sound-design/banner.jpg",
+    iconUrl: "/categories/music/ambient-sound-design/icon.svg",
+    slug: "ambiances-sonores",
   },
   {
     id: 310,
@@ -2304,6 +3245,9 @@ const allCategories = [
     level: 3,
     parent_id: 60,
     description: "Conception sonore pour applications mobiles et logiciels.",
+    imageUrl: "/categories/music/app-sound-design/banner.jpg",
+    iconUrl: "/categories/music/app-sound-design/icon.svg",
+    slug: "sound-design-applications",
   },
 
   // Niveau 3 pour "Cours et Transcriptions"
@@ -2313,6 +3257,9 @@ const allCategories = [
     level: 3,
     parent_id: 61,
     description: "Enseignement musical en ligne.",
+    imageUrl: "/categories/music/online-music-lessons/banner.jpg",
+    iconUrl: "/categories/music/online-music-lessons/icon.svg",
+    slug: "cours-musique-en-ligne",
   },
   {
     id: 312,
@@ -2320,6 +3267,9 @@ const allCategories = [
     level: 3,
     parent_id: 61,
     description: "Services de transcription musicale.",
+    imageUrl: "/categories/music/music-transcription/banner.jpg",
+    iconUrl: "/categories/music/music-transcription/icon.svg",
+    slug: "transcription-partitions",
   },
   {
     id: 313,
@@ -2327,6 +3277,9 @@ const allCategories = [
     level: 3,
     parent_id: 61,
     description: "Formation en production et ingénierie du son.",
+    imageUrl: "/categories/music/music-production/banner.jpg",
+    iconUrl: "/categories/music/music-production/icon.svg",
+    slug: "cours-production-musicale",
   },
   {
     id: 314,
@@ -2334,6 +3287,9 @@ const allCategories = [
     level: 3,
     parent_id: 61,
     description: "Transcription d'accords pour chansons.",
+    imageUrl: "/categories/music/chord-transcription/banner.jpg",
+    iconUrl: "/categories/music/chord-transcription/icon.svg",
+    slug: "transcription-accords",
   },
 
   // Niveau 3 pour "Gestion d'entreprises"
@@ -2343,6 +3299,9 @@ const allCategories = [
     level: 3,
     parent_id: 62,
     description: "Élaboration de plans stratégiques pour entreprises.",
+    imageUrl: "/categories/business/strategic-planning/banner.jpg",
+    iconUrl: "/categories/business/strategic-planning/icon.svg",
+    slug: "planification-strategique",
   },
   {
     id: 316,
@@ -2350,6 +3309,9 @@ const allCategories = [
     level: 3,
     parent_id: 62,
     description: "Services de gestion de projets d'entreprise.",
+    imageUrl: "/categories/business/project-management/banner.jpg",
+    iconUrl: "/categories/business/project-management/icon.svg",
+    slug: "gestion-projet",
   },
   {
     id: 317,
@@ -2357,6 +3319,9 @@ const allCategories = [
     level: 3,
     parent_id: 62,
     description: "Conseil en organisation et optimisation des processus.",
+    imageUrl: "/categories/business/organizational-consulting/banner.jpg",
+    iconUrl: "/categories/business/organizational-consulting/icon.svg",
+    slug: "conseil-organisation",
   },
   {
     id: 318,
@@ -2364,6 +3329,10 @@ const allCategories = [
     level: 3,
     parent_id: 62,
     description: "Services de gestion des ressources humaines.",
+    imageUrl:
+      "/categories/human-resources/human-resources-management/banner.jpg",
+    iconUrl: "/categories/human-resources/human-resources-management/icon.svg",
+    slug: "gestion-ressources-humaines",
   },
 
   // Niveau 3 pour "IA pour les entreprises"
@@ -2373,6 +3342,9 @@ const allCategories = [
     level: 3,
     parent_id: 63,
     description: "Automatisation des processus d'entreprise par l'IA.",
+    imageUrl: "/categories/ai/ai-automation/banner.jpg",
+    iconUrl: "/categories/ai/ai-automation/icon.svg",
+    slug: "automatisation-processus",
   },
   {
     id: 320,
@@ -2380,6 +3352,9 @@ const allCategories = [
     level: 3,
     parent_id: 63,
     description: "Utilisation de l'IA pour l'analyse prédictive en entreprise.",
+    imageUrl: "/categories/ai/ai-predictive-analytics/banner.jpg",
+    iconUrl: "/categories/ai/ai-predictive-analytics/icon.svg",
+    slug: "analyse-predictive",
   },
   {
     id: 321,
@@ -2387,6 +3362,9 @@ const allCategories = [
     level: 3,
     parent_id: 63,
     description: "Implémentation de chatbots IA pour les entreprises.",
+    imageUrl: "/categories/ai/ai-chatbots/banner.jpg",
+    iconUrl: "/categories/ai/ai-chatbots/icon.svg",
+    slug: "chatbots-entreprise",
   },
   {
     id: 322,
@@ -2394,6 +3372,9 @@ const allCategories = [
     level: 3,
     parent_id: 63,
     description: "Utilisation de l'IA pour améliorer la prise de décision.",
+    imageUrl: "/categories/ai/ai-decision-making/banner.jpg",
+    iconUrl: "/categories/ai/ai-decision-making/icon.svg",
+    slug: "ia-prise-decision",
   },
 
   // Niveau 3 pour "Services juridiques"
@@ -2403,6 +3384,9 @@ const allCategories = [
     level: 3,
     parent_id: 64,
     description: "Services de rédaction et révision de contrats.",
+    imageUrl: "/categories/legal/contract-drafting/banner.jpg",
+    iconUrl: "/categories/legal/contract-drafting/icon.svg",
+    slug: "redaction-contrats",
   },
   {
     id: 324,
@@ -2410,6 +3394,9 @@ const allCategories = [
     level: 3,
     parent_id: 64,
     description: "Services de conseil juridique pour entreprises.",
+    imageUrl: "/categories/legal/legal-consulting/banner.jpg",
+    iconUrl: "/categories/legal/legal-consulting/icon.svg",
+    slug: "conseil-juridique",
   },
   {
     id: 325,
@@ -2417,6 +3404,11 @@ const allCategories = [
     level: 3,
     parent_id: 64,
     description: "Gestion de la propriété intellectuelle.",
+    imageUrl:
+      "/categories/intellectual-property/intellectual-property-management/banner.jpg",
+    iconUrl:
+      "/categories/intellectual-property/intellectual-property-management/icon.svg",
+    slug: "propriete-intellectuelle",
   },
   {
     id: 326,
@@ -2424,6 +3416,9 @@ const allCategories = [
     level: 3,
     parent_id: 64,
     description: "Services de conformité aux réglementations.",
+    imageUrl: "/categories/compliance/regulatory-compliance/banner.jpg",
+    iconUrl: "/categories/compliance/regulatory-compliance/icon.svg",
+    slug: "conformite-reglementaire",
   },
 
   // Niveau 3 pour "Gestion e-commerce"
@@ -2433,6 +3428,9 @@ const allCategories = [
     level: 3,
     parent_id: 65,
     description: "Services de gestion de boutiques e-commerce.",
+    imageUrl: "/categories/business/e-commerce-management/banner.jpg",
+    iconUrl: "/categories/business/e-commerce-management/icon.svg",
+    slug: "gestion-boutique-e-commerce",
   },
   {
     id: 328,
@@ -2440,6 +3438,9 @@ const allCategories = [
     level: 3,
     parent_id: 65,
     description: "Optimisation du taux de conversion pour e-commerce.",
+    imageUrl: "/categories/business/e-commerce-optimization/banner.jpg",
+    iconUrl: "/categories/business/e-commerce-optimization/icon.svg",
+    slug: "optimisation-conversion-e-commerce",
   },
   {
     id: 329,
@@ -2447,6 +3448,9 @@ const allCategories = [
     level: 3,
     parent_id: 65,
     description: "Services de gestion des stocks pour e-commerce.",
+    imageUrl: "/categories/business/e-commerce-inventory-management/banner.jpg",
+    iconUrl: "/categories/business/e-commerce-inventory-management/icon.svg",
+    slug: "gestion-stocks-e-commerce",
   },
   {
     id: 330,
@@ -2454,6 +3458,9 @@ const allCategories = [
     level: 3,
     parent_id: 65,
     description: "Gestion du service client pour boutiques en ligne.",
+    imageUrl: "/categories/business/e-commerce-customer-service/banner.jpg",
+    iconUrl: "/categories/business/e-commerce-customer-service/icon.svg",
+    slug: "service-client-e-commerce",
   },
 
   // Niveau 3 pour "Data et veille économique"
@@ -2463,6 +3470,9 @@ const allCategories = [
     level: 3,
     parent_id: 66,
     description: "Services d'analyse de données d'entreprise.",
+    imageUrl: "/categories/business/data-analysis/banner.jpg",
+    iconUrl: "/categories/business/data-analysis/icon.svg",
+    slug: "analyse-donnees-entreprise",
   },
   {
     id: 332,
@@ -2470,6 +3480,9 @@ const allCategories = [
     level: 3,
     parent_id: 66,
     description: "Services de veille concurrentielle.",
+    imageUrl: "/categories/business/competitor-analysis/banner.jpg",
+    iconUrl: "/categories/business/competitor-analysis/icon.svg",
+    slug: "veille-concurrentielle",
   },
   {
     id: 333,
@@ -2477,6 +3490,9 @@ const allCategories = [
     level: 3,
     parent_id: 66,
     description: "Réalisation d'études de marché approfondies.",
+    imageUrl: "/categories/business/market-research/banner.jpg",
+    iconUrl: "/categories/business/market-research/icon.svg",
+    slug: "etudes-marche",
   },
   {
     id: 334,
@@ -2484,6 +3500,9 @@ const allCategories = [
     level: 3,
     parent_id: 66,
     description: "Création de tableaux de bord et rapports d'analyse.",
+    imageUrl: "/categories/business/business-intelligence/banner.jpg",
+    iconUrl: "/categories/business/business-intelligence/icon.svg",
+    slug: "tableaux-bord-reporting",
   },
 
   // Niveau 3 pour "Ventes et service client"
@@ -2493,6 +3512,9 @@ const allCategories = [
     level: 3,
     parent_id: 67,
     description: "Élaboration de stratégies de vente efficaces.",
+    imageUrl: "/categories/business/sales-strategy/banner.jpg",
+    iconUrl: "/categories/business/sales-strategy/icon.svg",
+    slug: "strategies-vente",
   },
   {
     id: 336,
@@ -2500,6 +3522,9 @@ const allCategories = [
     level: 3,
     parent_id: 67,
     description: "Formation et coaching des équipes commerciales.",
+    imageUrl: "/categories/business/sales-training/banner.jpg",
+    iconUrl: "/categories/business/sales-training/icon.svg",
+    slug: "formation-equipes-vente",
   },
   {
     id: 337,
@@ -2507,6 +3532,10 @@ const allCategories = [
     level: 3,
     parent_id: 67,
     description: "Mise en place et optimisation de systèmes CRM.",
+    imageUrl:
+      "/categories/business/customer-relationship-management/banner.jpg",
+    iconUrl: "/categories/business/customer-relationship-management/icon.svg",
+    slug: "gestion-relation-client",
   },
   {
     id: 338,
@@ -2514,6 +3543,9 @@ const allCategories = [
     level: 3,
     parent_id: 67,
     description: "Services de support client externalisés.",
+    imageUrl: "/categories/business/customer-support/banner.jpg",
+    iconUrl: "/categories/business/customer-support/icon.svg",
+    slug: "support-client",
   },
 
   // Niveau 3 pour "Général & Administratif"
@@ -2523,6 +3555,9 @@ const allCategories = [
     level: 3,
     parent_id: 68,
     description: "Services d'assistance virtuelle pour entreprises.",
+    imageUrl: "/categories/ai/ai-virtual-assistant/banner.jpg",
+    iconUrl: "/categories/ai/ai-virtual-assistant/icon.svg",
+    slug: "assistant-virtuel",
   },
   {
     id: 340,
@@ -2530,6 +3565,9 @@ const allCategories = [
     level: 3,
     parent_id: 68,
     description: "Services de gestion administrative externalisés.",
+    imageUrl: "/categories/business/administrative-services/banner.jpg",
+    iconUrl: "/categories/business/administrative-services/icon.svg",
+    slug: "gestion-administrative",
   },
   {
     id: 341,
@@ -2537,6 +3575,9 @@ const allCategories = [
     level: 3,
     parent_id: 68,
     description: "Services de saisie et de traitement de données.",
+    imageUrl: "/categories/data-management/data-entry/banner.jpg",
+    iconUrl: "/categories/data-management/data-entry/icon.svg",
+    slug: "saisie-donnees",
   },
   {
     id: 342,
@@ -2544,6 +3585,9 @@ const allCategories = [
     level: 3,
     parent_id: 68,
     description: "Services de transcription audio et vidéo.",
+    imageUrl: "/categories/writing/transcription/banner.jpg",
+    iconUrl: "/categories/writing/transcription/icon.svg",
+    slug: "transcription",
   },
 
   // Niveau 3 pour "Divers" (Business)
@@ -2553,6 +3597,9 @@ const allCategories = [
     level: 3,
     parent_id: 69,
     description: "Conseil en pratiques commerciales durables.",
+    imageUrl: "/categories/business/sustainability-consulting/banner.jpg",
+    iconUrl: "/categories/business/sustainability-consulting/icon.svg",
+    slug: "conseil-durabilite",
   },
   {
     id: 344,
@@ -2560,6 +3607,9 @@ const allCategories = [
     level: 3,
     parent_id: 69,
     description: "Optimisation de la chaîne d'approvisionnement.",
+    imageUrl: "/categories/business/supply-chain-optimization/banner.jpg",
+    iconUrl: "/categories/business/supply-chain-optimization/icon.svg",
+    slug: "optimisation-chaine-approvisionnement",
   },
   {
     id: 345,
@@ -2567,6 +3617,9 @@ const allCategories = [
     level: 3,
     parent_id: 69,
     description: "Services de conseil en innovation d'entreprise.",
+    imageUrl: "/categories/business/innovation-consulting/banner.jpg",
+    iconUrl: "/categories/business/innovation-consulting/icon.svg",
+    slug: "conseil-innovation",
   },
   {
     id: 346,
@@ -2574,6 +3627,10 @@ const allCategories = [
     level: 3,
     parent_id: 69,
     description: "Services de gestion et d'évaluation des risques.",
+    imageUrl:
+      "/categories/risk-management/risk-management-consulting/banner.jpg",
+    iconUrl: "/categories/risk-management/risk-management-consulting/icon.svg",
+    slug: "gestion-risques",
   },
 
   // Niveau 3 pour "Services de comptabilité"
@@ -2583,6 +3640,9 @@ const allCategories = [
     level: 3,
     parent_id: 70,
     description: "Services de tenue de livres comptables.",
+    imageUrl: "/categories/finance/accounting/banner.jpg",
+    iconUrl: "/categories/finance/accounting/icon.svg",
+    slug: "tenue-livres",
   },
   {
     id: 348,
@@ -2590,6 +3650,9 @@ const allCategories = [
     level: 3,
     parent_id: 70,
     description: "Services de préparation et de déclaration fiscale.",
+    imageUrl: "/categories/finance/tax-preparation/banner.jpg",
+    iconUrl: "/categories/finance/tax-preparation/icon.svg",
+    slug: "preparation-fiscale",
   },
   {
     id: 349,
@@ -2597,6 +3660,9 @@ const allCategories = [
     level: 3,
     parent_id: 70,
     description: "Services d'audit financier pour entreprises.",
+    imageUrl: "/categories/finance/auditing/banner.jpg",
+    iconUrl: "/categories/finance/auditing/icon.svg",
+    slug: "audit-financier",
   },
   {
     id: 350,
@@ -2604,6 +3670,9 @@ const allCategories = [
     level: 3,
     parent_id: 70,
     description: "Services de comptabilité analytique et de gestion.",
+    imageUrl: "/categories/finance/management-accounting/banner.jpg",
+    iconUrl: "/categories/finance/management-accounting/icon.svg",
+    slug: "comptabilite-gestion",
   },
 
   // Niveau 3 pour "Finance d'entreprise"
@@ -2613,6 +3682,9 @@ const allCategories = [
     level: 3,
     parent_id: 71,
     description: "Services de planification financière pour entreprises.",
+    imageUrl: "/categories/finance/financial-planning/banner.jpg",
+    iconUrl: "/categories/finance/financial-planning/icon.svg",
+    slug: "planification-financiere",
   },
   {
     id: 352,
@@ -2620,6 +3692,9 @@ const allCategories = [
     level: 3,
     parent_id: 71,
     description: "Services d'évaluation de la valeur des entreprises.",
+    imageUrl: "/categories/finance/business-valuation/banner.jpg",
+    iconUrl: "/categories/finance/business-valuation/icon.svg",
+    slug: "evaluation-entreprise",
   },
   {
     id: 353,
@@ -2627,6 +3702,9 @@ const allCategories = [
     level: 3,
     parent_id: 71,
     description: "Services de gestion de la trésorerie d'entreprise.",
+    imageUrl: "/categories/finance/treasury-management/banner.jpg",
+    iconUrl: "/categories/finance/treasury-management/icon.svg",
+    slug: "gestion-tresorerie",
   },
   {
     id: 354,
@@ -2634,6 +3712,9 @@ const allCategories = [
     level: 3,
     parent_id: 71,
     description: "Assistance à la levée de fonds pour entreprises.",
+    imageUrl: "/categories/finance/fundraising/banner.jpg",
+    iconUrl: "/categories/finance/fundraising/icon.svg",
+    slug: "levée-fonds",
   },
 
   // Niveau 3 pour "Analyse et planification financières"
@@ -2643,6 +3724,9 @@ const allCategories = [
     level: 3,
     parent_id: 72,
     description: "Création de modèles financiers complexes.",
+    imageUrl: "/categories/finance/financial-modeling/banner.jpg",
+    iconUrl: "/categories/finance/financial-modeling/icon.svg",
+    slug: "modelisation-financiere",
   },
   {
     id: 356,
@@ -2650,6 +3734,9 @@ const allCategories = [
     level: 3,
     parent_id: 72,
     description: "Analyse et évaluation d'opportunités d'investissement.",
+    imageUrl: "/categories/finance/investment-analysis/banner.jpg",
+    iconUrl: "/categories/finance/investment-analysis/icon.svg",
+    slug: "analyse-investissement",
   },
   {
     id: 357,
@@ -2657,6 +3744,9 @@ const allCategories = [
     level: 3,
     parent_id: 72,
     description: "Élaboration de prévisions financières.",
+    imageUrl: "/categories/finance/forecasting/banner.jpg",
+    iconUrl: "/categories/finance/forecasting/icon.svg",
+    slug: "previsions-financieres",
   },
   {
     id: 358,
@@ -2664,6 +3754,9 @@ const allCategories = [
     level: 3,
     parent_id: 72,
     description: "Analyse de la rentabilité des projets et activités.",
+    imageUrl: "/categories/finance/return-on-investment/banner.jpg",
+    iconUrl: "/categories/finance/return-on-investment/icon.svg",
+    slug: "analyse-rentabilite",
   },
 
   // Niveau 3 pour "Budget personnel et gestion du patrimoine"
@@ -2673,6 +3766,9 @@ const allCategories = [
     level: 3,
     parent_id: 73,
     description: "Services de planification financière pour particuliers.",
+    imageUrl: "/categories/finance/personal-finance-planning/banner.jpg",
+    iconUrl: "/categories/finance/personal-finance-planning/icon.svg",
+    slug: "planification-financiere-personnelle",
   },
   {
     id: 360,
@@ -2680,6 +3776,9 @@ const allCategories = [
     level: 3,
     parent_id: 73,
     description: "Services de gestion de portefeuille d'investissement.",
+    imageUrl: "/categories/finance/investment-portfolio-management/banner.jpg",
+    iconUrl: "/categories/finance/investment-portfolio-management/icon.svg",
+    slug: "gestion-portefeuille",
   },
   {
     id: 361,
@@ -2687,6 +3786,9 @@ const allCategories = [
     level: 3,
     parent_id: 73,
     description: "Conseil en planification de retraite.",
+    imageUrl: "/categories/finance/retirement-planning/banner.jpg",
+    iconUrl: "/categories/finance/retirement-planning/icon.svg",
+    slug: "conseil-retraite",
   },
   {
     id: 362,
@@ -2694,6 +3796,9 @@ const allCategories = [
     level: 3,
     parent_id: 73,
     description: "Services de planification successorale.",
+    imageUrl: "/categories/finance/estate-planning/banner.jpg",
+    iconUrl: "/categories/finance/estate-planning/icon.svg",
+    slug: "planification-successorale",
   },
 
   // Niveau 3 pour "Collecte de fonds"
@@ -2703,6 +3808,9 @@ const allCategories = [
     level: 3,
     parent_id: 74,
     description: "Stratégies et gestion de campagnes de crowdfunding.",
+    imageUrl: "/categories/business/crowdfunding/banner.jpg",
+    iconUrl: "/categories/business/crowdfunding/icon.svg",
+    slug: "crowdfunding",
   },
   {
     id: 364,
@@ -2710,6 +3818,9 @@ const allCategories = [
     level: 3,
     parent_id: 74,
     description: "Recherche et demande de subventions et financements.",
+    imageUrl: "/categories/business/grants-funding/banner.jpg",
+    iconUrl: "/categories/business/grants-funding/icon.svg",
+    slug: "subventions-financements",
   },
   {
     id: 365,
@@ -2718,6 +3829,9 @@ const allCategories = [
     parent_id: 74,
     description:
       "Stratégies de collecte de fonds pour organisations à but non lucratif.",
+    imageUrl: "/categories/business/non-profit-fundraising/banner.jpg",
+    iconUrl: "/categories/business/non-profit-fundraising/icon.svg",
+    slug: "collecte-fonds-associations",
   },
   {
     id: 366,
@@ -2725,6 +3839,9 @@ const allCategories = [
     level: 3,
     parent_id: 74,
     description: "Organisation d'événements pour la collecte de fonds.",
+    imageUrl: "/categories/business/fundraising-events/banner.jpg",
+    iconUrl: "/categories/business/fundraising-events/icon.svg",
+    slug: "evenements-collecte-fonds",
   },
 
   // Niveau 3 pour "Développement de l'IA"
@@ -2734,6 +3851,9 @@ const allCategories = [
     level: 3,
     parent_id: 75,
     description: "Création d'algorithmes d'intelligence artificielle.",
+    imageUrl: "/categories/ai/ai-algorithm-development/banner.jpg",
+    iconUrl: "/categories/ai/ai-algorithm-development/icon.svg",
+    slug: "developpement-algorithmes-ia",
   },
   {
     id: 368,
@@ -2741,6 +3861,9 @@ const allCategories = [
     level: 3,
     parent_id: 75,
     description: "Intégration de solutions d'IA dans des systèmes existants.",
+    imageUrl: "/categories/ai/ai-integration/banner.jpg",
+    iconUrl: "/categories/ai/ai-integration/icon.svg",
+    slug: "integration-ia",
   },
   {
     id: 369,
@@ -2748,6 +3871,9 @@ const allCategories = [
     level: 3,
     parent_id: 75,
     description: "Création de chatbots intelligents.",
+    imageUrl: "/categories/ai/ai-chatbots/banner.jpg",
+    iconUrl: "/categories/ai/ai-chatbots/icon.svg",
+    slug: "developpement-chatbots-ia",
   },
   {
     id: 370,
@@ -2755,6 +3881,9 @@ const allCategories = [
     level: 3,
     parent_id: 75,
     description: "Développement de modèles d'IA pour l'analyse prédictive.",
+    imageUrl: "/categories/ai/ai-predictive-modeling/banner.jpg",
+    iconUrl: "/categories/ai/ai-predictive-modeling/icon.svg",
+    slug: "ia-analyse-predictive",
   },
 
   // Niveau 3 pour "Data"
@@ -2765,6 +3894,9 @@ const allCategories = [
     parent_id: 76,
     description:
       "Services de nettoyage et de préparation de données pour l'IA.",
+    imageUrl: "/categories/ai/data-preprocessing/banner.jpg",
+    iconUrl: "/categories/ai/data-preprocessing/icon.svg",
+    slug: "nettoyage-preparation-donnees",
   },
   {
     id: 372,
@@ -2773,6 +3905,9 @@ const allCategories = [
     parent_id: 76,
     description:
       "Services d'annotation de données pour l'entraînement de modèles d'IA.",
+    imageUrl: "/categories/ai/data-annotation/banner.jpg",
+    iconUrl: "/categories/ai/data-annotation/icon.svg",
+    slug: "annotation-donnees",
   },
   {
     id: 373,
@@ -2780,6 +3915,9 @@ const allCategories = [
     level: 3,
     parent_id: 76,
     description: "Analyse de grands ensembles de données pour l'IA.",
+    imageUrl: "/categories/ai/big-data-analysis/banner.jpg",
+    iconUrl: "/categories/ai/big-data-analysis/icon.svg",
+    slug: "analyse-donnees-massives",
   },
   {
     id: 374,
@@ -2787,6 +3925,9 @@ const allCategories = [
     level: 3,
     parent_id: 76,
     description: "Création de visualisations de données pour l'IA.",
+    imageUrl: "/categories/ai/data-visualization/banner.jpg",
+    iconUrl: "/categories/ai/data-visualization/icon.svg",
+    slug: "visualisation-donnees",
   },
 
   // Niveau 3 pour "Artistes en IA"
@@ -2796,6 +3937,9 @@ const allCategories = [
     level: 3,
     parent_id: 77,
     description: "Création d'images uniques à l'aide de l'IA.",
+    imageUrl: "/categories/ai/ai-image-generation/banner.jpg",
+    iconUrl: "/categories/ai/ai-image-generation/icon.svg",
+    slug: "generation-images-ia",
   },
   {
     id: 376,
@@ -2803,6 +3947,9 @@ const allCategories = [
     level: 3,
     parent_id: 77,
     description: "Création d'œuvres d'art génératives avec l'IA.",
+    imageUrl: "/categories/ai/ai-generative-art/banner.jpg",
+    iconUrl: "/categories/ai/ai-generative-art/icon.svg",
+    slug: "art-generatif-ia",
   },
   {
     id: 377,
@@ -2810,6 +3957,9 @@ const allCategories = [
     level: 3,
     parent_id: 77,
     description: "Application de styles artistiques à des images via l'IA.",
+    imageUrl: "/categories/ai/ai-style-transfer/banner.jpg",
+    iconUrl: "/categories/ai/ai-style-transfer/icon.svg",
+    slug: "style-transfer-ia",
   },
   {
     id: 378,
@@ -2817,6 +3967,9 @@ const allCategories = [
     level: 3,
     parent_id: 77,
     description: "Création de NFT uniques à l'aide de l'IA.",
+    imageUrl: "/categories/ai/ai-nft-creation/banner.jpg",
+    iconUrl: "/categories/ai/ai-nft-creation/icon.svg",
+    slug: "creation-nft-ia",
   },
 
   // Niveau 3 pour "IA pour les entreprises"
@@ -2827,6 +3980,9 @@ const allCategories = [
     parent_id: 78,
     description:
       "Utilisation de l'IA pour automatiser les processus d'entreprise.",
+    imageUrl: "/categories/ai/ai-automation/banner.jpg",
+    iconUrl: "/categories/ai/ai-automation/icon.svg",
+    slug: "ia-automatisation-processus",
   },
   {
     id: 380,
@@ -2834,6 +3990,9 @@ const allCategories = [
     level: 3,
     parent_id: 78,
     description: "Implémentation de l'IA pour améliorer la prise de décision.",
+    imageUrl: "/categories/ai/ai-decision-making/banner.jpg",
+    iconUrl: "/categories/ai/ai-decision-making/icon.svg",
+    slug: "ia-prise-decision",
   },
   {
     id: 381,
@@ -2841,6 +4000,9 @@ const allCategories = [
     level: 3,
     parent_id: 78,
     description: "Utilisation de l'IA pour améliorer la relation client.",
+    imageUrl: "/categories/ai/ai-customer-service/banner.jpg",
+    iconUrl: "/categories/ai/ai-customer-service/icon.svg",
+    slug: "ia-relation-client",
   },
   {
     id: 382,
@@ -2849,6 +4011,9 @@ const allCategories = [
     parent_id: 78,
     description:
       "Application de l'IA pour optimiser les opérations d'entreprise.",
+    imageUrl: "/categories/ai/ai-operations-optimization/banner.jpg",
+    iconUrl: "/categories/ai/ai-operations-optimization/icon.svg",
+    slug: "ia-optimisation-operations",
   },
 
   // Niveau 3 pour "Vidéo d'IA"
@@ -2858,6 +4023,9 @@ const allCategories = [
     level: 3,
     parent_id: 79,
     description: "Création de vidéos à l'aide de l'intelligence artificielle.",
+    imageUrl: "/categories/video/ai-generated-videos/banner.jpg",
+    iconUrl: "/categories/video/ai-generated-videos/icon.svg",
+    slug: "video-ai",
   },
   {
     id: 384,
@@ -2865,6 +4033,9 @@ const allCategories = [
     level: 3,
     parent_id: 79,
     description: "Édition vidéo assistée par l'IA.",
+    imageUrl: "/categories/video/ai-video-editing/banner.jpg",
+    iconUrl: "/categories/video/ai-video-editing/icon.svg",
+    slug: "edition-video-automatisée",
   },
   {
     id: 385,
@@ -2872,6 +4043,9 @@ const allCategories = [
     level: 3,
     parent_id: 79,
     description: "Génération automatique de sous-titres par IA.",
+    imageUrl: "/categories/video/ai-subtitle-generation/banner.jpg",
+    iconUrl: "/categories/video/ai-subtitle-generation/icon.svg",
+    slug: "sous-titrage-automatique",
   },
   {
     id: 386,
@@ -2879,6 +4053,9 @@ const allCategories = [
     level: 3,
     parent_id: 79,
     description: "Analyse du contenu vidéo à l'aide de l'IA.",
+    imageUrl: "/categories/video/ai-video-analysis/banner.jpg",
+    iconUrl: "/categories/video/ai-video-analysis/icon.svg",
+    slug: "analyse-video-par-ia",
   },
 
   // Niveau 3 pour "Audio par l'IA"
@@ -2888,6 +4065,9 @@ const allCategories = [
     level: 3,
     parent_id: 80,
     description: "Création de compositions musicales à l'aide de l'IA.",
+    imageUrl: "/categories/music/ai-music-generation/banner.jpg",
+    iconUrl: "/categories/music/ai-music-generation/icon.svg",
+    slug: "generation-musique-par-ia",
   },
   {
     id: 388,
@@ -2895,6 +4075,9 @@ const allCategories = [
     level: 3,
     parent_id: 80,
     description: "Génération de voix artificielles réalistes.",
+    imageUrl: "/categories/music/ai-voice-synthesis/banner.jpg",
+    iconUrl: "/categories/music/ai-voice-synthesis/icon.svg",
+    slug: "synthèse-vocale",
   },
   {
     id: 389,
@@ -2902,6 +4085,9 @@ const allCategories = [
     level: 3,
     parent_id: 80,
     description: "Transcription de fichiers audio en texte par IA.",
+    imageUrl: "/categories/audio/ai-audio-transcription/banner.jpg",
+    iconUrl: "/categories/audio/ai-audio-transcription/icon.svg",
+    slug: "transcription-audio-automatique",
   },
   {
     id: 390,
@@ -2909,6 +4095,9 @@ const allCategories = [
     level: 3,
     parent_id: 80,
     description: "Amélioration de la qualité audio à l'aide de l'IA.",
+    imageUrl: "/categories/audio/ai-audio-enhancement/banner.jpg",
+    iconUrl: "/categories/audio/ai-audio-enhancement/icon.svg",
+    slug: "amelioration-audio-par-ia",
   },
 
   // Niveau 3 pour "Contenu de l'IA"
@@ -2918,6 +4107,9 @@ const allCategories = [
     level: 3,
     parent_id: 81,
     description: "Génération de contenu textuel à l'aide de l'IA.",
+    imageUrl: "/categories/writing/ai-content-generation/banner.jpg",
+    iconUrl: "/categories/writing/ai-content-generation/icon.svg",
+    slug: "redaction-contenu-par-ia",
   },
   {
     id: 392,
@@ -2925,6 +4117,9 @@ const allCategories = [
     level: 3,
     parent_id: 81,
     description: "Services de traduction automatique par IA.",
+    imageUrl: "/categories/writing/ai-translation/banner.jpg",
+    iconUrl: "/categories/writing/ai-translation/icon.svg",
+    slug: "traduction-automatique",
   },
   {
     id: 393,
@@ -2932,6 +4127,9 @@ const allCategories = [
     level: 3,
     parent_id: 81,
     description: "Création de résumés de textes par IA.",
+    imageUrl: "/categories/writing/ai-summary-generation/banner.jpg",
+    iconUrl: "/categories/writing/ai-summary-generation/icon.svg",
+    slug: "resume-automatique",
   },
   {
     id: 394,
@@ -2939,6 +4137,9 @@ const allCategories = [
     level: 3,
     parent_id: 81,
     description: "Création de titres et slogans accrocheurs par IA.",
+    imageUrl: "/categories/marketing/ai-branding/banner.jpg",
+    iconUrl: "/categories/marketing/ai-branding/icon.svg",
+    slug: "generation-titres-slogans",
   },
 
   // Niveau 3 pour "Développement personnel"
@@ -2948,6 +4149,9 @@ const allCategories = [
     level: 3,
     parent_id: 82,
     description: "Services de coaching pour le développement personnel.",
+    imageUrl: "/categories/personal-growth/life-coaching/banner.jpg",
+    iconUrl: "/categories/personal-growth/life-coaching/icon.svg",
+    slug: "coaching-vie",
   },
   {
     id: 396,
@@ -2955,6 +4159,9 @@ const allCategories = [
     level: 3,
     parent_id: 82,
     description: "Guidance en méditation et pratiques de pleine conscience.",
+    imageUrl: "/categories/wellness/mindfulness/banner.jpg",
+    iconUrl: "/categories/wellness/mindfulness/icon.svg",
+    slug: "meditation-pleine-conscience",
   },
   {
     id: 397,
@@ -2962,6 +4169,9 @@ const allCategories = [
     level: 3,
     parent_id: 82,
     description: "Techniques et conseils pour la gestion du stress.",
+    imageUrl: "/categories/wellness/stress-management/banner.jpg",
+    iconUrl: "/categories/wellness/stress-management/icon.svg",
+    slug: "gestion-stress",
   },
   {
     id: 398,
@@ -2969,6 +4179,9 @@ const allCategories = [
     level: 3,
     parent_id: 82,
     description: "Coaching pour renforcer la confiance en soi.",
+    imageUrl: "/categories/personal-growth/self-confidence/banner.jpg",
+    iconUrl: "/categories/personal-growth/self-confidence/icon.svg",
+    slug: "developpement-confiance-soi",
   },
 
   // Niveau 3 pour "Mode et style"
@@ -2978,6 +4191,9 @@ const allCategories = [
     level: 3,
     parent_id: 83,
     description: "Services de conseil en image personnelle.",
+    imageUrl: "/categories/fashion/personal-style/banner.jpg",
+    iconUrl: "/categories/fashion/personal-style/icon.svg",
+    slug: "conseil-image",
   },
   {
     id: 400,
@@ -2985,6 +4201,9 @@ const allCategories = [
     level: 3,
     parent_id: 83,
     description: "Services de stylisme et de conseil vestimentaire.",
+    imageUrl: "/categories/fashion/personal-style/banner.jpg",
+    iconUrl: "/categories/fashion/personal-style/icon.svg",
+    slug: "stylisme-personnel",
   },
   {
     id: 401,
@@ -2992,6 +4211,9 @@ const allCategories = [
     level: 3,
     parent_id: 83,
     description: "Conseils et techniques de maquillage personnalisés.",
+    imageUrl: "/categories/beauty/makeup-consultation/banner.jpg",
+    iconUrl: "/categories/beauty/makeup-consultation/icon.svg",
+    slug: "conseil-maquillage",
   },
   {
     id: 402,
@@ -2999,6 +4221,9 @@ const allCategories = [
     level: 3,
     parent_id: 83,
     description: "Conseils pour le choix de coiffures adaptées.",
+    imageUrl: "/categories/fashion/hair-styling/banner.jpg",
+    iconUrl: "/categories/fashion/hair-styling/icon.svg",
+    slug: "conseil-coiffure",
   },
 
   // Niveau 3 pour "Bien-être et fitness"
@@ -3008,6 +4233,9 @@ const allCategories = [
     level: 3,
     parent_id: 84,
     description: "Services de coaching pour l'entraînement physique.",
+    imageUrl: "/categories/wellness/fitness/banner.jpg",
+    iconUrl: "/categories/wellness/fitness/icon.svg",
+    slug: "coaching-fitness",
   },
   {
     id: 404,
@@ -3015,6 +4243,9 @@ const allCategories = [
     level: 3,
     parent_id: 84,
     description: "Conseils en nutrition et plans alimentaires personnalisés.",
+    imageUrl: "/categories/nutrition/diet-consultation/banner.jpg",
+    iconUrl: "/categories/nutrition/diet-consultation/icon.svg",
+    slug: "nutrition-dietetique",
   },
   {
     id: 405,
@@ -3022,6 +4253,9 @@ const allCategories = [
     level: 3,
     parent_id: 84,
     description: "Cours et séances de yoga et Pilates.",
+    imageUrl: "/categories/wellness/yoga-pilates/banner.jpg",
+    iconUrl: "/categories/wellness/yoga-pilates/icon.svg",
+    slug: "yoga-pilates",
   },
   {
     id: 406,
@@ -3029,6 +4263,9 @@ const allCategories = [
     level: 3,
     parent_id: 84,
     description: "Services de thérapies alternatives et holistiques.",
+    imageUrl: "/categories/wellness/alternative-therapies/banner.jpg",
+    iconUrl: "/categories/wellness/alternative-therapies/icon.svg",
+    slug: "therapies-alternatives",
   },
 
   // Niveau 3 pour "Jeux vidéo"
@@ -3039,6 +4276,9 @@ const allCategories = [
     parent_id: 85,
     description:
       "Services de coaching pour améliorer les performances dans les jeux vidéo.",
+    imageUrl: "/categories/gaming/game-coaching/banner.jpg",
+    iconUrl: "/categories/gaming/game-coaching/icon.svg",
+    slug: "coaching-jeux-video",
   },
   {
     id: 408,
@@ -3046,6 +4286,9 @@ const allCategories = [
     level: 3,
     parent_id: 85,
     description: "Services liés au streaming de jeux vidéo.",
+    imageUrl: "/categories/gaming/streaming-games/banner.jpg",
+    iconUrl: "/categories/gaming/streaming-games/icon.svg",
+    slug: "streaming-jeux-video",
   },
   {
     id: 409,
@@ -3053,6 +4296,9 @@ const allCategories = [
     level: 3,
     parent_id: 85,
     description: "Services de test et d'évaluation de jeux vidéo.",
+    imageUrl: "/categories/gaming/game-testing/banner.jpg",
+    iconUrl: "/categories/gaming/game-testing/icon.svg",
+    slug: "tests-jeux-video",
   },
   {
     id: 410,
@@ -3060,6 +4306,9 @@ const allCategories = [
     level: 3,
     parent_id: 85,
     description: "Création de contenu lié aux  jeux vidéo.",
+    imageUrl: "/categories/gaming/game-content-creation/banner.jpg",
+    iconUrl: "/categories/gaming/game-content-creation/icon.svg",
+    slug: "creation-contenu-gaming",
   },
 
   // Niveau 3 pour "Loisirs & Hobbies"
@@ -3069,6 +4318,9 @@ const allCategories = [
     level: 3,
     parent_id: 86,
     description: "Leçons de musique pour divers instruments.",
+    imageUrl: "/categories/music/music-lessons/banner.jpg",
+    iconUrl: "/categories/music/music-lessons/icon.svg",
+    slug: "cours-musique",
   },
   {
     id: 412,
@@ -3076,6 +4328,9 @@ const allCategories = [
     level: 3,
     parent_id: 86,
     description: "Cours de dessin, peinture et autres formes d'art.",
+    imageUrl: "/categories/art/art-lessons/banner.jpg",
+    iconUrl: "/categories/art/art-lessons/icon.svg",
+    slug: "cours-art",
   },
   {
     id: 413,
@@ -3083,6 +4338,9 @@ const allCategories = [
     level: 3,
     parent_id: 86,
     description: "Formation en photographie pour tous niveaux.",
+    imageUrl: "/categories/photography/photography-lessons/banner.jpg",
+    iconUrl: "/categories/photography/photography-lessons/icon.svg",
+    slug: "cours-photographie",
   },
   {
     id: 414,
@@ -3090,6 +4348,9 @@ const allCategories = [
     level: 3,
     parent_id: 86,
     description: "Leçons de cuisine et de pâtisserie.",
+    imageUrl: "/categories/culinary-arts/cooking-classes/banner.jpg",
+    iconUrl: "/categories/culinary-arts/cooking-classes/icon.svg",
+    slug: "cours-cuisine",
   },
 
   // Niveau 3 pour "Divers" (Croissance personnelle)
@@ -3099,6 +4360,9 @@ const allCategories = [
     level: 3,
     parent_id: 87,
     description: "Services d'astrologie et de lecture de tarots.",
+    imageUrl: "/categories/astrology/astrology-consulting/banner.jpg",
+    iconUrl: "/categories/astrology/astrology-consulting/icon.svg",
+    slug: "astrologie-tarologie",
   },
   {
     id: 416,
@@ -3106,6 +4370,9 @@ const allCategories = [
     level: 3,
     parent_id: 87,
     description: "Cours pour développer diverses compétences personnelles.",
+    imageUrl: "/categories/personal-growth/skill-development/banner.jpg",
+    iconUrl: "/categories/personal-growth/skill-development/icon.svg",
+    slug: "developpement-competences",
   },
   {
     id: 417,
@@ -3113,6 +4380,9 @@ const allCategories = [
     level: 3,
     parent_id: 87,
     description: "Coaching pour améliorer les relations personnelles.",
+    imageUrl: "/categories/personal-growth/relationship-coaching/banner.jpg",
+    iconUrl: "/categories/personal-growth/relationship-coaching/icon.svg",
+    slug: "coaching-relationnel",
   },
   {
     id: 418,
@@ -3120,6 +4390,9 @@ const allCategories = [
     level: 3,
     parent_id: 87,
     description: "Services de coaching pour l'évolution professionnelle.",
+    imageUrl: "/categories/career-development/career-coaching/banner.jpg",
+    iconUrl: "/categories/career-development/career-coaching/icon.svg",
+    slug: "coaching-carriere",
   },
 
   // Niveau 3 pour "Conseillers d'entreprise"
@@ -3129,6 +4402,9 @@ const allCategories = [
     level: 3,
     parent_id: 88,
     description: "Services de conseil en stratégie d'entreprise.",
+    imageUrl: "/categories/consulting/strategic-consulting/banner.jpg",
+    iconUrl: "/categories/consulting/strategic-consulting/icon.svg",
+    slug: "conseil-strategie",
   },
   {
     id: 420,
@@ -3137,6 +4413,9 @@ const allCategories = [
     parent_id: 88,
     description:
       "Conseil en gestion d'entreprise et optimisation des processus.",
+    imageUrl: "/categories/business/business-consulting/banner.jpg",
+    iconUrl: "/categories/business/business-consulting/icon.svg",
+    slug: "conseil-gestion",
   },
   {
     id: 421,
@@ -3144,6 +4423,10 @@ const allCategories = [
     level: 3,
     parent_id: 88,
     description: "Services de conseil en gestion des ressources humaines.",
+    imageUrl:
+      "/categories/human-resources/human-resources-consulting/banner.jpg",
+    iconUrl: "/categories/human-resources/human-resources-consulting/icon.svg",
+    slug: "conseil-ressources-humaines",
   },
   {
     id: 422,
@@ -3152,6 +4435,11 @@ const allCategories = [
     parent_id: 88,
     description:
       "Accompagnement dans la transformation numérique des entreprises.",
+    imageUrl:
+      "/categories/digital-transformation/digital-transformation-consulting/banner.jpg",
+    iconUrl:
+      "/categories/digital-transformation/digital-transformation-consulting/icon.svg",
+    slug: "accompagnement-transformation-numerique",
   },
 
   // Niveau 3 pour "Stratégie marketing"
@@ -3161,6 +4449,9 @@ const allCategories = [
     level: 3,
     parent_id: 89,
     description: "Élaboration de stratégies de marque.",
+    imageUrl: "/categories/marketing/brand-strategy/banner.jpg",
+    iconUrl: "/categories/marketing/brand-strategy/icon.svg",
+    slug: "strategie-marque",
   },
   {
     id: 424,
@@ -3168,6 +4459,9 @@ const allCategories = [
     level: 3,
     parent_id: 89,
     description: "Conseil en stratégie de marketing numérique.",
+    imageUrl: "/categories/marketing/digital-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/digital-marketing/icon.svg",
+    slug: "marketing-digital",
   },
   {
     id: 425,
@@ -3175,6 +4469,9 @@ const allCategories = [
     level: 3,
     parent_id: 89,
     description: "Développement de stratégies de contenu marketing.",
+    imageUrl: "/categories/marketing/content-marketing/banner.jpg",
+    iconUrl: "/categories/marketing/content-marketing/icon.svg",
+    slug: "strategie-contenu",
   },
   {
     id: 426,
@@ -3182,6 +4479,9 @@ const allCategories = [
     level: 3,
     parent_id: 89,
     description: "Réalisation d'analyses de marché approfondies.",
+    imageUrl: "/categories/business/market-analysis/banner.jpg",
+    iconUrl: "/categories/business/market-analysis/icon.svg",
+    slug: "analyse-marche",
   },
 
   // Niveau 3 pour "Accompagnement et conseils"
@@ -3191,6 +4491,9 @@ const allCategories = [
     level: 3,
     parent_id: 90,
     description: "Services de coaching pour dirigeants et équipes.",
+    imageUrl: "/categories/consulting/executive-coaching/banner.jpg",
+    iconUrl: "/categories/consulting/executive-coaching/icon.svg",
+    slug: "coaching-entreprise",
   },
   {
     id: 428,
@@ -3198,6 +4501,9 @@ const allCategories = [
     level: 3,
     parent_id: 90,
     description: "Mentorat pour entrepreneurs et startups.",
+    imageUrl: "/categories/consulting/entrepreneur-mentorship/banner.jpg",
+    iconUrl: "/categories/consulting/entrepreneur-mentorship/icon.svg",
+    slug: "mentorat-entrepreneurial",
   },
   {
     id: 429,
@@ -3205,6 +4511,9 @@ const allCategories = [
     level: 3,
     parent_id: 90,
     description: "Conseils pour améliorer la productivité en entreprise.",
+    imageUrl: "/categories/business/productivity-consulting/banner.jpg",
+    iconUrl: "/categories/business/productivity-consulting/icon.svg",
+    slug: "conseil-productivite",
   },
   {
     id: 430,
@@ -3213,6 +4522,9 @@ const allCategories = [
     parent_id: 90,
     description:
       "Accompagnement dans les processus de changement organisationnel.",
+    imageUrl: "/categories/business/change-management/banner.jpg",
+    iconUrl: "/categories/business/change-management/icon.svg",
+    slug: "accompagnement-changement",
   },
 
   // Niveau 3 pour "Conseil en technologie"
@@ -3222,6 +4534,9 @@ const allCategories = [
     level: 3,
     parent_id: 91,
     description: "Conseil en architecture des systèmes d'information.",
+    imageUrl: "/categories/technology/it-architecture/banner.jpg",
+    iconUrl: "/categories/technology/it-architecture/icon.svg",
+    slug: "architecture-it",
   },
   {
     id: 432,
@@ -3229,6 +4544,9 @@ const allCategories = [
     level: 3,
     parent_id: 91,
     description: "Conseil en cybersécurité et protection des données.",
+    imageUrl: "/categories/security/cybersecurity/banner.jpg",
+    iconUrl: "/categories/security/cybersecurity/icon.svg",
+    slug: "securite-informatique",
   },
   {
     id: 433,
@@ -3236,6 +4554,11 @@ const allCategories = [
     level: 3,
     parent_id: 91,
     description: "Accompagnement dans la transformation numérique.",
+    imageUrl:
+      "/categories/digital-transformation/digital-transformation-consulting/banner.jpg",
+    iconUrl:
+      "/categories/digital-transformation/digital-transformation-consulting/icon.svg",
+    slug: "transformation-numerique",
   },
   {
     id: 434,
@@ -3243,6 +4566,9 @@ const allCategories = [
     level: 3,
     parent_id: 91,
     description: "Conseil sur les nouvelles technologies et l'innovation.",
+    imageUrl: "/categories/technology/innovation-consulting/banner.jpg",
+    iconUrl: "/categories/technology/innovation-consulting/icon.svg",
+    slug: "conseil-innovation-technologique",
   },
 
   // Niveau 3 pour "Mentorat"
@@ -3252,6 +4578,9 @@ const allCategories = [
     level: 3,
     parent_id: 92,
     description: "Mentorat pour développer les compétences de leadership.",
+    imageUrl: "/categories/leadership/leadership-development/banner.jpg",
+    iconUrl: "/categories/leadership/leadership-development/icon.svg",
+    slug: "mentorat-leadership",
   },
   {
     id: 436,
@@ -3259,6 +4588,9 @@ const allCategories = [
     level: 3,
     parent_id: 92,
     description: "Accompagnement des entrepreneurs dans leur parcours.",
+    imageUrl: "/categories/entrepreneurship/entrepreneur-mentorship/banner.jpg",
+    iconUrl: "/categories/entrepreneurship/entrepreneur-mentorship/icon.svg",
+    slug: "mentorat-entrepreneuriat",
   },
   {
     id: 437,
@@ -3266,6 +4598,11 @@ const allCategories = [
     level: 3,
     parent_id: 92,
     description: "Guidance pour l'évolution et la transition de carrière.",
+    imageUrl:
+      "/categories/career-development/career-transition-coaching/banner.jpg",
+    iconUrl:
+      "/categories/career-development/career-transition-coaching/icon.svg",
+    slug: "mentorat-carriere",
   },
   {
     id: 438,
@@ -3273,6 +4610,9 @@ const allCategories = [
     level: 3,
     parent_id: 92,
     description: "Mentorat dans des domaines techniques spécifiques.",
+    imageUrl: "/categories/technology/technical-mentorship/banner.jpg",
+    iconUrl: "/categories/technology/technical-mentorship/icon.svg",
+    slug: "mentorat-technique",
   },
 
   // Niveau 3 pour "Produits et loisirs"
@@ -3282,6 +4622,9 @@ const allCategories = [
     level: 3,
     parent_id: 93,
     description: "Services de photographie professionnelle de produits.",
+    imageUrl: "/categories/photography/product-photography/banner.jpg",
+    iconUrl: "/categories/photography/product-photography/icon.svg",
+    slug: "photographie-produits",
   },
   {
     id: 440,
@@ -3289,6 +4632,9 @@ const allCategories = [
     level: 3,
     parent_id: 93,
     description: "Photographie spécialisée pour la nourriture et les boissons.",
+    imageUrl: "/categories/culinary-arts/food-photography/banner.jpg",
+    iconUrl: "/categories/culinary-arts/food-photography/icon.svg",
+    slug: "photographie-culinaire",
   },
   {
     id: 441,
@@ -3296,6 +4642,9 @@ const allCategories = [
     level: 3,
     parent_id: 93,
     description: "Services de photographie pour événements et célébrations.",
+    imageUrl: "/categories/photography/event-photography/banner.jpg",
+    iconUrl: "/categories/photography/event-photography/icon.svg",
+    slug: "photographie-evenements",
   },
   {
     id: 442,
@@ -3303,6 +4652,9 @@ const allCategories = [
     level: 3,
     parent_id: 93,
     description: "Services de photographie pour la mode et le style.",
+    imageUrl: "/categories/fashion/fashion-photography/banner.jpg",
+    iconUrl: "/categories/fashion/fashion-photography/icon.svg",
+    slug: "photographie-mode",
   },
 
   // Niveau 3 pour "Personnes et scènes"
@@ -3312,6 +4664,9 @@ const allCategories = [
     level: 3,
     parent_id: 94,
     description: "Services de photographie de portraits professionnels.",
+    imageUrl: "/categories/photography/portrait-photography/banner.jpg",
+    iconUrl: "/categories/photography/portrait-photography/icon.svg",
+    slug: "photographie-portrait",
   },
   {
     id: 444,
@@ -3319,6 +4674,9 @@ const allCategories = [
     level: 3,
     parent_id: 94,
     description: "Services de photographie spécialisée pour les mariages.",
+    imageUrl: "/categories/wedding-photography/wedding-photography/banner.jpg",
+    iconUrl: "/categories/wedding-photography/wedding-photography/icon.svg",
+    slug: "photographie-mariage",
   },
   {
     id: 445,
@@ -3326,6 +4684,11 @@ const allCategories = [
     level: 3,
     parent_id: 94,
     description: "Services de photographie pour l'immobilier.",
+    imageUrl:
+      "/categories/real-estate-photography/real-estate-photography/banner.jpg",
+    iconUrl:
+      "/categories/real-estate-photography/real-estate-photography/icon.svg",
+    slug: "photographie-immobiliere",
   },
   {
     id: 446,
@@ -3333,6 +4696,10 @@ const allCategories = [
     level: 3,
     parent_id: 94,
     description: "Services de photographie de paysages.",
+    imageUrl:
+      "/categories/landscape-photography/landscape-photography/banner.jpg",
+    iconUrl: "/categories/landscape-photography/landscape-photography/icon.svg",
+    slug: "photographie-paysages",
   },
 
   // Niveau 3 pour "Photographies locales"
@@ -3342,6 +4709,9 @@ const allCategories = [
     level: 3,
     parent_id: 95,
     description: "Services de photographie à New York.",
+    imageUrl: "/categories/photography/new-york-photography/banner.jpg",
+    iconUrl: "/categories/photography/new-york-photography/icon.svg",
+    slug: "photographie-new-york",
   },
   {
     id: 448,
@@ -3349,6 +4719,9 @@ const allCategories = [
     level: 3,
     parent_id: 95,
     description: "Services de photographie à Los Angeles.",
+    imageUrl: "/categories/photography/los-angeles-photography/banner.jpg",
+    iconUrl: "/categories/photography/los-angeles-photography/icon.svg",
+    slug: "photographie-los-angeles",
   },
   {
     id: 449,
@@ -3356,6 +4729,9 @@ const allCategories = [
     level: 3,
     parent_id: 95,
     description: "Services de photographie à Londres.",
+    imageUrl: "/categories/photography/london-photography/banner.jpg",
+    iconUrl: "/categories/photography/london-photography/icon.svg",
+    slug: "photographie-london",
   },
   {
     id: 450,
@@ -3363,6 +4739,9 @@ const allCategories = [
     level: 3,
     parent_id: 95,
     description: "Services de photographie à Paris.",
+    imageUrl: "/categories/photography/paris-photography/banner.jpg",
+    iconUrl: "/categories/photography/paris-photography/icon.svg",
+    slug: "photographie-paris",
   },
   {
     id: 451,
@@ -3370,6 +4749,9 @@ const allCategories = [
     level: 3,
     parent_id: 95,
     description: "Services de photographie dans diverses villes.",
+    imageUrl: "/categories/photography/city-photography/banner.jpg",
+    iconUrl: "/categories/photography/city-photography/icon.svg",
+    slug: "photographie-diverses-villes",
   },
 
   // Niveau 3 pour "Divers" (Photographie)
@@ -3379,6 +4761,9 @@ const allCategories = [
     level: 3,
     parent_id: 96,
     description: "Cours et ateliers de photographie.",
+    imageUrl: "/categories/photography/photography-workshops/banner.jpg",
+    iconUrl: "/categories/photography/photography-workshops/icon.svg",
+    slug: "cours-photographie",
   },
   {
     id: 453,
@@ -3386,12 +4771,19 @@ const allCategories = [
     level: 3,
     parent_id: 96,
     description: "Création de préréglages pour l'édition photo.",
+    imageUrl: "/categories/photography/photo-editing/banner.jpg",
+    iconUrl: "/categories/photography/photo-editing/icon.svg",
+    slug: "creation-prereglages-photo",
   },
   {
+    id: 454,
     name: "Autres",
     level: 3,
     parent_id: 96,
     description: "Autres services de photographie spécialisés.",
+    imageUrl: "/categories/photography/other/banner.jpg",
+    iconUrl: "/categories/photography/other/icon.svg",
+    slug: "divers-photographie-specialise",
   },
 ];
 
@@ -3402,9 +4794,7 @@ export const seedCategory = async () => {
     "----- The categoryHierarchy table has been successfully cleared.",
   );
 
-  // Sort categories by level
   const sortedCategories = allCategories.sort((a, b) => a.level - b.level);
-
   const categoryMap = new Map();
 
   for (const category of sortedCategories) {
@@ -3417,6 +4807,10 @@ export const seedCategory = async () => {
           parentId: category.parent_id
             ? categoryMap.get(category.parent_id)
             : null,
+          imageUrl: category.imageUrl || null,
+          iconUrl: category.iconUrl || null,
+          slug:
+            category.slug || category.name.toLowerCase().replace(/\s+/g, "-"),
         },
       });
       categoryMap.set(category.id, createdCategory.id);
