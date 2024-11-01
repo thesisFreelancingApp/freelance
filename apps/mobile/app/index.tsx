@@ -1,140 +1,161 @@
+import { View, ScrollView, RefreshControl, Dimensions } from "react-native";
 import { router } from "expo-router";
-import * as React from "react";
-import { View } from "react-native";
-import Animated, {
-    FadeInUp,
-    FadeOutDown,
-    LayoutAnimationConfig,
-} from "react-native-reanimated";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { Button } from "~/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card";
-import { Progress } from "~/components/ui/progress";
 import { Text } from "~/components/ui/text";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "~/components/ui/tooltip";
-import { Info } from "~/lib/icons/Info";
+import { ServiceCard } from "~/components/service-card";
+import { useServices } from "~/lib/hooks/use-services";
+import { Search, ChevronRight } from "lucide-react-native";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
-const GITHUB_AVATAR_URI =
-    "https://i.pinimg.com/originals/ef/a2/8d/efa28d18a04e7fa40ed49eeb0ab660db.jpg";
+const categories = [
+  { name: "Graphisme & Design", icon: "🎨" },
+  { name: "Marketing digital", icon: "📱" },
+  { name: "Rédaction & Traduction", icon: "✍️" },
+  { name: "Vidéo & Animation", icon: "🎥" },
+  { name: "Musique & Audio", icon: "🎵" },
+  { name: "Programmation & Tech", icon: "💻" },
+  { name: "Business", icon: "💼" },
+  { name: "Data", icon: "📊" },
+];
 
-export default function Screen() {
-    const [progress, setProgress] = React.useState(78);
+export default function HomeScreen() {
+  const { services, isLoading, refetch } = useServices();
+  console.log("services ++++++++++", services);
+  const width = Dimensions.get("window").width;
 
-    function updateProgressValue() {
-        setProgress(Math.floor(Math.random() * 100));
-    }
-    return (
-        <View className="items-center justify-center flex-1 gap-5 p-6 bg-secondary/30">
-            <Card className="w-full max-w-sm p-6 rounded-2xl">
-                <CardHeader className="items-center">
-                    <Avatar
-                        alt="Rick Sanchez's Avatar"
-                        className="w-24 h-24"
-                    >
-                        <AvatarImage source={{ uri: GITHUB_AVATAR_URI }} />
-                        <AvatarFallback>
-                            <Text>RS</Text>
-                        </AvatarFallback>
-                    </Avatar>
-                    <View className="p-3" />
-                    <CardTitle className="pb-2 text-center">
-                        Rick Sanchez
-                    </CardTitle>
-                    <View className="flex-row">
-                        <CardDescription className="text-base font-semibold">
-                            Scientist
-                        </CardDescription>
-                        <Tooltip delayDuration={150}>
-                            <TooltipTrigger className="px-2 pb-0.5 active:opacity-50">
-                                <Info
-                                    size={14}
-                                    strokeWidth={2.5}
-                                    className="w-4 h-4 text-foreground/70"
-                                />
-                            </TooltipTrigger>
-                            <TooltipContent className="px-4 py-2 shadow">
-                                <Text className="native:text-lg">
-                                    Freelance
-                                </Text>
-                            </TooltipContent>
-                        </Tooltip>
-                    </View>
-                </CardHeader>
-                <CardContent>
-                    <View className="flex-row justify-around gap-3">
-                        <View className="items-center">
-                            <Text className="text-sm text-muted-foreground">
-                                Dimension
-                            </Text>
-                            <Text className="text-xl font-semibold">C-137</Text>
-                        </View>
-                        <View className="items-center">
-                            <Text className="text-sm text-muted-foreground">
-                                Age
-                            </Text>
-                            <Text className="text-xl font-semibold">70</Text>
-                        </View>
-                        <View className="items-center">
-                            <Text className="text-sm text-muted-foreground">
-                                Species
-                            </Text>
-                            <Text className="text-xl font-semibold">Human</Text>
-                        </View>
-                    </View>
-                </CardContent>
-                <CardFooter className="flex-col gap-3 pb-0">
-                    <View className="flex-row items-center overflow-hidden">
-                        <Text className="text-sm text-muted-foreground">
-                            Productivity:
-                        </Text>
-                        <LayoutAnimationConfig skipEntering>
-                            <Animated.View
-                                key={progress}
-                                entering={FadeInUp}
-                                exiting={FadeOutDown}
-                                className="items-center w-11"
-                            >
-                                <Text className="text-sm font-bold text-sky-600">
-                                    {progress}%
-                                </Text>
-                            </Animated.View>
-                        </LayoutAnimationConfig>
-                    </View>
-                    <Progress
-                        value={progress}
-                        className="h-2"
-                        indicatorClassName="bg-sky-600"
-                    />
-                    <View />
-                    <Button
-                        variant="outline"
-                        className="shadow shadow-foreground/5"
-                        onPress={updateProgressValue}
-                    >
-                        <Text>Update</Text>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="shadow shadow-foreground/5"
-                        onPress={() => {
-                            router.push("/hello");
-                        }}
-                    >
-                        <Text>Update</Text>
-                    </Button>
-                </CardFooter>
-            </Card>
+  const featuredServices = services?.slice(0, 5) || [];
+
+  return (
+    <ScrollView
+      className="flex-1 bg-background"
+      refreshControl={
+        <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+      }
+    >
+      {/* Hero Section */}
+      <View className="bg-primary/5 p-4 pb-8">
+        <Text className="text-2xl font-bold mb-2">
+          Trouvez le freelance idéal
+        </Text>
+        <Text className="text-muted-foreground mb-4">
+          Des milliers de talents à votre service
+        </Text>
+        <View className="relative">
+          <Input
+            placeholder="Rechercher un service..."
+            className="pl-10 bg-background"
+            onPressIn={() => router.push("/search")}
+          />
+          <Search
+            size={20}
+            className="absolute left-3 top-2.5 text-muted-foreground"
+          />
         </View>
-    );
+      </View>
+
+      {/* Categories Carousel */}
+      <View className="py-6">
+        <View className="flex-row justify-between items-center px-4 mb-4">
+          <Text className="text-lg font-semibold">Catégories</Text>
+          <Button variant="ghost" onPress={() => router.push("/categories")}>
+            <Text className="text-primary mr-1">Voir tout</Text>
+            <ChevronRight size={16} className="text-primary" />
+          </Button>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="px-4"
+        >
+          {categories.map((category, index) => (
+            <View
+              key={index}
+              className="mr-4 items-center bg-secondary/10 rounded-lg p-4 w-24"
+            >
+              <Text className="text-2xl mb-2">{category.icon}</Text>
+              <Text className="text-xs text-center" numberOfLines={2}>
+                {category.name}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Featured Services Carousel */}
+      <View className="mb-6">
+        <View className="flex-row justify-between items-center px-4 mb-4">
+          <View>
+            <Text className="text-lg font-semibold">Services Populaires</Text>
+            <Text className="text-sm text-muted-foreground">
+              Les mieux notés
+            </Text>
+          </View>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="px-4"
+        >
+          {featuredServices.map((service) => (
+            <View
+              key={service.id}
+              className="mr-4"
+              style={{ width: width - 48 }}
+            >
+              <ServiceCard
+                service={service}
+                onPress={() =>
+                  router.push({
+                    pathname: "/service/[id]",
+                    params: { id: service.id },
+                  })
+                }
+              />
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* How it Works */}
+      <View className="px-4 py-6 bg-secondary/5">
+        <Text className="text-lg font-semibold mb-4">Comment ça marche</Text>
+        {[
+          "Inscrivez-vous",
+          "Trouvez un freelance",
+          "Obtenez du travail de qualité",
+        ].map((step, index) => (
+          <View key={index} className="flex-row items-center mb-4">
+            <View className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center mr-3">
+              <Text className="font-semibold text-primary">{index + 1}</Text>
+            </View>
+            <View>
+              <Text className="font-medium">{step}</Text>
+              <Text className="text-sm text-muted-foreground">
+                Une description de l'étape à remplir ici.
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      {/* Regular Services List */}
+      <View className="p-4">
+        <Text className="text-lg font-semibold mb-4">Tous les services</Text>
+        <View className="gap-4">
+          {services?.map((service) => (
+            <ServiceCard
+              key={service.id}
+              service={service}
+              onPress={() =>
+                router.push({
+                  pathname: "/service/[id]",
+                  params: { id: service.id },
+                })
+              }
+            />
+          ))}
+        </View>
+      </View>
+    </ScrollView>
+  );
 }
