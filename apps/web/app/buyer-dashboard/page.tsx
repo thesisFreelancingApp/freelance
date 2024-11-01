@@ -1,12 +1,11 @@
-'use client'
-
+"use client"
 import { useState } from 'react'
 import { DollarSign, ShoppingBag, Briefcase } from "lucide-react"
 import { StatCard } from '@/app/pages/buyer-summary/stat-card'
 import { RecentPurchases } from '@/app/pages/buyer-summary/recent-purchases'
 import { BuyerReviews } from '@/app/pages/buyer-summary/buyer-reviews'
 import { SellerReviews } from '@/app/pages/buyer-summary/seller-reviews'
-
+import {getSellerOverview} from '@/server.actions/seller-dashboard.actions'
 // Fake data
 const initialBuyerData = {
   totalSpent: 5280,
@@ -36,9 +35,9 @@ const initialBuyerData = {
   ],
 }
 
-export default function BuyerDashboard() {
+const BuyerDashboard=async() =>{
   const [buyerData, setBuyerData] = useState(initialBuyerData)
-
+    const data = await getSellerOverview()
   const handleUpdateReview = (id: number, newRating: number, newComment: string) => {
     const updatedReviews = buyerData.reviews.recentComments.map(review =>
       review.id === id ? { ...review, rating: newRating, comment: newComment } : review
@@ -88,3 +87,5 @@ export default function BuyerDashboard() {
     </div>
   )
 }
+
+export default BuyerDashboard

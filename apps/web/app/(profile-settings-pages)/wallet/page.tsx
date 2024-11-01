@@ -1,6 +1,7 @@
 "use client";
 
 import imageWallet from "@/assets/profile/Wallet.svg";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -115,11 +117,13 @@ export default function Component() {
               <h2 className="text-lg font-semibold text-gray-800">
                 Votre Wallet
               </h2>
+
               <p className="mt-1 text-2xl font-bold text-gray-900">
                 {walletDetails.balance} {walletDetails.currency}
               </p>
             </div>
             <Wallet className="w-10 h-10 text-gray-500" />
+            <Badge>Wallet Id : {walletDetails.id}</Badge>
           </div>
           <Separator className="mb-4" />
           <h3 className="mb-4 text-xl font-semibold text-gray-800">
