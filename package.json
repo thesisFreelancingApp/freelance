@@ -8,11 +8,12 @@
         "install:all": "npm run clean && npm i &&  npm run install:web && npm run install:mobile",
         "install:web": "cd apps/web && npm install",
         "install:mobile": "cd apps/mobile && npm install",
-        "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && rm -rf prisma/migrations && cd ../mobile && rm -rf node_modules",
+        "clean": "rm -rf node_modules && cd apps/web && rm -rf node_modules && rm -rf .next && rm -rf prisma/migrations && cd ../mobile && rm -rf node_modules",
         "prismaUnix": "cd apps/web/prisma && rm -rf  prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
         "prismaWin": "cd apps/web/prisma && rmdir /s /q   prisma/migrations && npx prisma migrate dev dev init && npx prisma generate",
         "seed": "cd apps/web && npm run seed",
-        "studio": "cd apps/web && npx prisma studio"
+        "studio": "cd apps/web && npx prisma studio",
+        "cleanNext": "cd apps/web &&  rm -rf .next"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.7",

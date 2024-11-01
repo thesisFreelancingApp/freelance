@@ -4,11 +4,9 @@ import Header from "@/app/pages/__header";
 import { TailwindIndicator } from "@/components/ui/tailwind-indicator";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { MediaPlayer, MediaProvider } from "@vidstack/react";
 import React from "react";
 // Imports - Hooks and Utilities
 import UseTawkToScript from "@/hooks/use-Tawk-liveChat";
-import { PlayIcon } from "@vidstack/react/icons";
 import { ThemeProvider } from "next-themes";
 // Imports - Styles and Fonts
 import "@/styles/globals.css";
@@ -62,9 +60,9 @@ export default function RootLayout({
             <Header />
 
             {/* Main Content Area */}
-            <main className="flex flex-col items-center  align-top  flex-1 w-full min-h-[80vh] gap-10 md:gap-20">
+            <div className="flex flex-col items-center  align-top  flex-1 w-full min-h-[60vh] gap-10 md:gap-20">
               {children}
-            </main>
+            </div>
 
             {/* Footer */}
             <Footer />

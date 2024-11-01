@@ -46,7 +46,7 @@ export async function initiatePaymentAction({
     }
 
     // Création de la transaction avec un statut `PENDING`
-    const transaction = await prisma.transaction.create({
+    const transaction = await prisma.walletTransaction.create({
       data: {
         amount: amount,
         type: "PAYMENT", // Ensure this matches the TransactionType enum
@@ -79,7 +79,7 @@ export async function initiatePaymentAction({
         description: "Order Payment", // Description du paiement
         acceptedPaymentMethods: ["wallet", "bank_card", "e-DINAR", "flouci"], // Moyens de paiement acceptés
         lifespan: 10, // Durée de validité du paiement en minutes
-        checkoutForm: true, // Activer le formulaire de paiement
+        checkoutForm: false, // Activer le formulaire de paiement
         addPaymentFeesToAmount: true, // Ajouter les frais de paiement au montant total
 
         webhook: "https://yourdomain.com/api/payment/webhook", // URL de webhook pour recevoir les notifications de paiement

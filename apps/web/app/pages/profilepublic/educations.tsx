@@ -9,14 +9,21 @@ type Profile = {
   username: string;
   title?: string;
   bio?: string;
-  educations?: string[];
+
   professionalProfile?: ProfessionalProfile;
+  seller?: Seller;
 };
 
 type ProfessionalProfile = {
-  educations?: string[];
+  educations?: { faculty: string }[]; // Update the type to include faculty
   // Add other properties as needed
 };
+  type Seller = {
+    professionalProfile?: ProfessionalProfile;
+  };  
+
+
+
 
 const Educations = ({
   profile,
@@ -25,17 +32,15 @@ const Educations = ({
   profile: Profile;
   username: string;
 }) => {
- 
-
-  
+  console.log("yeeeeeeeeeeeeeeeeeeees", profile);
   return (
     <Card className="col-span-1 shadow-none md:col-span-2 bg-background">
       <CardContent className="pt-2">
         <div>
-                <h3 className="mb-2 font-semibold">Educations</h3>
+          <h3 className="mb-2 font-semibold">Educations</h3>
           <p className="text-muted-foreground">
-            {profile.professionalProfile?.educations?.map((education) => (
-              <Badge key={education}>{education}</Badge>
+            {profile.seller?.professionalProfile?.educations?.map((education) => (
+              <Badge key={education.faculty}>{education.faculty}</Badge>
             ))}
           </p>
         </div>

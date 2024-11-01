@@ -176,6 +176,32 @@ export const getUserEmail = async () => {
   }
 };
 
+export const getUserId = async () => {
+  // Initialiser le client Supabase
+  const supabase = createClient();
+
+  // Récupérer l'utilisateur actuel depuis Supabase
+  const { data, error } = await supabase.auth.getUser();
+
+  // Gérer les erreurs potentielles
+  if (error) {
+    console.error(
+      "Erreur lors de la récupération de l'utilisateur :",
+      error.message,
+    );
+    return { error: "Impossible de récupérer l'utilisateur" };
+  }
+
+  // Vérifier si l'utilisateur existe et extraire l'ID de l'utilisateur
+  if (data) {
+    const userId = data.user?.id;
+    console.log(userId);
+    return { userId };
+  } else {
+    return { error: "Aucun utilisateur actuellement connecté" };
+  }
+};
+
 export const isAuthenticated = async () => {
   // Initialize Supabase client
   const supabase = createClient();
