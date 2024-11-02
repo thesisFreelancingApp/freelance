@@ -1,5 +1,5 @@
-import React from "react";
-import { View, FlatList, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, FlatList, Pressable, RefreshControl } from "react-native";
 import { Text } from "../ui/text";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { format } from "date-fns";
@@ -10,9 +10,16 @@ interface ChatRoomListProps {
   rooms: ChatRoom[];
   userId: string;
   loading?: boolean;
+  onRefresh?: () => Promise<void>;
 }
 
-export function ChatRoomList({ rooms, userId, loading }: ChatRoomListProps) {
+export function ChatRoomList({
+  rooms,
+  userId,
+  loading,
+  onRefresh,
+}: ChatRoomListProps) {
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
   const getOtherParticipant = (room: ChatRoom) => {
@@ -65,6 +72,14 @@ export function ChatRoomList({ rooms, userId, loading }: ChatRoomListProps) {
     );
   };
 
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      setRefreshing(true);
+      await onRefresh();
+      setRefreshing(false);
+    }
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
@@ -80,6 +95,9 @@ export function ChatRoomList({ rooms, userId, loading }: ChatRoomListProps) {
       renderItem={renderItem}
       className="flex-1"
       contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
       ListEmptyComponent={
         <View className="flex-1 items-center justify-center p-4">
           <Text className="text-muted-foreground text-center">

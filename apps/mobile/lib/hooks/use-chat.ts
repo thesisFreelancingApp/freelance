@@ -87,25 +87,38 @@ export function useChat(roomId: string, currentUserId: string) {
     }
   };
 
-  const sendMessage = async (content: string, senderId: string) => {
-    const { data, error } = await supabase
-      .from("Message")
-      .insert({
-        chatRoomId: roomId,
-        senderId,
-        content,
-        createdAt: new Date().toISOString(),
-        isRead: false,
-      })
-      .select()
-      .single();
+  const sendMessage = async (
+    content: string,
+    senderId: string,
+    retries = 3
+  ) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const { data, error } = await supabase
+          .from("Message")
+          .insert({
+            chatRoomId: roomId,
+            senderId,
+            content,
+            createdAt: new Date().toISOString(),
+            isRead: false,
+          })
+          .select()
+          .single();
 
-    if (error) {
-      console.error("Error sending message:", error);
-      return null;
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error(
+          `Error sending message (attempt ${i + 1}/${retries}):`,
+          error
+        );
+        if (i === retries - 1) return null;
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
     }
-
-    return data;
+    return null;
   };
 
   return {

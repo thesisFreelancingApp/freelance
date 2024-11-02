@@ -192,7 +192,12 @@ export default function ServiceDetailScreen() {
 
               {/* Seller Info - Improved layout */}
               <View className="flex-row items-center mb-6">
-                <Avatar className="h-14 w-14 mr-4 border-2 border-background">
+                <Avatar
+                  className="h-14 w-14 mr-4 border-2 border-background"
+                  alt={`Profile picture of ${
+                    service.creator?.profile?.firstName || "user"
+                  }`}
+                >
                   <AvatarImage
                     source={{ uri: service.creator?.profile?.profilePic }}
                   />
