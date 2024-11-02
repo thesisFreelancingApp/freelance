@@ -3,38 +3,60 @@ export interface ServiceMedia {
   videos?: string[];
 }
 
+export interface ServiceCreationInput {
+  name: string;
+  description: string;
+  images: string[];
+  tags: string[];
+  categoryId: number;
+  packages: ServicePackageInput[];
+}
+
+export interface ServicePackageInput {
+  name: string;
+  description?: string;
+  deliveryTime: number;
+  price: number;
+  revisions?: number;
+  features: string[];
+}
+
 export interface Service {
   id: string;
   name: string;
-  description: string | null;
-  medias: ServiceMedia | null;
-  tags: string[];
-  creator: {
-    id: string;
-    profile: {
-      firstName: string | null;
-      lastName: string | null;
-      profilePic: string | null;
-    };
+  description?: string;
+  medias?: {
+    images?: string[];
   };
-  packages: {
-    id: string;
-    name: string | null;
-    description: string | null;
-    deliveryTime: number | null;
-    price: string | null;
-    revisions: number | null;
-    features: string[];
-  }[];
-  ratings: {
-    id: string;
-    rating: number;
-    review: string | null;
-    createdAt: string;
-    rater: {
-      firstName: string | null;
-      lastName: string | null;
-      profilePic: string | null;
-    };
-  }[];
+  isPublic: boolean;
+  tags: string[];
+  creatorId: string;
+  categoryId: number;
+  createdAt: string;
+  updatedAt: string;
+  packages: ServicePackage[];
+  ratings?: Rating[];
+}
+
+export interface ServicePackage {
+  id: string;
+  serviceId: string;
+  name?: string;
+  description?: string;
+  deliveryTime?: number;
+  price?: number;
+  revisions?: number;
+  features: string[];
+}
+
+export interface Rating {
+  id: string;
+  rating: number;
+  review: string | null;
+  createdAt: string;
+  rater: {
+    firstName: string | null;
+    lastName: string | null;
+    profilePic: string | null;
+  };
 }
