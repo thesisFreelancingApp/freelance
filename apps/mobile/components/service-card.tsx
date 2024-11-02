@@ -24,15 +24,21 @@ export function ServiceCard({ service, onPress }: ServiceCardProps) {
   const lowestPackage = service.packages[0];
 
   return (
-    <Card onPress={onPress} className="overflow-hidden border-0 shadow-lg">
+    <Card
+      onPress={onPress}
+      className="overflow-hidden border-0 shadow-lg rounded-lg"
+    >
       <View className="relative">
         {service.medias?.images?.[0] && (
           <Image
             source={{ uri: service.medias.images[0] }}
             className="w-full h-48"
             contentFit="cover"
+            style={{ borderRadius: 8 }}
           />
         )}
+        {/* Overlay for better text contrast */}
+        <View className="absolute inset-0 bg-black/10" />
       </View>
 
       <CardContent className="p-4">
@@ -48,7 +54,7 @@ export function ServiceCard({ service, onPress }: ServiceCardProps) {
               {service.description}
             </Text>
           </View>
-          <View className="bg-primary/10 rounded-full px-3 py-1 flex-row items-center ml-2">
+          <View className="bg-primary/20 rounded-full px-3 py-1 flex-row items-center ml-2 shadow-sm">
             <Star size={16} className="text-primary mr-1" />
             <Text className="text-primary font-medium">{averageRating}</Text>
           </View>
@@ -56,7 +62,11 @@ export function ServiceCard({ service, onPress }: ServiceCardProps) {
 
         <View className="flex-row flex-wrap gap-1 mt-3">
           {service.tags.slice(0, 3).map((tag, index) => (
-            <Badge key={index} variant="secondary" className="px-2 py-0.5">
+            <Badge
+              key={index}
+              variant="secondary"
+              className="px-2 py-0.5 rounded-full"
+            >
               <Text className="text-xs">{tag}</Text>
             </Badge>
           ))}
@@ -69,9 +79,9 @@ export function ServiceCard({ service, onPress }: ServiceCardProps) {
               {lowestPackage?.deliveryTime} days
             </Text>
           </View>
-          <View>
+          <View className="text-right">
             <Text className="text-xs text-muted-foreground">Starting at</Text>
-            <Text className="text-sm font-semibold text-primary">
+            <Text className="text-base font-semibold text-primary">
               ${parseFloat(lowestPackage?.price || "0").toFixed(2)}
             </Text>
           </View>
