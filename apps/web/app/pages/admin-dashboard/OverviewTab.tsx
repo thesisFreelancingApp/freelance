@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { DollarSign, Users, CreditCard, QuestionMarkCircledIcon } from 'lucide-react'
+import { DollarSign, Users, CreditCard, MessageCircleQuestion } from 'lucide-react'
 
 const analyticsData = [
   { name: 'Jan', total: Math.floor(Math.random() * 5000) + 1000 },
@@ -77,7 +77,7 @@ export function OverviewTab() {
             <CardTitle className="text-sm font-medium">
               Active Disputes
             </CardTitle>
-            <QuestionMarkCircledIcon className="h-4 w-4 text-muted-foreground" />
+            <MessageCircleQuestion className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+573</div>

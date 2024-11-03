@@ -2,23 +2,23 @@
 
 import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DashboardHeader } from './DashboardHeader'
-import { OverviewTab } from './tabs/OverviewTab'
-import { UsersTab } from './tabs/UsersTab'
-import { ServicesTab } from './tabs/ServicesTab'
-import { OrdersTab } from './tabs/OrdersTab'
-import { DisputesTab } from './tabs/DisputesTab'
-import { MessagesTab } from './tabs/MessagesTab'
-import { ReviewsTab } from './tabs/ReviewsTab'
-import { AnalyticsTab } from './tabs/AnalyticsTab'
-import { SettingsTab } from './tabs/SettingsTab'
+// import { DashboardHeader } from './DashboardHeader'
+import { OverviewTab } from './OverviewTab'
+import { UsersTab } from './UsersTab'
+import { ServicesTab } from './ServicesTab'
+import { OrdersTab } from './OrdersTab'
+import { DisputesTab } from './DisputesTab'
+import { MessagesTab } from './MessagesTab'
+import { ReviewsTab } from './ReviewsTab'
+import { AnalyticsTab } from './AnalyticsTab'
+import { SettingsTab } from './SettingsTab'
 
 export function AdminDashboard() {
   return (
     <div className="hidden flex-col md:flex">
-      <DashboardHeader />
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="flex items-center justify-between space-y-2">
+      {/* <DashboardHeader /> */}
+      <div className="flex-1 space-y-4 p-8 pt-6" style={{ width: '84rem' }}>
+      <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">

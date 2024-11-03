@@ -1,8 +1,16 @@
-// 'use client'
+'use client'
+
+import { AdminDashboard } from "../pages/admin-dashboard/AdminDashboard"
 
 
 
-
+export default function AdminDashboardPage() {
+    return (
+      <main className="min-h-screen bg-background">
+        <AdminDashboard />
+      </main>
+    )
+  }
 
 
 
