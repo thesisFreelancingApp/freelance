@@ -422,20 +422,23 @@
   // Catégories
   // ------------------------
 
-  model MainCategories {
-    id          Int              @id @default(autoincrement())
-    name        String
-    description String?
-    level       Int
-    parentId    Int?
-    createdAt   DateTime         @default(now())
-    updatedAt   DateTime         @updatedAt
-    services    Service[] 
-    // Relations
-    parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
-    children    MainCategories[] @relation("Hierarchy")
-    professionalProfiles ProfessionalProfile[] 
-  }
+model MainCategories {
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String?
+  level       Int
+  parentId    Int?
+  imageUrl    String?       
+  iconUrl     String?         
+  slug        String?         // Add this for URL-friendly names
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  services    Service[] 
+  // Relations
+  parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
+  children    MainCategories[] @relation("Hierarchy")
+  professionalProfiles ProfessionalProfile[] 
+}
 
 
 

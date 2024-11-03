@@ -11,11 +11,13 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 interface SubCategory {
   name: string;
   children?: SubCategory[];
+  slug: string;
 }
 
 interface Category {
   name: string;
   children: SubCategory[];
+  slug: string;
 }
 
 interface SubMenuProps {
@@ -44,7 +46,7 @@ const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
                 <li className="flex items-center">
                   <Link
                     key={subSub.name}
-                    href={`/categories/${encodeHelper(subcategory.name)}/${encodeHelper(subSub.name)}`}
+                    href={`/categories/${encodeHelper(subcategory.slug)}/${encodeHelper(subSub.slug)}`}
                     className="flex items-center pl-2 group hover:cursor-pointer"
                   >
                     <span>{subSub.name}</span>
@@ -149,7 +151,7 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
         {allCategories.map((category: Category, index: number) => (
           <Link
             key={category.name}
-            href={`/categories/${encodeHelper(category.name)}`}
+            href={`/categories/${encodeHelper(category.slug)}`}
           >
             <li
               key={category.name}

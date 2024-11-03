@@ -1,4 +1,3 @@
-import { encodeHelper } from "@/hooks/use-Url";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -6,11 +5,13 @@ import React, { useState } from "react";
 // Types
 interface SubCategory {
   name: string;
+  slug: string;
   children?: SubCategory[];
 }
 
 interface Category {
   name: string;
+  slug: string;
   children: SubCategory[];
 }
 
@@ -23,16 +24,6 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ allCategories }) => {
     null,
   );
 
-  // Handle main category click
-  const handleCategoryClick = (index: number) => {
-    setActiveCategoryIndex(index);
-  };
-
-  // Handle back button click
-  const handleBackClick = () => {
-    setActiveCategoryIndex(null);
-  };
-
   return (
     <div className="flex flex-col">
       {activeCategoryIndex === null ? (
@@ -40,12 +31,9 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ allCategories }) => {
         <ul className="space-y-2">
           {allCategories.map((category, index) => (
             <li key={category.name} className="cursor-pointer">
-              <div
-                onClick={() => handleCategoryClick(index)}
-                className="font-bold text-primary"
-              >
-                {category.name}
-              </div>
+              <Link href={`/categories/${category.slug}`}>
+                <div className="font-bold text-primary">{category.name}</div>
+              </Link>
             </li>
           ))}
         </ul>
@@ -53,7 +41,7 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ allCategories }) => {
         // Show subcategories and children with back arrow
         <div>
           <button
-            onClick={handleBackClick}
+            onClick={() => setActiveCategoryIndex(null)}
             className="flex items-center mb-4 font-bold text-primary"
           >
             <ArrowLeft className="mr-2" />
@@ -74,7 +62,7 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ allCategories }) => {
                     {subCategory.children.map((child) => (
                       <li key={child.name}>
                         <Link
-                          href={`/categories/${encodeHelper(allCategories[activeCategoryIndex].name)}/${encodeHelper(subCategory.name)}/${encodeHelper(child.name)}`}
+                          href={`/categories/${subCategory.slug}/${child.slug}`}
                           className="flex items-center pl-2 group hover:cursor-pointer"
                         >
                           <span>{child.name}</span>

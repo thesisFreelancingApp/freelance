@@ -1,15 +1,15 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getCategoryByName } from "@/server.actions/testCat";
+import { Card } from "@/components/ui/card";
+import { getCategoryByName } from "@/server.actions/category/category-pages.actions";
+import Image from "next/image";
+import Link from "next/link";
 
-// @ts-ignore
-const CategoryPage = async ({ params }) => {
-  const { dynamicCategory } = params;
-
-  // Fetch category by name (slug)
-  const category = await getCategoryByName(dynamicCategory);
+const CategoryPage = async ({
+  params,
+}: {
+  params: { dynamicCategory: string };
+}) => {
+  const category = await getCategoryByName(params.dynamicCategory);
 
   if (!category) {
     return <div>Category not found.</div>; // Handle case where the category doesn't exist
@@ -17,56 +17,69 @@ const CategoryPage = async ({ params }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Category Title and Description */}
-      <div className="bg-[#313901] text-white p-8 rounded-lg mb-8">
-        <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
-        <p className="mb-4">{category.description}</p>
+      {/* Hero Banner Section */}
+      <div className="relative w-full h-[300px] mb-12">
+        <Image
+          src={category.imageUrl || "/defaults/category-banner.jpg"}
+          alt={category.name}
+          fill
+          className="object-cover rounded-xl"
+        />
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+          <div className="text-center text-white">
+            <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
+            <p className="text-xl max-w-2xl mx-auto">{category.description}</p>
+          </div>
+        </div>
       </div>
 
-      {/* Subcategories Section */}
-      {category.children && category.children.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {category.children.map((subCat: any) => (
-            <Card key={subCat.id} className="overflow-hidden">
-              <CardHeader className="p-0">
-                <Image
-                  src={subCat.image || "https://fiverr-res.cloudinary.com/image/upload/f_auto,q_auto/v1/attachments/generic_asset/asset/68011f21cd41c664951df861d9f876ac-1682402649968/Logo%20_%20Brand%20Identity.png"} // Use dynamic image or fallback
-                  alt={subCat.name}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover"
-                />
-              </CardHeader>
-              <CardContent className="p-4">
-                <CardTitle className="text-xl mb-2">
-                  <Link href={`/categories/${encodeURIComponent(subCat.name)}`}>
-                    {subCat.name}
-                  </Link>
-                </CardTitle>
-                {/* Sub-Subcategories List */}
-                {subCat.children && (
-                  <ul className="space-y-1">
-                    {subCat.children.map((subSubCat: any) => (
-                      <li key={subSubCat.id} className="flex items-center">
-                        <Link href={`/categories/${encodeURIComponent(subCat.name)}/${encodeURIComponent(subSubCat.name)}`}>
-                          <span className="text-sm text-gray-600">{subSubCat.name}</span>
-                        </Link>
-                        {subSubCat.isNew && (
-                          <Badge variant="secondary" className="ml-2 text-xs">
-                            NEW
-                          </Badge>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+      {/* Subcategories Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {category.children?.map((subCat) => (
+          <div key={subCat.name} className="flex flex-col">
+            {/* Non-clickable image section */}
+            <div className="relative w-full h-48 rounded-t-lg overflow-hidden mb-4">
+              <Image
+                src={subCat.imageUrl || "/default-subcategory.jpg"}
+                alt={subCat.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+
+            {/* Category title */}
+            <h3 className="text-xl font-semibold mb-4">{subCat.name}</h3>
+
+            {/*  subcategories list */}
+            {subCat.children && (
+              <ul className="space-y-3">
+                {subCat.children.map((child) => (
+                  <li key={child.name}>
+                    <Link
+                      href={`/categories/${subCat.slug}/${child.slug}`}
+                      className="text-muted-foreground hover:text-primary transition-colors duration-200 flex items-center group"
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                        {child.name}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+                {subCat.children.length > 5 && (
+                  <li>
+                    <Link
+                      href={`/categories/${subCat.slug}`}
+                      className="text-primary hover:text-primary/80 transition-colors duration-200 text-sm font-medium"
+                    >
+                      See all {subCat.children.length} services →
+                    </Link>
+                  </li>
                 )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <p>No subcategories available.</p>
-      )}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

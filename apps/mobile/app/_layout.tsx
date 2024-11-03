@@ -1,81 +1,130 @@
-import '~/global.css';
+import "~/global.css";
+import { Slot, Stack, Tabs, useRouter, useSegments } from "expo-router";
+import { ThemeProvider } from "@react-navigation/native";
+import { StatusBar } from "expo-status-bar";
+import * as React from "react";
+import { useColorScheme } from "~/lib/useColorScheme";
+import { Home, User, MessageSquare, Search, Bell } from "lucide-react-native";
+import { useAuth } from "~/lib/hooks/use-auth";
+import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Theme, ThemeProvider } from '@react-navigation/native';
-import { SplashScreen, Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import * as React from 'react';
-import { Platform } from 'react-native';
-import { NAV_THEME } from '~/lib/constants';
-import { useColorScheme } from '~/lib/useColorScheme';
-import { PortalHost } from '@rn-primitives/portal';
-import { ThemeToggle } from '~/components/ThemeToggle';
-import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
-
-const LIGHT_THEME: Theme = {
+const LIGHT_THEME = {
   dark: false,
-  colors: NAV_THEME.light,
+  colors: {
+    primary: "#0ea5e9",
+    background: "#ffffff",
+    card: "#ffffff",
+    text: "#000000",
+    border: "#e5e5e5",
+    notification: "#0ea5e9",
+  },
 };
-const DARK_THEME: Theme = {
+const DARK_THEME = {
   dark: true,
-  colors: NAV_THEME.dark,
+  colors: {
+    primary: "#0ea5e9",
+    background: "#1a1a1a",
+    card: "#1a1a1a",
+    text: "#ffffff",
+    border: "#333333",
+    notification: "#0ea5e9",
+  },
 };
-
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
-
-// Prevent the splash screen from auto-hiding before getting the color scheme.
-SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { colorScheme, setColorScheme, isDarkColorScheme } = useColorScheme();
-  const [isColorSchemeLoaded, setIsColorSchemeLoaded] = React.useState(false);
+  const { isDarkColorScheme } = useColorScheme();
+  const { session, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
 
   React.useEffect(() => {
-    (async () => {
-      const theme = await AsyncStorage.getItem('theme');
-      if (Platform.OS === 'web') {
-        // Adds the background color to the html element to prevent white background on overscroll.
-        document.documentElement.classList.add('bg-background');
+    if (!loading) {
+      if (!session && !segments[0]?.startsWith("(auth)")) {
+        router.replace("/(auth)");
+      } else if (session && segments[0]?.startsWith("(auth)")) {
+        router.replace("/");
       }
-      if (!theme) {
-        AsyncStorage.setItem('theme', colorScheme);
-        setIsColorSchemeLoaded(true);
-        return;
-      }
-      const colorTheme = theme === 'dark' ? 'dark' : 'light';
-      if (colorTheme !== colorScheme) {
-        setColorScheme(colorTheme);
-        setAndroidNavigationBar(colorTheme);
-        setIsColorSchemeLoaded(true);
-        return;
-      }
-      setAndroidNavigationBar(colorTheme);
-      setIsColorSchemeLoaded(true);
-    })().finally(() => {
-      SplashScreen.hideAsync();
-    });
-  }, []);
+    }
+  }, [session, loading, segments]);
 
-  if (!isColorSchemeLoaded) {
-    return null;
+  if (loading) {
+    return <View className="flex-1 bg-background" />;
   }
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? 'light' : 'dark'} />
-      <Stack>
-        <Stack.Screen
-          name='index'
-          options={{
-            title: 'Starter Base',
-            headerRight: () => <ThemeToggle />,
-          }}
-        />
-      </Stack>
-      <PortalHost />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+        {!session ? (
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="(auth)" />
+          </Stack>
+        ) : (
+          <Tabs
+            screenOptions={{
+              tabBarStyle: {
+                backgroundColor: isDarkColorScheme ? "#1a1a1a" : "#ffffff",
+                borderTopColor: isDarkColorScheme ? "#333333" : "#e5e5e5",
+              },
+              tabBarActiveTintColor: "#0ea5e9",
+              tabBarInactiveTintColor: isDarkColorScheme
+                ? "#999999"
+                : "#666666",
+            }}
+          >
+            <Tabs.Screen
+              name="index"
+              options={{
+                title: "Home",
+                tabBarIcon: ({ color, size }) => (
+                  <Home size={size} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="search"
+              options={{
+                title: "Explore",
+                tabBarIcon: ({ color, size }) => (
+                  <Search size={size} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="notifications"
+              options={{
+                title: "Notifications",
+                tabBarIcon: ({ color, size }) => (
+                  <Bell size={size} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="messages"
+              options={{
+                title: "Messages",
+                tabBarIcon: ({ color, size }) => (
+                  <MessageSquare size={size} color={color} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="profile"
+              options={{
+                title: "Profile",
+                tabBarIcon: ({ color, size }) => (
+                  <User size={size} color={color} />
+                ),
+              }}
+            />
+          </Tabs>
+        )}
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
