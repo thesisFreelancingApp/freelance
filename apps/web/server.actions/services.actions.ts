@@ -138,6 +138,17 @@ import { Decimal } from "@prisma/client/runtime/library";
 
 // // Récupérer les services en vedette
 // Récupérer les services en vedette
+
+
+
+
+
+
+
+
+
+
+
 export const getFeaturedServices = async (limit = 3) => {
   const services = await prisma.service.findMany({
     take: limit,

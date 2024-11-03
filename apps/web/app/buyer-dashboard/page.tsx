@@ -1,11 +1,12 @@
 "use client"
-import { useState } from 'react'
+import { useState ,useEffect} from 'react'
 import { DollarSign, ShoppingBag, Briefcase } from "lucide-react"
 import { StatCard } from '@/app/pages/buyer-summary/stat-card'
 import { RecentPurchases } from '@/app/pages/buyer-summary/recent-purchases'
 import { BuyerReviews } from '@/app/pages/buyer-summary/buyer-reviews'
 import { SellerReviews } from '@/app/pages/buyer-summary/seller-reviews'
-import {getSellerOverview} from '@/server.actions/seller-dashboard.actions'
+import {getBuyerData} from '@/server.actions/buyer.actions'
+
 // Fake data
 const initialBuyerData = {
   totalSpent: 5280,
@@ -35,24 +36,33 @@ const initialBuyerData = {
   ],
 }
 
-const BuyerDashboard=async() =>{
-  const [buyerData, setBuyerData] = useState(initialBuyerData)
-    const data = await getSellerOverview()
+const BuyerDashboard = () => {
+  const [buyerData, setBuyerData] = useState<any>(initialBuyerData);
+const [test,setTest] = useState<any>([])
+  const fetchBuyerData = async () => {
+    const data = await getBuyerData();
+    setTest(data);
+  };
+
+  useEffect(() => {
+    fetchBuyerData();
+  }, []);
+console.log(test)
   const handleUpdateReview = (id: number, newRating: number, newComment: string) => {
-    const updatedReviews = buyerData.reviews.recentComments.map(review =>
+    const updatedReviews = buyerData.reviews.recentComments.map((review: { id: number }) =>
       review.id === id ? { ...review, rating: newRating, comment: newComment } : review
-    )
+    );
     setBuyerData({
       ...buyerData,
       reviews: {
         ...buyerData.reviews,
         recentComments: updatedReviews,
       },
-    })
-  }
+    });
+  };
 
   const handleDeleteReview = (id: number) => {
-    const updatedReviews = buyerData.reviews.recentComments.filter(review => review.id !== id)
+    const updatedReviews = buyerData.reviews.recentComments.filter((review: { id: number }) => review.id !== id)
     setBuyerData({
       ...buyerData,
       reviews: {

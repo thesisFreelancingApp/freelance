@@ -1,631 +1,631 @@
-// Datasource et Générateur
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
-}
+  // Datasource et Générateur
+  datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+  }
 
-generator client {
-  provider = "prisma-client-js"
-}
+  generator client {
+    provider = "prisma-client-js"
+  }
 
-// Enums
-enum RequestStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-  COMPLETED
-  CANCELLED
-}
+  // Enums
+  enum RequestStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+    COMPLETED
+    CANCELLED
+  }
 
-enum Role {
-  USER
-  ADMIN
- 
-}
-
-// ------------------------
-// Modèles d'Authentification
-// ------------------------
-
-model AuthUser {
-  id        String           @id
-  email     String           @unique
-  role      Role             @default(USER)
-  name      String?
-  username  String           @unique
-  account   Account?
-  profile   PersonalProfile? @relation("ProfileAuthUser")
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  sessionLogs  SessionLog[]   @relation("UserSessionLogs") // Relation avec les logs de sessions
-  SessionLog SessionLog[]
-    preferences   UserPreferences? // Relation with user preferences
-}
-
-model Account {
-  id                Int      @id @default(autoincrement())
-  lastProvider      String?
-  providers         String[]
-  providerAccountId String?
-  userEmail         String   @unique
-  user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade)
-  accessToken       String?
-  refreshToken      String?
-  expiresAt         Int?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-}
-
-model SessionLog {
-  id           String    @id @default(uuid())
-  userId       String
-  ipAddress    String?
-  loginAt      DateTime  @default(now())
-  logoutAt     DateTime?
-  device       String?   // Pour stocker des informations sur le périphérique (ex: "Chrome on Windows")
-  location     String?   // Pour stocker des informations géographiques, si disponibles
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  // Relation avec AuthUser
-  user         AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  AuthUser AuthUser[] @relation("UserSessionLogs")
-}
-
-
-// Enum for Theme Options
-enum Theme {
-  LIGHT
-  DARK
-  SYSTEM // for system-based theme
-}
-
-// Enum for View Options
-enum View {
-  Seller
-  Buyer
-}
-enum Frequency  {
-  INSTANT
-  DAILY
-  WEEKLY
-}
-
-// Model for User Preferences
-model UserPreferences {
-  id            String           @id @default(uuid())
-  userId        String           @unique
-  theme         Theme            @default(SYSTEM)
-  view          View             @default(Buyer)
-  notifications Boolean          @default(true) // enable or disable notifications
-  language      String           @default("en") // default language
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  showOnlineStatus       Boolean             @default(true)    
-  notificationFrequency  Frequency           @default(DAILY) 
-  // Relations
-  user          AuthUser         @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-
-
-// ------------------------
-// Profils Utilisateurs et Rôles
-// ------------------------
-
-model PersonalProfile {
-  id                    String                @id
-  authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
-  firstName             String?
-  lastName              String?
-  profilePic            String?  @default("/profile.webp")
-  title                 String?
-  phoneNumber           String?
-  address               String?
-  bio                   String?
-  birthDate             DateTime?
-  userEmail             String                @unique
-  professionalProfileid String?
-  walletid              String?
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-
-  // Relations
-  seller                Seller?
-  buyer                 Buyer?
-  messages              Message[]             @relation("MessageSender")
-  notifications         Notification[]
-  chatRooms             ChatRoomParticipant[] @relation("ProfileChatRooms")
-  ratingsGiven          Rating[]              @relation("RatingRater")
-  ratingsReceived       Rating[]              @relation("RatingRatee")
-  createdProjects       Projects[]       @relation("CustomServiceCreator")
-  participantIn         CustomServiceParticipant[]
-  wallet                Wallet?               @relation("ProfileWallet", fields: [walletid], references: [id])
-
-  Wallet Wallet[]
-  Projects Projects[] @relation("ProjectParticipants")
-  ProjectParticipantRequest ProjectParticipantRequest[]
-  CreatedProjects Projects[] @relation("CreatedProjects")
-}
-
-model Seller {
-  id                    String               @id @default(uuid())
-  profileId             String               @unique
-  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
-  professionalProfileId String?              @unique
-  professionalProfile   ProfessionalProfile? @relation("SellerProfessionalProfile", fields: [professionalProfileId], references: [id])
-  sellerRating          Float?
-  totalEarnings         Float                @default(0.0)
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-
-  // Relations
-  createdServices       Service[]            @relation("CreatedServices")
-
-  Dispute Dispute[] @relation("DisputeInitiatorSeller")
-  DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantSeller")
-  DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderSeller")
-
-  Order Order[]
-}
-
-
-model Buyer {
-  id                    String               @id @default(uuid())
-  profileId             String               @unique
-  profile               PersonalProfile      @relation(fields: [profileId], references: [id])
-  professionalProfileId String?              @unique
-  professionalProfile   ProfessionalProfile? @relation("BuyerProfessionalProfile", fields: [professionalProfileId], references: [id])
-  totalSpent            Float                @default(0.0)
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
-
-  // Relations
-  purchasedServices     Service[]           @relation("PurchasedServices")
-
-  Dispute Dispute[] @relation("DisputeInitiatorBuyer")
-
-  DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantBuyer")
-
-  DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderBuyer")
-
-  Order Order[]
-}
-
-// ------------------------
-// Profil Professionnel
-// ------------------------
-enum ProfileType {
-  FREELANCER
-  COMPANY
-}
-
-
-model ProfessionalProfile {
-  id                   String               @id @default(uuid()) 
-  buyer                Buyer?               @relation("BuyerProfessionalProfile")
-  seller               Seller?              @relation("SellerProfessionalProfile")
-  personalWebsite      String?
-  occupations          Json?
-  companyName          String?
-  type                 ProfileType?
-  sector               String?
-  profession           String?
-  experienceYears      Int?
-  educations           Json?
-  skills               Json?
-  certifications       Json?
-  language             String[]
-  timeZone             String?
-  website              String?
-  preferredCategoryId  Int?
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
-
-  // Relations
-  preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
-}
-
-// ------------------------
-// Modèles de Service
-// ------------------------
-
-model Service {
-  id            String           @id @default(uuid())
-  name          String
-  description   String?
-  medias        Json?
-  isPublic      Boolean          @default(true)
-  tags          String[]
-  creatorId     String  
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-
-//services
-  categoryId    Int    
-  category      MainCategories   @relation(fields: [categoryId], references: [id]) // Relation avec MainCategories
+  enum Role {
+    USER
+    ADMIN
   
+  }
 
-  // Relations
-  creator       Seller           @relation("CreatedServices", fields: [creatorId], references: [id])
-  buyers        Buyer[]          @relation("PurchasedServices")
-  ratings       Rating[]         @relation("ServiceRatings")
-  packages      ServicePackage[]
-  
+  // ------------------------
+  // Modèles d'Authentification
+  // ------------------------
 
-  Dispute Dispute[] @relation("DisputeService")
+  model AuthUser {
+    id        String           @id
+    email     String           @unique
+    role      Role             @default(USER)
+    name      String?
+    username  String           @unique
+    account   Account?
+    profile   PersonalProfile? @relation("ProfileAuthUser")
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+    sessionLogs  SessionLog[]   @relation("UserSessionLogs") // Relation avec les logs de sessions
+    SessionLog SessionLog[]
+      preferences   UserPreferences? // Relation with user preferences
+  }
 
-  Order Order[]
-}
+  model Account {
+    id                Int      @id @default(autoincrement())
+    lastProvider      String?
+    providers         String[]
+    providerAccountId String?
+    userEmail         String   @unique
+    user              AuthUser @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+    accessToken       String?
+    refreshToken      String?
+    expiresAt         Int?
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+  }
 
-model ServicePackage {
-  id            String    @id @default(uuid())
-  serviceId     String
-  name          String?
-  description   String?
-  deliveryTime  Int?
-  price         Decimal?   @db.Decimal(12, 3)
-  revisions     Int?
-  features      String[]
+  model SessionLog {
+    id           String    @id @default(uuid())
+    userId       String
+    ipAddress    String?
+    loginAt      DateTime  @default(now())
+    logoutAt     DateTime?
+    device       String?   // Pour stocker des informations sur le périphérique (ex: "Chrome on Windows")
+    location     String?   // Pour stocker des informations géographiques, si disponibles
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
 
-
-  // Relations
-  service       Service   @relation(fields: [serviceId], references: [id])
-}
-
-// ------------------------
-// Modèle de Notation
-// ------------------------
-
-model Rating {
-  id              String           @id @default(uuid())
-  raterId         String
-  rateeId         String
-  serviceId       String?
-  projectsId      String?
-  rating          Int
-  review          String?
-  createdAt       DateTime         @default(now())
-
-  // Relations
-  rater           PersonalProfile  @relation("RatingRater", fields: [raterId], references: [id])
-  ratee           PersonalProfile  @relation("RatingRatee", fields: [rateeId], references: [id])
-  service         Service?         @relation("ServiceRatings", fields: [serviceId], references: [id])
-  projects        Projects?   @relation(fields: [projectsId], references: [id])
-}
-
-// ------------------------
-// Demandes de Services Personnalisés
-// ------------------------
-
-model Projects {
-  id             String   @id @default(uuid())
-  title          String?
-  description    String?
-  minBudget      Decimal? @db.Decimal(10, 2)
-  maxBudget      Decimal? @db.Decimal(10, 2)
-  proposedPrice  Decimal? @db.Decimal(10, 2)
-  message        String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  creatorId      String   // ID du créateur
-
-  // Stocker les objets structurés en tant que JSON
-  sprints        Json?    // Stocke les sprints en format JSON
-  medias         Json?    // Stocke les médias en format JSON
-  requirements   Json?    // Stocke les exigences en format JSON
-  skills         Json?    // Stocke les compétences en format JSON
-
-  // Relations
-  participantRequests ProjectParticipantRequest[] // Liste des demandes de participation
-  participants        PersonalProfile[]           @relation("ProjectParticipants") // Liste des participants acceptés
-  PersonalProfile     PersonalProfile[]           @relation("CustomServiceCreator")
-  creator             PersonalProfile             @relation("CreatedProjects", fields: [creatorId], references: [id], onDelete: Cascade)
-  Rating              Rating[]
-  CustomServiceParticipant CustomServiceParticipant[]
-  Dispute             Dispute[]                   @relation("DisputeProject")
-  Order               Order[]
-}
+    // Relation avec AuthUser
+    user         AuthUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    AuthUser AuthUser[] @relation("UserSessionLogs")
+  }
 
 
-// Modèle pour les demandes de participation
-model ProjectParticipantRequest {
-  id             String           @id @default(uuid())
-  projectId      String           // ID du projet associé
-  requesterId    String           // ID de l'utilisateur invité
-  status         ParticipationStatus @default(PENDING) // Statut de la demande
-  createdAt      DateTime         @default(now())
+  // Enum for Theme Options
+  enum Theme {
+    LIGHT
+    DARK
+    SYSTEM // for system-based theme
+  }
 
-  // Relations
-  project        Projects         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  requester      PersonalProfile  @relation(fields: [requesterId], references: [id], onDelete: Cascade)
-}
+  // Enum for View Options
+  enum View {
+    Seller
+    Buyer
+  }
+  enum Frequency  {
+    INSTANT
+    DAILY
+    WEEKLY
+  }
 
-// Enum pour le statut de participation
-enum ParticipationStatus {
-  PENDING
-  ACCEPTED
-  DECLINED
-CANCELLED
-}
-
-
-model CustomServiceParticipant {
-  id               String            @id @default(uuid())
-  customServiceId  String
-  participantId    String
-  joinedAt         DateTime          @default(now())
-
-  // Relations
-  customService    Projects    @relation(fields: [customServiceId], references: [id], onDelete: Cascade)
-  participant      PersonalProfile   @relation(fields: [participantId], references: [id], onDelete: Cascade)
-}
-
-// ------------------------
-// Modèles de Chat
-// ------------------------
-
-model ChatRoom {
-  id           String                @id @default(uuid())
-  title        String?
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-
-  // Relations
-  participants ChatRoomParticipant[] @relation("ChatRoomParticipants")
-  messages     Message[]
-}
-
-model ChatRoomParticipant {
-  id             String           @id @default(uuid())
-  chatRoomId     String
-  participantId  String
-  role           String
-  createdAt      DateTime         @default(now())
-
-  // Relations
-  chatRoom       ChatRoom         @relation("ChatRoomParticipants", fields: [chatRoomId], references: [id])
-  profile        PersonalProfile  @relation("ProfileChatRooms", fields: [participantId], references: [id])
-}
-
-model Message {
-  id          String           @id @default(uuid())
-  chatRoomId  String
-  senderId    String
-  content     String
-  createdAt   DateTime         @default(now())
-  isRead      Boolean          @default(false)
-
-  // Relations
-  chatRoom    ChatRoom         @relation(fields: [chatRoomId], references: [id])
-  sender      PersonalProfile  @relation("MessageSender", fields: [senderId], references: [id])
-}
-
-// ------------------------
-// Notifications
-// ------------------------
-
-model Notification {
-  id          String           @id @default(uuid())
-  recipientId String
-  type        String?
-  content     String?
-  isRead      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
-
-  // Relations
-  recipient   PersonalProfile  @relation(fields: [recipientId], references: [id])
-}
-
-// ------------------------
-// Catégories
-// ------------------------
-
-model MainCategories {
-  id          Int              @id @default(autoincrement())
-  name        String
-  description String?
-  level       Int
-  parentId    Int?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  services    Service[] 
-  // Relations
-  parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
-  children    MainCategories[] @relation("Hierarchy")
-  professionalProfiles ProfessionalProfile[] 
-}
+  // Model for User Preferences
+  model UserPreferences {
+    id            String           @id @default(uuid())
+    userId        String           @unique
+    theme         Theme            @default(SYSTEM)
+    view          View             @default(Buyer)
+    notifications Boolean          @default(true) // enable or disable notifications
+    language      String           @default("en") // default language
+    createdAt     DateTime         @default(now())
+    updatedAt     DateTime         @updatedAt
+    showOnlineStatus       Boolean             @default(true)    
+    notificationFrequency  Frequency           @default(DAILY) 
+    // Relations
+    user          AuthUser         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  }
 
 
 
-// ------------------------
-// Walet
-// ------------------------
+  // ------------------------
+  // Profils Utilisateurs et Rôles
+  // ------------------------
 
-model Wallet {
-  id                String           @id @default(uuid())
-  balance           Decimal          @default(0.0) @db.Decimal(12, 2)
-  currency          String           @default("TND")
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
+  model PersonalProfile {
+    id                    String                @id
+    authUser              AuthUser              @relation("ProfileAuthUser", fields: [id], references: [id], onDelete: Cascade)
+    firstName             String?
+    lastName              String?
+    profilePic            String?  @default("/profile.webp")
+    title                 String?
+    phoneNumber           String?
+    address               String?
+    bio                   String?
+    birthDate             DateTime?
+    userEmail             String                @unique
+    professionalProfileid String?
+    walletid              String?
+    createdAt             DateTime              @default(now())
+    updatedAt             DateTime              @updatedAt
 
-  // Relations
-  ownerId           String          @unique
-  owner             PersonalProfile?  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  transactions      WalletTransaction[]
+    // Relations
+    seller                Seller?
+    buyer                 Buyer?
+    messages              Message[]             @relation("MessageSender")
+    notifications         Notification[]
+    chatRooms             ChatRoomParticipant[] @relation("ProfileChatRooms")
+    ratingsGiven          Rating[]              @relation("RatingRater")
+    ratingsReceived       Rating[]              @relation("RatingRatee")
+    createdProjects       Projects[]       @relation("CustomServiceCreator")
+    participantIn         CustomServiceParticipant[]
+    wallet                Wallet?               @relation("ProfileWallet", fields: [walletid], references: [id])
 
-  PersonalProfile PersonalProfile[] @relation("ProfileWallet")
-}
+    Wallet Wallet[]
+    Projects Projects[] @relation("ProjectParticipants")
+    ProjectParticipantRequest ProjectParticipantRequest[]
+    CreatedProjects Projects[] @relation("CreatedProjects")
+  }
 
-// Modèle Transaction
-model WalletTransaction {
-  id                String           @id @default(uuid())
-  amount            Decimal          @db.Decimal(12, 2)
-  type              TransactionType
-  description       String?
-  createdAt         DateTime         @default(now())
+  model Seller {
+    id                    String               @id @default(uuid())
+    profileId             String               @unique
+    profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+    professionalProfileId String?              @unique
+    professionalProfile   ProfessionalProfile? @relation("SellerProfessionalProfile", fields: [professionalProfileId], references: [id])
+    sellerRating          Float?
+    totalEarnings         Float                @default(0.0)
+    createdAt             DateTime             @default(now())
+    updatedAt             DateTime             @updatedAt
 
-  // Relations
-  walletId          String
-  wallet            Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+    // Relations
+    createdServices       Service[]            @relation("CreatedServices")
 
-  // Optional relation with PaymentTransaction
-  payment           PaymentTransaction?
+    Dispute Dispute[] @relation("DisputeInitiatorSeller")
+    DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantSeller")
+    DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderSeller")
+
     Order Order[]
-}
-
-// Enum pour les types de transaction
-enum TransactionType {
-  DEPOSIT
-  WITHDRAWAL
-  TRANSFER
-  PAYMENT
-}
-
-// ------------------------
-// Modèle PaymentTransaction
-// ------------------------
-
-model PaymentTransaction {
-  id                String           @id @default(uuid())
-  transactionId     String?           @unique
-  paymentMethod     String           // e.g., "Credit Card", "PayPal"
-  transactionStatus PaymentStatus    // Enum for different payment statuses
-  transactionReference String?       @unique
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-
-  // Relations
-  transaction       WalletTransaction?     @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  
-
-  Order Order[]
-}
-
-// Enum for payment statuses
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-  REFUNDED
-}
+  }
 
 
+  model Buyer {
+    id                    String               @id @default(uuid())
+    profileId             String               @unique
+    profile               PersonalProfile      @relation(fields: [profileId], references: [id])
+    professionalProfileId String?              @unique
+    professionalProfile   ProfessionalProfile? @relation("BuyerProfessionalProfile", fields: [professionalProfileId], references: [id])
+    totalSpent            Float                @default(0.0)
+    createdAt             DateTime             @default(now())
+    updatedAt             DateTime             @updatedAt
+
+    // Relations
+    purchasedServices     Service[]           @relation("PurchasedServices")
+
+    Dispute Dispute[] @relation("DisputeInitiatorBuyer")
+
+    DisputeParticipant DisputeParticipant[] @relation("DisputeParticipantBuyer")
+
+    DisputeMessage DisputeMessage[] @relation("DisputeMessageSenderBuyer")
+
+    Order Order[]
+  }
+
+  // ------------------------
+  // Profil Professionnel
+  // ------------------------
+  enum ProfileType {
+    FREELANCER
+    COMPANY
+  }
 
 
-// Enum pour le statut des disputes
-enum DisputeStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-}
+  model ProfessionalProfile {
+    id                   String               @id @default(uuid()) 
+    buyer                Buyer?               @relation("BuyerProfessionalProfile")
+    seller               Seller?              @relation("SellerProfessionalProfile")
+    personalWebsite      String?
+    occupations          Json?
+    companyName          String?
+    type                 ProfileType?
+    sector               String?
+    profession           String?
+    experienceYears      Int?
+    educations           Json?
+    skills               Json?
+    certifications       Json?
+    language             String[]
+    timeZone             String?
+    website              String?
+    preferredCategoryId  Int?
+    createdAt            DateTime             @default(now())
+    updatedAt            DateTime             @updatedAt
 
-// Modèle Dispute
-model Dispute {
-  id             String               @id @default(uuid())
-  serviceId      String?              // Optional link to a specific service
-  projectId      String?              // Optional link to a specific project
-  initiatorSellerId String?           // Seller initiating the dispute
-  initiatorBuyerId String?            // Buyer initiating the dispute
-  description    String
-  status         DisputeStatus        @default(OPEN)
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+    // Relations
+    preferredCategory    MainCategories?      @relation(fields: [preferredCategoryId], references: [id])
+  }
 
-  // Relations
-  initiatorSeller   Seller?            @relation("DisputeInitiatorSeller", fields: [initiatorSellerId], references: [id])
-  initiatorBuyer    Buyer?             @relation("DisputeInitiatorBuyer", fields: [initiatorBuyerId], references: [id])
-  service           Service?           @relation("DisputeService", fields: [serviceId], references: [id])
-  project           Projects?          @relation("DisputeProject", fields: [projectId], references: [id])
-  participants      DisputeParticipant[] // List of participants involved in the dispute
-  messages          DisputeMessage[]     // Messages exchanged in the dispute
+  // ------------------------
+  // Modèles de Service
+  // ------------------------
 
-  Order Order[] @relation("DisputeOrder")
-}
+  model Service {
+    id            String           @id @default(uuid())
+    name          String
+    description   String?
+    medias        Json?
+    isPublic      Boolean          @default(true)
+    tags          String[]
+    creatorId     String  
+    createdAt     DateTime         @default(now())
+    updatedAt     DateTime         @updatedAt
 
+  //services
+    categoryId    Int    
+    category      MainCategories   @relation(fields: [categoryId], references: [id]) // Relation avec MainCategories
+    
 
-// Modèle DisputeParticipant pour les participants dans les disputes
-model DisputeParticipant {
-  id             String           @id @default(uuid())
-  disputeId      String
-  participantSellerId String?     // Seller participant
-  participantBuyerId String?      // Buyer participant
-  role           String
-  joinedAt       DateTime         @default(now())
+    // Relations
+    creator       Seller           @relation("CreatedServices", fields: [creatorId], references: [id])
+    buyers        Buyer[]          @relation("PurchasedServices")
+    ratings       Rating[]         @relation("ServiceRatings")
+    packages      ServicePackage[]
+    
 
-  // Relations
-  dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
-  participantSeller Seller?       @relation("DisputeParticipantSeller", fields: [participantSellerId], references: [id], onDelete: Cascade)
-  participantBuyer  Buyer?        @relation("DisputeParticipantBuyer", fields: [participantBuyerId], references: [id], onDelete: Cascade)
-}
+    Dispute Dispute[] @relation("DisputeService")
 
+    Order Order[]
+  }
 
-// Modèle DisputeMessage pour les messages dans les disputes
-model DisputeMessage {
-  id             String           @id @default(uuid())
-  disputeId      String
-  senderSellerId String?          // Seller sender
-  senderBuyerId  String?          // Buyer sender
-  content        String
-  createdAt      DateTime         @default(now())
-  isRead         Boolean          @default(false)
-
-  // Relations
-  dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
-  senderSeller   Seller?          @relation("DisputeMessageSenderSeller", fields: [senderSellerId], references: [id])
-  senderBuyer    Buyer?           @relation("DisputeMessageSenderBuyer", fields: [senderBuyerId], references: [id])
-}
-
-
-model Order {
-  id                  String               @id @default(uuid())
-  totalAmount         Decimal              @db.Decimal(12, 2)
-  currency            String               @default("TND")
-  status              OrderStatus          @default(PENDING)
-  description         String
-  paymentMethod       PaymentMethodType    // Ajoute l'option pour spécifier le type de paiement
-  paymentStatus       PaymentStatus        @default(PENDING)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-
-  // Relations pour le paiement
-  walletTransactionId String?              // ID de la transaction Wallet (si utilisé)
-  transaction         WalletTransaction?   @relation(fields: [walletTransactionId], references: [id], onDelete: SetNull)
-
-  payTransactionId    String?              // ID de la transaction Payment (si utilisé)
-  paymentTransaction  PaymentTransaction?  @relation(fields: [payTransactionId], references: [transactionId], onDelete: SetNull)
-
-  // Relations pour les utilisateurs
-  buyerId             String               // Lien avec l'acheteur
-  buyer               Buyer                @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-
-  sellerId            String
-  seller              Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-
-  serviceId           String?
-  service             Service?             @relation(fields: [serviceId], references: [id], onDelete: SetNull)
-
-  projectId           String?
-  project             Projects?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
-
-  disputeid           String?
-  dispute             Dispute?             @relation("DisputeOrder", fields: [disputeid], references: [id], onDelete: SetNull)
-}
-
-enum PaymentMethodType {
-  WALLET
-  EXTERNAL
-}
+  model ServicePackage {
+    id            String    @id @default(uuid())
+    serviceId     String
+    name          String?
+    description   String?
+    deliveryTime  Int?
+    price         Decimal?   @db.Decimal(12, 3)
+    revisions     Int?
+    features      String[]
 
 
+    // Relations
+    service       Service   @relation(fields: [serviceId], references: [id])
+  }
 
-enum OrderStatus {
-  PENDING
-  ACCEPTED
-  IN_PROGRESS
-  IN_REVISION
-  COMPLETED
+  // ------------------------
+  // Modèle de Notation
+  // ------------------------
+
+  model Rating {
+    id              String           @id @default(uuid())
+    raterId         String
+    rateeId         String
+    serviceId       String?
+    projectsId      String?
+    rating          Int
+    review          String?
+    createdAt       DateTime         @default(now())
+
+    // Relations
+    rater           PersonalProfile  @relation("RatingRater", fields: [raterId], references: [id])
+    ratee           PersonalProfile  @relation("RatingRatee", fields: [rateeId], references: [id])
+    service         Service?         @relation("ServiceRatings", fields: [serviceId], references: [id])
+    projects        Projects?   @relation(fields: [projectsId], references: [id])
+  }
+
+  // ------------------------
+  // Demandes de Services Personnalisés
+  // ------------------------
+
+  model Projects {
+    id             String   @id @default(uuid())
+    title          String?
+    description    String?
+    minBudget      Decimal? @db.Decimal(10, 2)
+    maxBudget      Decimal? @db.Decimal(10, 2)
+    proposedPrice  Decimal? @db.Decimal(10, 2)
+    message        String?
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    creatorId      String   // ID du créateur
+
+    // Stocker les objets structurés en tant que JSON
+    sprints        Json?    // Stocke les sprints en format JSON
+    medias         Json?    // Stocke les médias en format JSON
+    requirements   Json?    // Stocke les exigences en format JSON
+    skills         Json?    // Stocke les compétences en format JSON
+
+    // Relations
+    participantRequests ProjectParticipantRequest[] // Liste des demandes de participation
+    participants        PersonalProfile[]           @relation("ProjectParticipants") // Liste des participants acceptés
+    PersonalProfile     PersonalProfile[]           @relation("CustomServiceCreator")
+    creator             PersonalProfile             @relation("CreatedProjects", fields: [creatorId], references: [id], onDelete: Cascade)
+    Rating              Rating[]
+    CustomServiceParticipant CustomServiceParticipant[]
+    Dispute             Dispute[]                   @relation("DisputeProject")
+    Order               Order[]
+  }
+
+
+  // Modèle pour les demandes de participation
+  model ProjectParticipantRequest {
+    id             String           @id @default(uuid())
+    projectId      String           // ID du projet associé
+    requesterId    String           // ID de l'utilisateur invité
+    status         ParticipationStatus @default(PENDING) // Statut de la demande
+    createdAt      DateTime         @default(now())
+
+    // Relations
+    project        Projects         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    requester      PersonalProfile  @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  }
+
+  // Enum pour le statut de participation
+  enum ParticipationStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
   CANCELLED
-}
+  }
+
+
+  model CustomServiceParticipant {
+    id               String            @id @default(uuid())
+    customServiceId  String
+    participantId    String
+    joinedAt         DateTime          @default(now())
+
+    // Relations
+    customService    Projects    @relation(fields: [customServiceId], references: [id], onDelete: Cascade)
+    participant      PersonalProfile   @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  }
+
+  // ------------------------
+  // Modèles de Chat
+  // ------------------------
+
+  model ChatRoom {
+    id           String                @id @default(uuid())
+    title        String?
+    createdAt    DateTime              @default(now())
+    updatedAt    DateTime              @updatedAt
+
+    // Relations
+    participants ChatRoomParticipant[] @relation("ChatRoomParticipants")
+    messages     Message[]
+  }
+
+  model ChatRoomParticipant {
+    id             String           @id @default(uuid())
+    chatRoomId     String
+    participantId  String
+    role           String
+    createdAt      DateTime         @default(now())
+
+    // Relations
+    chatRoom       ChatRoom         @relation("ChatRoomParticipants", fields: [chatRoomId], references: [id])
+    profile        PersonalProfile  @relation("ProfileChatRooms", fields: [participantId], references: [id])
+  }
+
+  model Message {
+    id          String           @id @default(uuid())
+    chatRoomId  String
+    senderId    String
+    content     String
+    createdAt   DateTime         @default(now())
+    isRead      Boolean          @default(false)
+
+    // Relations
+    chatRoom    ChatRoom         @relation(fields: [chatRoomId], references: [id])
+    sender      PersonalProfile  @relation("MessageSender", fields: [senderId], references: [id])
+  }
+
+  // ------------------------
+  // Notifications
+  // ------------------------
+
+  model Notification {
+    id          String           @id @default(uuid())
+    recipientId String
+    type        String?
+    content     String?
+    isRead      Boolean          @default(false)
+    createdAt   DateTime         @default(now())
+
+    // Relations
+    recipient   PersonalProfile  @relation(fields: [recipientId], references: [id])
+  }
+
+  // ------------------------
+  // Catégories
+  // ------------------------
+
+  model MainCategories {
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?
+    level       Int
+    parentId    Int?
+    createdAt   DateTime         @default(now())
+    updatedAt   DateTime         @updatedAt
+    services    Service[] 
+    // Relations
+    parent      MainCategories?  @relation("Hierarchy", fields: [parentId], references: [id])
+    children    MainCategories[] @relation("Hierarchy")
+    professionalProfiles ProfessionalProfile[] 
+  }
+
+
+
+  // ------------------------
+  // Walet
+  // ------------------------
+
+  model Wallet {
+    id                String           @id @default(uuid())
+    balance           Decimal          @default(0.0) @db.Decimal(12, 2)
+    currency          String           @default("TND")
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+
+    // Relations
+    ownerId           String          @unique
+    owner             PersonalProfile?  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    transactions      WalletTransaction[]
+
+    PersonalProfile PersonalProfile[] @relation("ProfileWallet")
+  }
+
+  // Modèle Transaction
+  model WalletTransaction {
+    id                String           @id @default(uuid())
+    amount            Decimal          @db.Decimal(12, 2)
+    type              TransactionType
+    description       String?
+    createdAt         DateTime         @default(now())
+
+    // Relations
+    walletId          String
+    wallet            Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+    // Optional relation with PaymentTransaction
+    payment           PaymentTransaction?
+      Order Order[]
+  }
+
+  // Enum pour les types de transaction
+  enum TransactionType {
+    DEPOSIT
+    WITHDRAWAL
+    TRANSFER
+    PAYMENT
+  }
+
+  // ------------------------
+  // Modèle PaymentTransaction
+  // ------------------------
+
+  model PaymentTransaction {
+    id                String           @id @default(uuid())
+    transactionId     String?           @unique
+    paymentMethod     String           // e.g., "Credit Card", "PayPal"
+    transactionStatus PaymentStatus    // Enum for different payment statuses
+    transactionReference String?       @unique
+    createdAt         DateTime         @default(now())
+    updatedAt         DateTime         @updatedAt
+
+    // Relations
+    transaction       WalletTransaction?     @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+    
+
+    Order Order[]
+  }
+
+  // Enum for payment statuses
+  enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+  }
+
+
+
+
+  // Enum pour le statut des disputes
+  enum DisputeStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    CLOSED
+  }
+
+  // Modèle Dispute
+  model Dispute {
+    id             String               @id @default(uuid())
+    serviceId      String?              // Optional link to a specific service
+    projectId      String?              // Optional link to a specific project
+    initiatorSellerId String?           // Seller initiating the dispute
+    initiatorBuyerId String?            // Buyer initiating the dispute
+    description    String
+    status         DisputeStatus        @default(OPEN)
+    createdAt      DateTime             @default(now())
+    updatedAt      DateTime             @updatedAt
+
+    // Relations
+    initiatorSeller   Seller?            @relation("DisputeInitiatorSeller", fields: [initiatorSellerId], references: [id])
+    initiatorBuyer    Buyer?             @relation("DisputeInitiatorBuyer", fields: [initiatorBuyerId], references: [id])
+    service           Service?           @relation("DisputeService", fields: [serviceId], references: [id])
+    project           Projects?          @relation("DisputeProject", fields: [projectId], references: [id])
+    participants      DisputeParticipant[] // List of participants involved in the dispute
+    messages          DisputeMessage[]     // Messages exchanged in the dispute
+
+    Order Order[] @relation("DisputeOrder")
+  }
+
+
+  // Modèle DisputeParticipant pour les participants dans les disputes
+  model DisputeParticipant {
+    id             String           @id @default(uuid())
+    disputeId      String
+    participantSellerId String?     // Seller participant
+    participantBuyerId String?      // Buyer participant
+    role           String
+    joinedAt       DateTime         @default(now())
+
+    // Relations
+    dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+    participantSeller Seller?       @relation("DisputeParticipantSeller", fields: [participantSellerId], references: [id], onDelete: Cascade)
+    participantBuyer  Buyer?        @relation("DisputeParticipantBuyer", fields: [participantBuyerId], references: [id], onDelete: Cascade)
+  }
+
+
+  // Modèle DisputeMessage pour les messages dans les disputes
+  model DisputeMessage {
+    id             String           @id @default(uuid())
+    disputeId      String
+    senderSellerId String?          // Seller sender
+    senderBuyerId  String?          // Buyer sender
+    content        String
+    createdAt      DateTime         @default(now())
+    isRead         Boolean          @default(false)
+
+    // Relations
+    dispute        Dispute          @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+    senderSeller   Seller?          @relation("DisputeMessageSenderSeller", fields: [senderSellerId], references: [id])
+    senderBuyer    Buyer?           @relation("DisputeMessageSenderBuyer", fields: [senderBuyerId], references: [id])
+  }
+
+
+  model Order {
+    id                  String               @id @default(uuid())
+    totalAmount         Decimal              @db.Decimal(12, 2)
+    currency            String               @default("TND")
+    status              OrderStatus          @default(PENDING)
+    description         String
+    paymentMethod       PaymentMethodType    // Ajoute l'option pour spécifier le type de paiement
+    paymentStatus       PaymentStatus        @default(PENDING)
+    createdAt           DateTime             @default(now())
+    updatedAt           DateTime             @updatedAt
+
+    // Relations pour le paiement
+    walletTransactionId String?              // ID de la transaction Wallet (si utilisé)
+    transaction         WalletTransaction?   @relation(fields: [walletTransactionId], references: [id], onDelete: SetNull)
+
+    payTransactionId    String?              // ID de la transaction Payment (si utilisé)
+    paymentTransaction  PaymentTransaction?  @relation(fields: [payTransactionId], references: [transactionId], onDelete: SetNull)
+
+    // Relations pour les utilisateurs
+    buyerId             String               // Lien avec l'acheteur
+    buyer               Buyer                @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+    sellerId            String
+    seller              Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+    serviceId           String?
+    service             Service?             @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+    projectId           String?
+    project             Projects?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+    disputeid           String?
+    dispute             Dispute?             @relation("DisputeOrder", fields: [disputeid], references: [id], onDelete: SetNull)
+  }
+
+  enum PaymentMethodType {
+    WALLET
+    EXTERNAL
+  }
+
+
+
+  enum OrderStatus {
+    PENDING
+    ACCEPTED
+    IN_PROGRESS
+    IN_REVISION
+    COMPLETED
+    CANCELLED
+  }
