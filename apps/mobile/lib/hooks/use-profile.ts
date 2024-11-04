@@ -49,7 +49,7 @@ export function useProfile() {
       // Fetch active orders count
       const { count: activeOrders, error: ordersError } = await supabase
         .from("Order")
-        .select("*", { count: true })
+        .select("*", { count: "exact" })
         .eq("sellerId", user.id)
         .eq("status", "ACTIVE");
 
@@ -58,7 +58,7 @@ export function useProfile() {
       // Fetch completed orders count
       const { count: completedOrders, error: completedError } = await supabase
         .from("Order")
-        .select("*", { count: true })
+        .select("*", { count: "exact" })
         .eq("sellerId", user.id)
         .eq("status", "COMPLETED");
 

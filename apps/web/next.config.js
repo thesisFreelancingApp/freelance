@@ -16,6 +16,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "hlxsztkqfvxjbrwmmfww.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "loremflickr.com",
+      },
     ],
   },
 };
