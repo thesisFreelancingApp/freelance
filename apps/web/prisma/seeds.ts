@@ -2,6 +2,10 @@ import { PrismaClient } from "@prisma/client";
 import { seedCategory } from "./seeds/categories";
 import { seedUsers } from "./seeds/users";
 import { seedServices } from "./seeds/services";
+import { seedRatings } from "./seeds/ratings";
+import { seedOrders } from "./seeds/orders";
+import { seedChats } from "./seeds/chat";
+import { seedDisputes } from "./seeds/disputes";
 
 const prisma = new PrismaClient();
 
@@ -11,18 +15,9 @@ async function mainSeed() {
 
     // Ensure the database schema is up to date
     console.log("----- Updating database schema...");
-    // await prisma.$executeRaw`CREATE TABLE IF NOT EXISTS "CategoryHierarchy" (
-    //   "id" SERIAL PRIMARY KEY,
-    //   "name" TEXT NOT NULL,
-    //   "description" TEXT,
-    //   "level" INTEGER NOT NULL,
-    //   "parentId" INTEGER,
-    //   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    //   "updatedAt" TIMESTAMP(3) NOT NULL,
-    //   FOREIGN KEY ("parentId") REFERENCES "CategoryHierarchy"("id")
-    // )`;
     console.log("----- Database schema updated successfully.");
 
+    // Seed in order of dependencies
     console.log("----- Seeding Categories...");
     await seedCategory();
 
@@ -32,8 +27,16 @@ async function mainSeed() {
     console.log("----- Seeding Services...");
     await seedServices();
 
-    // console.log("----- Seeding Rating...");
-    // await seedRatings();
+    console.log("----- Seeding Orders...");
+    await seedOrders();
+
+    console.log("----- Seeding Ratings...");
+    await seedRatings();
+    console.log("----- Seeding Chat Rooms and Messages...");
+    await seedChats();
+
+    console.log("----- Seeding Disputes...");
+    await seedDisputes();
 
     console.log("----- Database seeding completed successfully.");
   } catch (error) {

@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "~/lib/hooks/use-auth";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Mail, Lock, ArrowRight } from "lucide-react-native";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
@@ -18,15 +18,19 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     const { error } = await signIn(email, password);
     if (error) {
-      console.error(error);
+      console.error("Login error:", error);
+      // Show error message to user
+    } else {
+      // Navigation will be handled by root layout based on session
+      console.log("Login successful");
     }
   };
 
   const handleGoogleLogin = async () => {
     const { error } = await handleGoogleSignIn();
     if (error) {
-      console.error(error);
-      // Handle error (show toast/alert)
+      console.error("Google login error:", error);
+      // Show error message to user
     }
   };
 
