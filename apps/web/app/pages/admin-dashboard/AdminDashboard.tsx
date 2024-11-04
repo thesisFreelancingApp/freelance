@@ -12,6 +12,7 @@ import { MessagesTab } from "./MessagesTab";
 import { ReviewsTab } from "./ReviewsTab";
 import { AnalyticsTab } from "./AnalyticsTab";
 import { SettingsTab } from "./SettingsTab";
+import { WithdrawalRequestsTab } from "./WithdrawalRequestsTab"
 
 export function AdminDashboard() {
   return (
@@ -25,6 +26,7 @@ export function AdminDashboard() {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="ww">Withdraw</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="orders">Orders</TabsTrigger>
             <TabsTrigger value="disputes">Disputes</TabsTrigger>
@@ -45,6 +47,10 @@ export function AdminDashboard() {
           <TabsContent value="orders">
             <OrdersTab />
           </TabsContent>
+          <TabsContent value="ww">
+            <WithdrawalRequestsTab />
+          </TabsContent>
+
           <TabsContent value="disputes">
             <DisputesTab />
           </TabsContent>
