@@ -13,7 +13,7 @@ export async function sendMessage(receiverId: string, content: string) {
   if (userError || !user) {
     throw new Error("You must be logged in to send a message");
   }
-
+      
   try {
     // Check for an existing ChatRoom between the users
     let chatRoom = await prisma.chatRoom.findFirst({
