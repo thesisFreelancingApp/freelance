@@ -1,10 +1,16 @@
-import { View, ScrollView, Dimensions, StatusBar } from "react-native";
+import {
+  View,
+  ScrollView,
+  Dimensions,
+  StatusBar,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { Text } from "~/components/ui/text";
 import { Image } from "expo-image";
-import { useEffect, useState } from "react";
-import { supabase } from "~/lib/supabase";
-import type { Service } from "~/types/service";
+import { useService } from "~/lib/hooks/use-service";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import {
@@ -26,63 +32,27 @@ const { width } = Dimensions.get("window");
 
 export default function ServiceDetailScreen() {
   const { id } = useLocalSearchParams();
-  const [service, setService] = useState<Service | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { service, isLoading, error } = useService(id as string);
   const [selectedPackage, setSelectedPackage] = useState(0);
   const [liked, setLiked] = useState(false);
 
-  useEffect(() => {
-    async function fetchService() {
-      try {
-        // First fetch the service with its basic relations
-        const { data, error } = await supabase
-          .from("Service")
-          .select(
-            `
-            *,
-            packages:ServicePackage(
-              id,
-              name,
-              description,
-              price,
-              deliveryTime,
-              features
-            ),
-            ratings:Rating(
-              id,
-              rating,
-              review,
-              createdAt
-            )
-          `
-          )
-          .eq("id", id)
-          .single();
-
-        if (error) throw error;
-        setService(data);
-      } catch (error) {
-        console.error("Error fetching service:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchService();
-  }, [id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" className="text-primary" />
       </View>
     );
   }
 
-  if (!service) {
+  if (error || !service) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text>Service not found</Text>
+      <View className="flex-1 items-center justify-center p-4">
+        <Text className="text-destructive text-center mb-4">
+          {error?.message || "Service not found"}
+        </Text>
+        <Button onPress={() => router.back()}>
+          <Text className="text-primary-foreground">Go Back</Text>
+        </Button>
       </View>
     );
   }
@@ -95,11 +65,6 @@ export default function ServiceDetailScreen() {
         ).toFixed(1)
       : "New";
 
-  // Calculate the maximum number of features across all packages
-  const maxFeatures = Math.max(
-    ...(service?.packages.map((pkg) => pkg.features?.length || 0) || [])
-  );
-
   return (
     <View className="flex-1 bg-background">
       <StatusBar barStyle="light-content" />
@@ -108,7 +73,7 @@ export default function ServiceDetailScreen() {
         stickyHeaderIndices={[0]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        {/* Sticky Header - Made more prominent */}
+        {/* Sticky Header */}
         <Animated.View
           entering={FadeIn}
           className="flex-row justify-between items-center px-4 py-4 bg-background/95 backdrop-blur-xl z-10"
@@ -145,7 +110,7 @@ export default function ServiceDetailScreen() {
           </View>
         </Animated.View>
 
-        {/* Hero Image with Gallery and Page Indicator */}
+        {/* Hero Image */}
         <View className="relative">
           <ScrollView
             horizontal
@@ -179,7 +144,7 @@ export default function ServiceDetailScreen() {
 
         {/* Main Content */}
         <Animated.View entering={FadeInDown.delay(200)} className="px-4 -mt-20">
-          {/* Service Info Card - Enhanced spacing and hierarchy */}
+          {/* Service Info Card */}
           <Card className="mb-6 shadow-lg">
             <CardContent className="p-5">
               <Badge variant="secondary" className="mb-4">
@@ -190,27 +155,20 @@ export default function ServiceDetailScreen() {
 
               <Text className="text-2xl font-bold mb-5">{service.name}</Text>
 
-              {/* Seller Info - Improved layout */}
+              {/* Seller Info */}
               <View className="flex-row items-center mb-6">
                 <Avatar
                   className="h-14 w-14 mr-4 border-2 border-background"
-                  alt={`Profile picture of ${
-                    service.creator?.profile?.firstName || "user"
-                  }`}
+                  alt={`${service.seller?.firstName || "User"}'s avatar`}
                 >
-                  <AvatarImage
-                    source={{ uri: service.creator?.profile?.profilePic }}
-                  />
+                  <AvatarImage source={{ uri: service.seller?.profilePic }} />
                   <AvatarFallback>
-                    <Text className="text-lg">
-                      {service.creator?.profile?.firstName?.[0] || "S"}
-                    </Text>
+                    {service.seller?.firstName?.[0] || "S"}
                   </AvatarFallback>
                 </Avatar>
                 <View className="flex-1">
                   <Text className="font-semibold text-base">
-                    {service.creator?.profile?.firstName}{" "}
-                    {service.creator?.profile?.lastName}
+                    {service.seller?.firstName} {service.seller?.lastName}
                   </Text>
                   <View className="flex-row items-center mt-1">
                     <Star
@@ -218,13 +176,13 @@ export default function ServiceDetailScreen() {
                       className="text-yellow-400 fill-yellow-400 mr-1"
                     />
                     <Text className="text-sm text-muted-foreground">
-                      {averageRating} • {service.ratings.length} avis
+                      {averageRating} • {service.ratings?.length || 0} avis
                     </Text>
                   </View>
                 </View>
                 <Button
                   variant="outline"
-                  onPress={() => router.push("/messages")}
+                  onPress={() => router.push(`/chat/${service.seller?.id}`)}
                   className="rounded-full"
                 >
                   <MessageCircle size={18} className="mr-2" />
@@ -232,30 +190,31 @@ export default function ServiceDetailScreen() {
                 </Button>
               </View>
 
-              {/* Description - Better readability */}
+              {/* Description */}
               <Text className="text-base leading-relaxed text-muted-foreground mb-6">
                 {service.description}
               </Text>
 
-              {/* Tags - Enhanced visual */}
-              <View className="mb-4">
-                <Text className="font-medium mb-3">Tags</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  {service.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="mr-2 px-4 py-1.5"
-                    >
-                      <Text>{tag}</Text>
-                    </Badge>
-                  ))}
-                </ScrollView>
-              </View>
+              {/* Tags */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="mb-4"
+              >
+                {service.tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="mr-2 px-4 py-1.5"
+                  >
+                    <Text>{tag}</Text>
+                  </Badge>
+                ))}
+              </ScrollView>
             </CardContent>
           </Card>
 
-          {/* Packages Section - keep existing code but update styling */}
+          {/* Packages */}
           <View className="mb-24">
             <Text className="text-xl font-bold mb-4">Packages</Text>
             <ScrollView
@@ -272,59 +231,39 @@ export default function ServiceDetailScreen() {
                   style={{ width: width - 48 }}
                   className="mr-4"
                 >
-                  <Card
+                  <Pressable
+                    onPress={() => setSelectedPackage(index)}
                     className={cn(
-                      "border-2",
+                      "border-2 rounded-lg p-4 bg-card",
                       selectedPackage === index
                         ? "border-primary"
                         : "border-border"
                     )}
-                    onPress={() => setSelectedPackage(index)}
                   >
-                    <CardContent className="p-4">
-                      {/* Package Header */}
-                      <View className="min-h-[120]">
-                        <Text className="text-lg font-semibold mb-1">
-                          {pkg.name}
-                        </Text>
-                        <Text className="text-2xl font-bold text-primary mb-2">
-                          ${pkg.price}
-                        </Text>
-                        <Text className="text-muted-foreground">
-                          {pkg.description}
-                        </Text>
-                      </View>
+                    <Text className="text-lg font-semibold">{pkg.name}</Text>
+                    <Text className="text-2xl font-bold text-primary mt-2">
+                      ${pkg.price}
+                    </Text>
+                    <Text className="text-muted-foreground mt-2">
+                      {pkg.description}
+                    </Text>
 
-                      <Separator className="my-4" />
+                    <Separator className="my-4" />
 
-                      {/* Features Section with fixed height */}
-                      <View className="min-h-[200]">
-                        {pkg.features?.map((feature, i) => (
-                          <View key={i} className="flex-row items-center mb-3">
-                            <Check size={16} className="text-primary mr-2" />
-                            <Text className="text-sm flex-1">{feature}</Text>
-                          </View>
-                        ))}
-                        {/* Add empty spaces for missing features to maintain height */}
-                        {[
-                          ...Array(maxFeatures - (pkg.features?.length || 0)),
-                        ].map((_, i) => (
-                          <View key={`empty-${i}`} className="h-[28] mb-3" />
-                        ))}
+                    {pkg.features?.map((feature, i) => (
+                      <View key={i} className="flex-row items-center mb-3">
+                        <Check size={16} className="text-primary mr-2" />
+                        <Text className="text-sm">{feature}</Text>
                       </View>
+                    ))}
 
-                      {/* Delivery Time */}
-                      <View className="flex-row items-center mt-4 pt-4 border-t border-border">
-                        <Clock
-                          size={16}
-                          className="text-muted-foreground mr-2"
-                        />
-                        <Text className="text-muted-foreground">
-                          Livraison en {pkg.deliveryTime} jours
-                        </Text>
-                      </View>
-                    </CardContent>
-                  </Card>
+                    <View className="flex-row items-center mt-4 pt-4 border-t border-border">
+                      <Clock size={16} className="text-muted-foreground mr-2" />
+                      <Text className="text-muted-foreground">
+                        Livraison en {pkg.deliveryTime} jours
+                      </Text>
+                    </View>
+                  </Pressable>
                 </Animated.View>
               ))}
             </ScrollView>
@@ -332,7 +271,7 @@ export default function ServiceDetailScreen() {
         </Animated.View>
       </ScrollView>
 
-      {/* Bottom Action - Enhanced */}
+      {/* Bottom Action */}
       <Animated.View
         entering={FadeInDown.delay(500)}
         className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-background/95 backdrop-blur-lg"

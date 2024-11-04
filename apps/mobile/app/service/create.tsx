@@ -50,7 +50,10 @@ export default function CreateServiceScreen() {
       {/* Packages */}
       <View className="mt-4">
         <Text className="font-medium mb-2">Pricing Packages</Text>
-        <PackageForm packages={packages} onChange={setPackages} />
+        <PackageForm
+          packages={packages}
+          onChange={(packages) => setPackages(packages as ServicePackage[])}
+        />
       </View>
 
       <Button onPress={handleSubmit} className="mt-6 mb-8">

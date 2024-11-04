@@ -36,6 +36,15 @@ export interface Service {
   updatedAt: string;
   packages: ServicePackage[];
   ratings?: Rating[];
+  creator?: {
+    id: string;
+    profile?: {
+      firstName?: string;
+      lastName?: string;
+      profilePic?: string;
+      title?: string;
+    };
+  };
 }
 
 export interface ServicePackage {

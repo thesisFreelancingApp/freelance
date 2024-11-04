@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
 import type { Service } from "~/types/service";
 
@@ -12,33 +12,53 @@ export function useServices() {
       setIsLoading(true);
       setError(null);
 
-      // First try to fetch just the Service table
-      const { data: servicesData, error: servicesError } = await supabase
+      const { data, error: servicesError } = await supabase
         .from("Service")
-        .select("*");
-
-      if (servicesError) {
-        console.error("Error fetching services:", servicesError);
-        throw servicesError;
-      }
-
-      // If that works, then try to fetch with relations
-      const { data: fullData, error: fullError } = await supabase.from(
-        "Service"
-      ).select(`
+        .select(
+          `
           *,
-          packages:ServicePackage(id, name, price, deliveryTime),
-          ratings:Rating(rating)
-        `);
+          creator:creatorId(
+            id,
+            profile:PersonalProfile(
+              firstName,
+              lastName,
+              profilePic,
+              title
+            )
+          ),
+          packages:ServicePackage(*),
+          ratings:Rating(
+            id,
+            rating,
+            review,
+            createdAt,
+            rater:PersonalProfile!raterId(
+              firstName,
+              lastName,
+              profilePic
+            )
+          )
+        `
+        )
+        .eq("isPublic", true)
+        .order("createdAt", { ascending: false });
 
-      if (fullError) {
-        console.error("Error fetching full service data:", fullError);
-        throw fullError;
-      }
+      if (servicesError) throw servicesError;
 
-      setServices(fullData || []);
+      // Transform the data to match your Service type
+      const transformedServices: Service[] = data.map((service) => ({
+        ...service,
+        creator: {
+          id: service.creator.id,
+          profile: service.creator.profile,
+        },
+        packages: service.packages || [],
+        ratings: service.ratings || [],
+      }));
+
+      setServices(transformedServices);
     } catch (err) {
-      console.error("Error in fetchServices:", err);
+      console.error("Error fetching services:", err);
       setError(
         err instanceof Error ? err : new Error("Failed to fetch services")
       );
@@ -49,7 +69,32 @@ export function useServices() {
 
   useEffect(() => {
     fetchServices();
+
+    // Subscribe to changes
+    const subscription = supabase
+      .channel("services_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Service",
+        },
+        () => {
+          fetchServices();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  return { services, isLoading, error, refetch: fetchServices };
+  return {
+    services,
+    isLoading,
+    error,
+    refetch: fetchServices,
+  };
 }
