@@ -1,16 +1,20 @@
+
+"use server"
 // Import necessary modules and initialize Prisma
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 const prisma = new PrismaClient();
 
-// Middleware function to check if the user is an admin
-async function checkAdmin(request: NextRequest) {
+// Helper function to check if the user is an admin
+async function checkAdmin() {
   const supabase = createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-  if (userError || !user) return { isAdmin: false, redirect: NextResponse.redirect(new URL("/login", request.url)) };
+  if (userError || !user) {
+    return { isAdmin: false, redirect: NextResponse.redirect("/login") };
+  }
 
   const authUser = await prisma.authUser.findUnique({
     where: { id: user.id },
@@ -18,27 +22,27 @@ async function checkAdmin(request: NextRequest) {
   });
 
   if (!authUser || authUser.role !== "ADMIN") {
-    return { isAdmin: false, redirect: NextResponse.redirect(new URL("/", request.url)) };
+    return { isAdmin: false, redirect: NextResponse.redirect("/") };
   }
+
   return { isAdmin: true };
 }
 
 // Admin actions
 
 // User Management
-export async function getAllUsers(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllUsers() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const users = await prisma.authUser.findMany();
   return NextResponse.json(users);
 }
 
-export async function updateUserRole(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateUserRole({ userId, role }: { userId: string; role: string }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { userId, role } = await request.json();
   const updatedUser = await prisma.authUser.update({
     where: { id: userId },
     data: { role },
@@ -48,19 +52,18 @@ export async function updateUserRole(request: NextRequest) {
 }
 
 // Account Management
-export async function getAllAccounts(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllAccounts() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const accounts = await prisma.account.findMany();
   return NextResponse.json(accounts);
 }
 
-export async function updateAccountProvider(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateAccountProvider({ accountId, lastProvider }: { accountId: number; lastProvider: string }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { accountId, lastProvider } = await request.json();
   const updatedAccount = await prisma.account.update({
     where: { id: accountId },
     data: { lastProvider },
@@ -70,19 +73,18 @@ export async function updateAccountProvider(request: NextRequest) {
 }
 
 // Service Management
-export async function getAllServices(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllServices() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const services = await prisma.service.findMany();
   return NextResponse.json(services);
 }
 
-export async function updateServiceVisibility(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateServiceVisibility({ serviceId, isPublic }: { serviceId: string; isPublic: boolean }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { serviceId, isPublic } = await request.json();
   const updatedService = await prisma.service.update({
     where: { id: serviceId },
     data: { isPublic },
@@ -92,19 +94,18 @@ export async function updateServiceVisibility(request: NextRequest) {
 }
 
 // Wallet Management
-export async function getAllWallets(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllWallets() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const wallets = await prisma.wallet.findMany();
   return NextResponse.json(wallets);
 }
 
-export async function updateWalletBalance(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateWalletBalance({ walletId, balance }: { walletId: string; balance: number }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { walletId, balance } = await request.json();
   const updatedWallet = await prisma.wallet.update({
     where: { id: walletId },
     data: { balance },
@@ -114,19 +115,18 @@ export async function updateWalletBalance(request: NextRequest) {
 }
 
 // Transaction Management
-export async function getAllTransactions(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllTransactions() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const transactions = await prisma.walletTransaction.findMany();
   return NextResponse.json(transactions);
 }
 
-export async function updateTransactionDescription(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateTransactionDescription({ transactionId, description }: { transactionId: string; description: string }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { transactionId, description } = await request.json();
   const updatedTransaction = await prisma.walletTransaction.update({
     where: { id: transactionId },
     data: { description },
@@ -136,19 +136,19 @@ export async function updateTransactionDescription(request: NextRequest) {
 }
 
 // Order Management
-export async function getAllOrders(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllOrders() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const orders = await prisma.order.findMany();
   return NextResponse.json(orders);
+//   return 'hello'
 }
 
-export async function updateOrderStatus(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function updateOrderStatus({ orderId, status }: { orderId: string; status: string }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { orderId, status } = await request.json();
   const updatedOrder = await prisma.order.update({
     where: { id: orderId },
     data: { status },
@@ -158,19 +158,18 @@ export async function updateOrderStatus(request: NextRequest) {
 }
 
 // Notification Management
-export async function getAllNotifications(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function getAllNotifications() {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
   const notifications = await prisma.notification.findMany();
   return NextResponse.json(notifications);
 }
 
-export async function markNotificationAsRead(request: NextRequest) {
-  const adminCheck = await checkAdmin(request);
+export async function markNotificationAsRead({ notificationId }: { notificationId: string }) {
+  const adminCheck = await checkAdmin();
   if (!adminCheck.isAdmin) return adminCheck.redirect;
 
-  const { notificationId } = await request.json();
   const updatedNotification = await prisma.notification.update({
     where: { id: notificationId },
     data: { isRead: true },
@@ -179,4 +178,4 @@ export async function markNotificationAsRead(request: NextRequest) {
   return NextResponse.json(updatedNotification);
 }
 
-// Additional actions can be added similarly for models like `Message`, `Dispute`, etc.
+// Additional actions can be added similarly for other models like `Message`, `Dispute`, etc.

@@ -13,11 +13,34 @@ import { ReviewsTab } from "./ReviewsTab";
 import { AnalyticsTab } from "./AnalyticsTab";
 import { SettingsTab } from "./SettingsTab";
 import { WithdrawalRequestsTab } from "./WithdrawalRequestsTab"
+import {getAllOrders} from "@/server.actions/admin/getAuthUserRole"
+import { useEffect, useState } from "react";
 
-export function AdminDashboard() {
+const AdminDashboard = async () => {
+  // const orders = await getAllOrders(); // Call the server action here
+
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const ordersData = await getAllOrders(); // Call the server action here
+
+        // If ordersData is undefined, set an empty array; otherwise, set the orders data
+        setOrders(ordersData ?? []); // Update state with the fetched data
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setOrders([]); // Optionally set to empty array in case of error
+      }
+    };
+
+    fetchOrders();
+  }, []); // Empty dependency array means it only runs on mount
+
+console.log(orders,"___________________")
+
   return (
     <div className="hidden flex-col md:flex">
-      {/* <DashboardHeader /> */}
       <div className="flex-1 space-y-4 p-8 pt-6" style={{ width: "84rem" }}>
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
@@ -45,16 +68,15 @@ export function AdminDashboard() {
             <ServicesTab />
           </TabsContent>
           <TabsContent value="orders">
-            <OrdersTab />
+            {/* Pass orders to OrdersTab */}
+            <OrdersTab orders={orders} />
           </TabsContent>
           <TabsContent value="ww">
             <WithdrawalRequestsTab />
           </TabsContent>
-
           <TabsContent value="disputes">
             <DisputesTab />
           </TabsContent>
-
           <TabsContent value="messages">
             <MessagesTab />
           </TabsContent>
@@ -71,4 +93,6 @@ export function AdminDashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminDashboard;

@@ -1,6 +1,6 @@
 'use client'
 
-import { AdminDashboard } from "../pages/admin-dashboard/AdminDashboard"
+import  AdminDashboard  from "../pages/admin-dashboard/AdminDashboard"
 
 
 
