@@ -1,4 +1,4 @@
-import { View, ScrollView, RefreshControl } from "react-native";
+import { View, ScrollView, RefreshControl, Pressable } from "react-native";
 import { Text } from "~/components/ui/text";
 import { Input } from "~/components/ui/input";
 import { Search as SearchIcon, Filter, X } from "lucide-react-native";
@@ -128,14 +128,11 @@ export default function SearchScreen() {
                   "Mobile Apps",
                   "SEO",
                 ].map((term) => (
-                  <Badge
-                    key={term}
-                    variant="secondary"
-                    className="px-3 py-1.5"
-                    onPress={() => setQuery(term)}
-                  >
-                    <Text>{term}</Text>
-                  </Badge>
+                  <Pressable key={term} onPress={() => setQuery(term)}>
+                    <Badge variant="secondary" className="px-3 py-1.5">
+                      <Text>{term}</Text>
+                    </Badge>
+                  </Pressable>
                 ))}
               </View>
             </View>

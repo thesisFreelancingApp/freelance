@@ -1,18 +1,19 @@
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { Text } from "./ui/text";
-import { Card, CardContent } from "./ui/card";
 import { Image } from "expo-image";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Star, Clock } from "lucide-react-native";
 import { Badge } from "./ui/badge";
 import type { Service } from "~/types/service";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface ServiceCardProps {
   service: Service;
   onPress?: () => void;
+  index?: number;
 }
 
-export function ServiceCard({ service, onPress }: ServiceCardProps) {
+export function ServiceCard({ service, onPress, index = 0 }: ServiceCardProps) {
   const averageRating =
     service.ratings && service.ratings.length > 0
       ? (
@@ -22,61 +23,121 @@ export function ServiceCard({ service, onPress }: ServiceCardProps) {
       : "New";
 
   const lowestPackage = service.packages[0];
+  const creatorProfile = service.creator?.profile;
 
   return (
-    <Card onPress={onPress} className="overflow-hidden border-0 shadow-lg">
-      <View className="relative">
-        {service.medias?.images?.[0] && (
-          <Image
-            source={{ uri: service.medias.images[0] }}
-            className="w-full h-48"
-            contentFit="cover"
-          />
-        )}
-      </View>
+    <Animated.View
+      entering={FadeInDown.delay(index * 100)}
+      className="overflow-hidden"
+    >
+      <Pressable
+        onPress={onPress}
+        className="bg-card rounded-2xl shadow-sm border border-border"
+      >
+        {/* Image Section */}
+        <View className="relative w-full h-48 overflow-hidden">
+          {service.medias?.images?.[0] ? (
+            <Image
+              source={{ uri: service.medias.images[0] }}
+              style={{ width: "100%", height: "100%" }}
+              contentFit="cover"
+              transition={300}
+              priority="high"
+            />
+          ) : (
+            <View className="w-full h-full bg-muted" />
+          )}
 
-      <CardContent className="p-4">
-        <View className="flex-row justify-between items-start">
-          <View className="flex-1">
-            <Text className="text-lg font-semibold" numberOfLines={2}>
+          {/* Price Badge */}
+          <View className="absolute top-3 right-3">
+            <Badge
+              variant="secondary"
+              className="shadow-lg backdrop-blur-lg bg-background/90"
+            >
+              <Text className="text-sm font-semibold">
+                ${lowestPackage?.price?.toFixed(2)}
+              </Text>
+            </Badge>
+          </View>
+
+          {/* Rating Badge */}
+          {averageRating !== "New" && (
+            <View className="absolute top-3 left-3">
+              <Badge className="shadow-lg backdrop-blur-lg bg-background/90 flex-row items-center">
+                <Star
+                  size={12}
+                  className="text-yellow-500 fill-yellow-500 mr-1"
+                />
+                <Text className="text-sm font-medium">{averageRating}</Text>
+              </Badge>
+            </View>
+          )}
+
+          {/* Delivery Time */}
+          <View className="absolute bottom-3 right-3">
+            <Badge
+              variant="secondary"
+              className="shadow-lg backdrop-blur-lg bg-background/90 flex-row items-center"
+            >
+              <Clock size={12} className="text-muted-foreground mr-1" />
+              <Text className="text-sm">
+                {lowestPackage?.deliveryTime} days
+              </Text>
+            </Badge>
+          </View>
+        </View>
+
+        {/* Content Section */}
+        <View className="p-4">
+          {/* Title and Description */}
+          <View className="mb-3">
+            <Text className="text-lg font-semibold mb-1" numberOfLines={2}>
               {service.name}
             </Text>
-            <Text
-              className="text-sm text-muted-foreground mt-1"
-              numberOfLines={2}
-            >
+            <Text className="text-sm text-muted-foreground" numberOfLines={2}>
               {service.description}
             </Text>
           </View>
-          <View className="bg-primary/10 rounded-full px-3 py-1 flex-row items-center ml-2">
-            <Star size={16} className="text-primary mr-1" />
-            <Text className="text-primary font-medium">{averageRating}</Text>
-          </View>
-        </View>
 
-        <View className="flex-row flex-wrap gap-1 mt-3">
-          {service.tags.slice(0, 3).map((tag, index) => (
-            <Badge key={index} variant="secondary" className="px-2 py-0.5">
-              <Text className="text-xs">{tag}</Text>
-            </Badge>
-          ))}
-        </View>
+          {/* Tags */}
+          <View className="flex-row flex-wrap gap-1 mb-4">
+            {service.tags.slice(0, 3).map((tag, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="px-2 py-0.5 rounded-full"
+              >
+                <Text className="text-xs">{tag}</Text>
+              </Badge>
+            ))}
+          </View>
 
-        <View className="flex-row items-center justify-between mt-4 pt-3 border-t border-border">
-          <View className="flex-row items-center">
-            <Clock size={12} className="text-muted-foreground" />
-            <Text className="text-xs text-muted-foreground ml-1">
-              {lowestPackage?.deliveryTime} days
-            </Text>
-          </View>
-          <View>
-            <Text className="text-xs text-muted-foreground">Starting at</Text>
-            <Text className="text-sm font-semibold text-primary">
-              ${parseFloat(lowestPackage?.price || "0").toFixed(2)}
-            </Text>
+          {/* Creator Info */}
+          <View className="flex-row items-center justify-between pt-3 border-t border-border">
+            <View className="flex-row items-center">
+              <Avatar
+                className="h-6 w-6 mr-2"
+                alt={creatorProfile?.firstName || "Creator"}
+              >
+                <AvatarImage
+                  source={{ uri: creatorProfile?.profilePic || undefined }}
+                />
+                <AvatarFallback>
+                  <Text>{creatorProfile?.firstName?.[0] || "C"}</Text>
+                </AvatarFallback>
+              </Avatar>
+              <Text className="text-sm text-muted-foreground">
+                {creatorProfile?.firstName} {creatorProfile?.lastName}
+              </Text>
+            </View>
+            {creatorProfile?.title && (
+              <Badge variant="secondary" className="text-xs">
+                <Text>{creatorProfile.title}</Text>
+              </Badge>
+            )}
           </View>
         </View>
-      </CardContent>
-    </Card>
+      </Pressable>
+    </Animated.View>
   );
 }
