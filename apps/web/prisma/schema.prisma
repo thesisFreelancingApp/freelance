@@ -409,13 +409,28 @@ model Message {
 model Notification {
   id          String           @id @default(uuid())
   recipientId String
-  type        String?
-  content     String?
-  isRead      Boolean          @default(false)
-  createdAt   DateTime         @default(now())
+  type        NotificationType
+  content     String
+  link        String?         // Add this field
+  metadata    Json?
+  isRead      Boolean         @default(false)
+  createdAt   DateTime        @default(now())
 
   // Relations
-  recipient   PersonalProfile  @relation(fields: [recipientId], references: [id])
+  recipient   PersonalProfile @relation(fields: [recipientId], references: [id])
+
+  @@index([recipientId])
+}
+
+enum NotificationType {
+  NEW_ORDER
+  ORDER_STATUS_CHANGE
+  NEW_MESSAGE
+  NEW_RATING
+  PAYMENT_RECEIVED
+  SERVICE_APPROVED
+  DISPUTE_CREATED
+  DISPUTE_RESOLVED
 }
 
 // ------------------------
