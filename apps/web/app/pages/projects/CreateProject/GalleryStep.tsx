@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { uploadImage } from "@/server.actions/uploadMedias.actions";
-import { Loader2, X } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -173,11 +173,14 @@ export default function MediaStep({ form }: MediaStepProps) {
                 ))}
               </div>
             ) : (
-              <Label className="text-center">
-                {isDragging
-                  ? "Relâchez pour ajouter"
-                  : "Glissez-déposez des images ou vidéos ici ou cliquez pour sélectionner"}
-              </Label>
+              <div className="flex flex-col items-center text-center space-y-7">
+                <Upload />
+                <Label className="items-center text-center ">
+                  {isDragging
+                    ? "Relâchez pour ajouter"
+                    : "Glissez-déposez des images ou vidéos  ici\n ou cliquez pour sélectionner"}
+                </Label>
+              </div>
             )}
             <input
               type="file"

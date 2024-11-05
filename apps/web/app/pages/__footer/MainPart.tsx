@@ -1,13 +1,9 @@
 import {
-  FaApple,
   FaDiscord,
   FaRedditAlien,
   FaTelegramPlane,
   FaTwitter,
 } from "react-icons/fa";
-import Logo from "@/public/WaiaHub-LogoIcon.svg";
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 
 const sections = [
   {
@@ -42,46 +38,25 @@ const sections = [
   },
 ];
 
+const FooterLink = ({ href, children }) => (
+  <li className="font-medium hover:text-primary">
+    <a href={href}>{children}</a>
+  </li>
+);
+
 const MainPart = () => {
   return (
-    <section className="py-32">
-      <div className="container">
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <img src={Logo.src} alt="logo" className="mb-8 mr-auto h-7 md:mb-0" />
-          {/* <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <p className="text-lg font-medium">
-              Copy the code and make it yours.
-            </p>
-            <div className="flex gap-2">
-              <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-lg bg-primary p-2.5"
-              >
-                <FaApple className="size-7 text-background" />
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-lg bg-primary p-2.5"
-              >
-                <img
-                  src="images/icons/google-play-icon.svg"
-                  className="size-6 text-background"
-                  alt="google play"
-                />
-              </a>
-            </div> */}
-          {/* </div> */}
-        </div>
-        <Separator className="my-14" />
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+    <footer className="items-center justify-center mb-20 border-t border-b-foreground/6">
+      <div className="flex flex-col max-w-screen-xl px-4 mx-auto mt-4 md:px-12 lg:px-20">
+        <div className="grid gap-10 md:grid-cols-4">
           {sections.map((section, sectionIdx) => (
             <div key={sectionIdx}>
               <h3 className="mb-4 font-bold">{section.title}</h3>
               <ul className="space-y-4 text-muted-foreground">
                 {section.links.map((link, linkIdx) => (
-                  <li key={linkIdx} className="font-medium hover:text-primary">
-                    <Link href={link.href}>{link.name}</Link>
-                  </li>
+                  <FooterLink key={linkIdx} href={link.href}>
+                    {link.name}
+                  </FooterLink>
                 ))}
               </ul>
             </div>
@@ -89,44 +64,39 @@ const MainPart = () => {
           <div>
             <h3 className="mb-4 font-bold">Legal</h3>
             <ul className="space-y-4 text-muted-foreground">
-              <li className="font-medium hover:text-primary">
-                <a href="#">Term of Services</a>
-              </li>
-              <li className="font-medium hover:text-primary">
-                <a href="#">Privacy Policy</a>
-              </li>
+              <FooterLink href="#">Term of Services</FooterLink>
+              <FooterLink href="#">Privacy Policy</FooterLink>
             </ul>
             <h3 className="mt-8 mb-4 font-bold">Social</h3>
             <ul className="flex items-center space-x-6 text-muted-foreground">
               <li className="font-medium hover:text-primary">
                 <a href="#">
-                  <FaDiscord className="size-6" />
+                  <FaDiscord className="text-lg" />
                 </a>
               </li>
               <li className="font-medium hover:text-primary">
                 <a href="#">
-                  <FaRedditAlien className="size-6" />
+                  <FaRedditAlien className="text-lg" />
                 </a>
               </li>
               <li className="font-medium hover:text-primary">
                 <a href="#">
-                  <FaTwitter className="size-6" />
+                  <FaTwitter className="text-lg" />
                 </a>
               </li>
               <li className="font-medium hover:text-primary">
                 <a href="#">
-                  <FaTelegramPlane className="size-6" />
+                  <FaTelegramPlane className="text-lg" />
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        <Separator className="my-14" />
-        <p className="text-sm text-muted-foreground">
-          © 2024 Shadcnblocks. All rights reserved.
-        </p>
       </div>
-    </section>
+      <p className="flex justify-center my-8 text-sm text-muted-foreground">
+        © 2024 Waiahub. All rights reserved.
+      </p>
+    </footer>
   );
 };
 

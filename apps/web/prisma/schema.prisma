@@ -347,7 +347,7 @@ enum ParticipationStatus {
   PENDING
   ACCEPTED
   DECLINED
-CANCELLED
+  CANCELLED
 }
 
 

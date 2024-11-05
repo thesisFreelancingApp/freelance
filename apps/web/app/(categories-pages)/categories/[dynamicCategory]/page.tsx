@@ -1,5 +1,3 @@
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { getCategoryByName } from "@/server.actions/category/category-pages.actions";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,29 +14,32 @@ const CategoryPage = async ({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container px-4 py-8 mx-auto">
       {/* Hero Banner Section */}
       <div className="relative w-full h-[300px] mb-12">
         <Image
-          src={category.imageUrl || "/defaults/category-banner.jpg"}
+          src={
+            // category.imageUrl ||
+            "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/Sans%20titre-1.webp"
+          }
           alt={category.name}
           fill
           className="object-cover rounded-xl"
         />
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl">
           <div className="text-center text-white">
-            <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
-            <p className="text-xl max-w-2xl mx-auto">{category.description}</p>
+            <h1 className="mb-4 text-4xl font-bold">{category.name}</h1>
+            <p className="max-w-2xl mx-auto text-xl">{category.description}</p>
           </div>
         </div>
       </div>
 
       {/* Subcategories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {category.children?.map((subCat) => (
           <div key={subCat.name} className="flex flex-col">
             {/* Non-clickable image section */}
-            <div className="relative w-full h-48 rounded-t-lg overflow-hidden mb-4">
+            <div className="relative w-full h-48 mb-4 overflow-hidden rounded-t-lg">
               <Image
                 src={subCat.imageUrl || "/default-subcategory.jpg"}
                 alt={subCat.name}
@@ -48,7 +49,7 @@ const CategoryPage = async ({
             </div>
 
             {/* Category title */}
-            <h3 className="text-xl font-semibold mb-4">{subCat.name}</h3>
+            <h3 className="mb-4 text-xl font-semibold">{subCat.name}</h3>
 
             {/*  subcategories list */}
             {subCat.children && (
@@ -57,9 +58,9 @@ const CategoryPage = async ({
                   <li key={child.name}>
                     <Link
                       href={`/categories/${subCat.slug}/${child.slug}`}
-                      className="text-muted-foreground hover:text-primary transition-colors duration-200 flex items-center group"
+                      className="flex items-center transition-colors duration-200 text-muted-foreground hover:text-primary group"
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                      <span className="transition-transform duration-200 group-hover:translate-x-1">
                         {child.name}
                       </span>
                     </Link>
@@ -69,7 +70,7 @@ const CategoryPage = async ({
                   <li>
                     <Link
                       href={`/categories/${subCat.slug}`}
-                      className="text-primary hover:text-primary/80 transition-colors duration-200 text-sm font-medium"
+                      className="text-sm font-medium transition-colors duration-200 text-primary hover:text-primary/80"
                     >
                       See all {subCat.children.length} services →
                     </Link>
