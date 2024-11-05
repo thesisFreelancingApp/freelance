@@ -79,7 +79,7 @@ export default function Step5Review({
         <div>
           <h3 className="font-semibold">Images</h3>
           <div className="grid grid-cols-2 gap-2">
-            {serviceData.images.map((image, index) => (
+            {serviceData.medias.map((image, index) => (
               <img
                 key={index}
                 src={image}
