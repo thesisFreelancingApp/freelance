@@ -4,7 +4,7 @@ import * as React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import { DashboardHeader } from './DashboardHeader'
 import { OverviewTab } from "./OverviewTab";
-import UsersTab from "./UsersTab";
+import {UsersTab} from "./UsersTab";
 import ServicesTab from "./ServicesTab";
 import OrdersTab from "./OrdersTab";
 import DisputesTab from "./DisputesTab";
@@ -13,31 +13,31 @@ import { ReviewsTab } from "./ReviewsTab";
 import { AnalyticsTab } from "./AnalyticsTab";
 import { SettingsTab } from "./SettingsTab";
 import { WithdrawalRequestsTab } from "./WithdrawalRequestsTab"
-import {getAllOrders} from "@/server.actions/admin/getAuthUserRole"
+// import {getAllOrders} from "@/server.actions/admin/getAuthUserRole"
 import { useEffect, useState } from "react";
 
 const AdminDashboard = async () => {
   // const orders = await getAllOrders(); // Call the server action here
 
-  const [orders, setOrders] = useState([]);
+//   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const ordersData = await getAllOrders(); // Call the server action here
+//   useEffect(() => {
+//     const fetchOrders = async () => {
+//       try {
+//         const ordersData = await getAllOrders(); // Call the server action here
 
-        // If ordersData is undefined, set an empty array; otherwise, set the orders data
-        setOrders(ordersData ?? []); // Update state with the fetched data
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        setOrders([]); // Optionally set to empty array in case of error
-      }
-    };
+//         // If ordersData is undefined, set an empty array; otherwise, set the orders data
+//         setOrders(ordersData ?? []); // Update state with the fetched data
+//       } catch (error) {
+//         console.error("Error fetching orders:", error);
+//         setOrders([]); // Optionally set to empty array in case of error
+//       }
+//     };
 
-    fetchOrders();
-  }, []); // Empty dependency array means it only runs on mount
+//     fetchOrders();
+//   }, []); // Empty dependency array means it only runs on mount
 
-console.log(orders,"___________________")
+// console.log(orders,"___________________")
 
   return (
     <div className="hidden flex-col md:flex">
@@ -69,7 +69,7 @@ console.log(orders,"___________________")
           </TabsContent>
           <TabsContent value="orders">
             {/* Pass orders to OrdersTab */}
-            <OrdersTab orders={orders} />
+            <OrdersTab  />
           </TabsContent>
           <TabsContent value="ww">
             <WithdrawalRequestsTab />
