@@ -105,11 +105,20 @@ export const seedServices = async () => {
 
     console.log(`Found ${sellers.length} sellers`);
 
-    // Get all categories
-    const categories = await prisma.mainCategories.findMany();
+    // Get only level 3 categories
+    const categories = await prisma.mainCategories.findMany({
+      where: {
+        level: 3,
+      },
+    });
+
     if (categories.length === 0) {
-      throw new Error("No categories found. Please seed categories first.");
+      throw new Error(
+        "No level 3 categories found. Please seed categories first.",
+      );
     }
+
+    console.log(`Found ${categories.length} level 3 categories`);
 
     // Generate services for each seller
     for (const seller of sellers) {
