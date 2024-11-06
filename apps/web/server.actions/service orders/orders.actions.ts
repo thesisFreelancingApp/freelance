@@ -28,6 +28,10 @@ export async function createOrder(
   paymentMethod: PaymentMethodType,
 ): Promise<CreateOrderResponse> {
   try {
+    console.log("sellerId", sellerId);
+    console.log("serviceId", serviceId);
+    console.log("totalAmount", totalAmount);
+    console.log("paymentMethod", paymentMethod);
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
     if (error || !user.user?.id) {
