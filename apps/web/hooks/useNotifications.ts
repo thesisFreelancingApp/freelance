@@ -85,3 +85,16 @@ export function useNotifications() {
     },
   };
 }
+
+// Creating a notification check the type of notification in the schema we have a lot of types ,content and metadata are different for each type , the link is optional but you can add it if you want to redirect the user to a specific page
+// await createNotification({
+//     recipientId: userId,
+//     type: "NEW_ORDER",
+//     content: "You have received a new order",
+//     link: `/orders/${orderId}`,
+//     metadata: {
+//       orderId,
+//       amount,
+//       buyerName
+//     }
+//   });
