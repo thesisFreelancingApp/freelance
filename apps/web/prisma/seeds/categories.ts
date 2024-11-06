@@ -22,7 +22,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services de conception graphique et de design pour divers besoins visuels.",
-    imageUrl: "/categories/design/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/grfx.webp",
     iconUrl: "/categories/design/icon.svg",
     slug: "graphisme-design",
   },
@@ -31,7 +32,8 @@ const allCategories: CategorySeed[] = [
     name: "Programmation & Tech",
     level: 1,
     description: "Services de développement logiciel, web et technologique.",
-    imageUrl: "/categories/programming/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/tech.webp",
     iconUrl: "/categories/programming/icon.svg",
     slug: "programmation-tech",
   },
@@ -41,7 +43,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Stratégies et services de marketing en ligne pour promouvoir les entreprises.",
-    imageUrl: "/categories/marketing/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/grfx.webp",
     iconUrl: "/categories/marketing/icon.svg",
     slug: "marketing-digital",
   },
@@ -51,7 +54,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services de production vidéo et d'animation pour divers projets.",
-    imageUrl: "/categories/video/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/video.webp",
     iconUrl: "/categories/video/icon.svg",
     slug: "video-animation",
   },
@@ -61,7 +65,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services d'écriture, de rédaction et de traduction dans diverses langues.",
-    imageUrl: "/categories/writing/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/redact.webp",
     iconUrl: "/categories/writing/icon.svg",
     slug: "redaction-traduction",
   },
@@ -71,7 +76,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services liés à la production musicale et au traitement audio.",
-    imageUrl: "/categories/music/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/audio.webp",
     iconUrl: "/categories/music/icon.svg",
     slug: "musique-audio",
   },
@@ -80,7 +86,8 @@ const allCategories: CategorySeed[] = [
     name: "Business",
     level: 1,
     description: "Services de conseil et de soutien aux entreprises.",
-    imageUrl: "/categories/business/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/business.webp",
     iconUrl: "/categories/business/icon.svg",
     slug: "business",
   },
@@ -90,7 +97,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services financiers et de comptabilité pour particuliers et entreprises.",
-    imageUrl: "/categories/finance/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/finnn.webp",
     iconUrl: "/categories/finance/icon.svg",
     slug: "finance",
   },
@@ -100,7 +108,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services utilisant l'intelligence artificielle pour diverses applications.",
-    imageUrl: "/categories/ai/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/ia.webp",
     iconUrl: "/categories/ai/icon.svg",
     slug: "services-ia",
   },
@@ -109,7 +118,8 @@ const allCategories: CategorySeed[] = [
     name: "Croissance personnelle",
     level: 1,
     description: "Services de développement personnel et de bien-être.",
-    imageUrl: "/categories/personal-growth/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/croissance.webp",
     iconUrl: "/categories/personal-growth/icon.svg",
     slug: "croissance-personnelle",
   },
@@ -118,7 +128,8 @@ const allCategories: CategorySeed[] = [
     name: "Consultations",
     level: 1,
     description: "Services de conseil dans divers domaines d'expertise.",
-    imageUrl: "/categories/consulting/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/croissan.webp",
     iconUrl: "/categories/consulting/icon.svg",
     slug: "consultations",
   },
@@ -128,7 +139,8 @@ const allCategories: CategorySeed[] = [
     level: 1,
     description:
       "Services de photographie professionnelle pour différents besoins.",
-    imageUrl: "/categories/photography/banner.jpg",
+    imageUrl:
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/photoo.webp",
     iconUrl: "/categories/photography/icon.svg",
     slug: "photographie",
   },

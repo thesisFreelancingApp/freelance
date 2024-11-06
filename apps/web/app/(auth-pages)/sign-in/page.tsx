@@ -20,42 +20,42 @@ export default function Login({ searchParams }: { searchParams: Message }) {
   return (
     <Card className="w-[400px]">
       <CardHeader>
-        <h1 className="text-2xl font-semibold text-center">Sign in</h1>
+        <h1 className="text-2xl font-semibold text-center">Connexion</h1>
       </CardHeader>
       <CardContent className="space-y-4">
         <form>
           <GoogleSignInButton
-            pendingText="Signing In..."
+            pendingText="Connexion en cours..."
             formAction={googleSignUpAction}
             className="w-full text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:text-white hover:text-white dark:hover:bg-blue-700"
           >
-            Continue with Google
+            Continuer avec Google
           </GoogleSignInButton>
         </form>
         <div className="relative">
           <Separator className="mt-6" />
           <span className="absolute px-2 text-xs -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-background text-muted-foreground">
-            or
+            ou
           </span>
         </div>
         <form className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="vous@example.com"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Mot de passe</Label>
             <Input
               id="password"
               type="password"
               name="password"
-              placeholder="Your password"
+              placeholder="Votre mot de passe"
               required
             />
           </div>
@@ -64,15 +64,15 @@ export default function Login({ searchParams }: { searchParams: Message }) {
               className="text-xs underline text-muted-foreground hover:text-primary"
               href="/forgot-password"
             >
-              Forgot Password?
+              Mot de passe oublié ?
             </Link>
           </div>
           <SubmitButton
-            pendingText="Signing In..."
+            pendingText="Connexion en cours..."
             formAction={signInAction}
             className="w-full"
           >
-            Sign in
+            Connexion
           </SubmitButton>
 
           <FormMessage message={searchParams} />
@@ -80,12 +80,12 @@ export default function Login({ searchParams }: { searchParams: Message }) {
       </CardContent>
       <CardFooter>
         <p className="w-full text-sm text-center text-muted-foreground">
-          Don't have an account?{" "}
+          Vous n'avez pas de compte ?{" "}
           <Link
             className="font-medium underline text-primary hover:text-primary/80"
             href="/sign-up"
           >
-            Sign up
+            S'inscrire
           </Link>
         </p>
       </CardFooter>
