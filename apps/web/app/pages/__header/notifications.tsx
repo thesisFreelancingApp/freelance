@@ -1,5 +1,4 @@
 "use client";
-import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,44 +7,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotifications } from "@/hooks/useNotifications";
+import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
+import type { NotificationType } from "@/hooks/useNotifications";
 
 interface Notification {
   id: string;
-  message: string;
-  read: boolean;
-  timestamp: string;
+  type: NotificationType;
+  content: string;
+  link?: string;
+  isRead: boolean;
+  createdAt: Date;
+  metadata?: Record<string, any> | null;
 }
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      message: "Your gig was approved",
-      read: false,
-      timestamp: "2 hours ago",
-    },
-    {
-      id: "2",
-      message: "New order received",
-      read: false,
-      timestamp: "1 day ago",
-    },
-    {
-      id: "3",
-      message: "Your payout is ready",
-      read: true,
-      timestamp: "3 days ago",
-    },
-  ]);
+  const router = useRouter();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } =
+    useNotifications();
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+  const handleNotificationClick = async (notification: Notification) => {
+    await markAsRead(notification.id);
+    if (notification.link) {
+      router.push(notification.link);
+    }
   };
 
   return (
@@ -64,9 +51,14 @@ export default function Notifications() {
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-sm font-semibold">Notifications</h2>
           {unreadCount > 0 && (
-            <span className="text-xs text-muted-foreground">
-              {unreadCount} unread
-            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={markAllAsRead}
+              className="text-xs"
+            >
+              Mark all as read
+            </Button>
           )}
         </div>
         <ScrollArea className="h-[calc(80vh-8rem)] py-2">
@@ -78,20 +70,21 @@ export default function Notifications() {
             notifications.map((notification) => (
               <DropdownMenuItem
                 key={notification.id}
-                className="px-4 py-3 focus:bg-accent cursor-default"
+                className="px-4 py-3 focus:bg-accent cursor-pointer"
+                onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex flex-col w-full">
                   <div className="flex justify-between items-start gap-2">
                     <p
                       className={`text-sm ${
-                        !notification.read
+                        !notification.isRead
                           ? "font-semibold text-foreground"
                           : "text-muted-foreground"
                       }`}
                     >
-                      {notification.message}
+                      {notification.content}
                     </p>
-                    {!notification.read && (
+                    {!notification.isRead && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -106,21 +99,15 @@ export default function Notifications() {
                     )}
                   </div>
                   <span className="text-[10px] text-muted-foreground mt-1">
-                    {notification.timestamp}
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                    })}
                   </span>
                 </div>
               </DropdownMenuItem>
             ))
           )}
         </ScrollArea>
-        <div className="p-4 border-t">
-          <Link
-            href="/notifications"
-            className="block text-sm text-center text-primary hover:text-primary/80"
-          >
-            View all notifications
-          </Link>
-        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
