@@ -1,10 +1,10 @@
 "use server";
 import prisma from "@/lib/prismaClient";
+import { Prisma } from "@prisma/client";
 
 export type NotificationType =
   | "NEW_ORDER"
   | "ORDER_STATUS_CHANGE"
-  | "NEW_MESSAGE"
   | "NEW_RATING"
   | "PAYMENT_RECEIVED"
   | "SERVICE_APPROVED"
@@ -27,15 +27,17 @@ export async function createNotification({
   metadata,
 }: CreateNotificationProps) {
   try {
+    const notificationData = {
+      recipientId,
+      type,
+      content,
+      ...(link && { link }),
+      metadata: metadata || Prisma.JsonNull,
+      isRead: false,
+    };
+
     const notification = await prisma.notification.create({
-      data: {
-        recipientId,
-        type,
-        content,
-        link,
-        metadata: metadata || null,
-        isRead: false,
-      },
+      data: notificationData,
     });
 
     return notification;
