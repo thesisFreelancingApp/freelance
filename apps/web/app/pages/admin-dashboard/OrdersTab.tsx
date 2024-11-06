@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, MoreHorizontal, Search } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,30 +27,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-// Dummy data for orders
-const orders = [
-  { id: 'ORD001', buyer: 'Alice Johnson', seller: 'David Lee', amount: 150, status: 'COMPLETED', date: '2023-05-15' },
-  { id: 'ORD002', buyer: 'Bob Smith', seller: 'Eva Green', amount: 200, status: 'IN_PROGRESS', date: '2023-05-16' },
-  { id: 'ORD003', buyer: 'Charlie Brown', seller: 'Frank White', amount: 100, status: 'PENDING', date: '2023-05-17' },
-  { id: 'ORD004', buyer: 'Diana Prince', seller: 'George Black', amount: 300, status: 'COMPLETED', date: '2023-05-18' },
-  { id: 'ORD005', buyer: 'Ethan Hunt', seller: 'Helen Red', amount: 250, status: 'CANCELLED', date: '2023-05-19' },
-]
+import { getOrders } from '@/server.actions/dashboard/order.action'
 
 export default function OrdersTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [orders, setOrders] = useState<any[]>([]) // To store fetched orders
 
+  // Fetch orders on component mount
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const { orders } = await getOrders(1, 10) // Adjust pagination as needed
+      setOrders(orders)
+    }
+    
+    fetchOrders()
+  }, [])
+console.log(orders,'__________')
   // Filter orders based on search term, status, and date range
   const filteredOrders = orders.filter(order => 
     (order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     order.buyer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     order.seller.toLowerCase().includes(searchTerm.toLowerCase())) &&
+     order.buyer.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     order.seller.username.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (statusFilter === 'All' || order.status === statusFilter) &&
-    (!startDate || order.date >= startDate) &&
-    (!endDate || order.date <= endDate)
+    (!startDate || order.createdAt >= startDate) &&
+    (!endDate || order.createdAt <= endDate)
   )
 
   return (
@@ -107,11 +110,11 @@ export default function OrdersTab() {
           {filteredOrders.map((order) => (
             <TableRow key={order.id}>
               <TableCell>{order.id}</TableCell>
-              <TableCell>{order.buyer}</TableCell>
-              <TableCell>{order.seller}</TableCell>
-              <TableCell>${order.amount}</TableCell>
-              <TableCell>{order.status}</TableCell>
-              <TableCell>{order.date}</TableCell>
+              <TableCell>{order.buyer.id}</TableCell> 
+              <TableCell>{order.seller.id}</TableCell> 
+              <TableCell>${order.totalAmount}</TableCell>
+              <TableCell>{order.status.toString()}</TableCell>
+              <TableCell>{order.createdAt.toString()}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

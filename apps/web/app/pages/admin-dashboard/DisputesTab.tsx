@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronDown, MoreHorizontal, Search } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DisputeType, getDisputes } from '@/server.actions/dashboard/disputes.action'
 
 // Dummy data for disputes
 const disputes = [
@@ -41,8 +42,19 @@ export default function DisputesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
+  const [disputesData, setDisputesData] = useState<DisputeType[] | null>();
+
+  useEffect(() => {
+    async function getDisputesData() {
+      const data = await getDisputes();
+      setDisputesData(data);
+      console.log(data);
+    }
+    getDisputesData();
+  }, []);
+
   // Filter disputes based on search term and status
-  const filteredDisputes = disputes.filter(dispute => 
+  const filteredDisputes = disputesData.filter(dispute => 
     (dispute.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
      dispute.initiator.toLowerCase().includes(searchTerm.toLowerCase()) ||
      dispute.respondent.toLowerCase().includes(searchTerm.toLowerCase()) ||

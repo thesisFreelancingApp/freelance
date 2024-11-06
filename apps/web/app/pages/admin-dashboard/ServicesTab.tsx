@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { ChevronDown, MoreHorizontal, Search } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,28 +27,125 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getServices } from '@/server.actions/dashboard/services.action'
 
-// Dummy data for services
-const services = [
-  { id: 1, name: 'Web Development', category: 'Programming', creator: 'Alice Johnson', status: 'Active' },
-  { id: 2, name: 'Logo Design', category: 'Design', creator: 'Bob Smith', status: 'Active' },
-  { id: 3, name: 'Content Writing', category: 'Writing', creator: 'Charlie Brown', status: 'Inactive' },
-  { id: 4, name: 'SEO Optimization', category: 'Marketing', creator: 'David Lee', status: 'Active' },
-  { id: 5, name: 'Video Editing', category: 'Multimedia', creator: 'Eva Green', status: 'Active' },
-]
+type Services = {
+  id: string;
+  name: string;
+  description: string | null;
+  medias?: any; // Assuming `Json?` in Prisma, adjust as needed for specific types
+  isPublic: boolean;
+  tags: string[];
+  creatorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  categoryId: number;
+  status: string;
+
+  // Relations
+  creator: {
+    name: string
+    id: string;
+    profileId: string;
+    sellerRating?: number;
+    totalEarnings?: number;
+    createdAt: Date;
+    updatedAt: Date;
+    
+    // Nested related data
+    profile: {
+      lastName: string
+      firstName: string
+      id: string;
+      name: string;
+      // Add more fields here as per the PersonalProfile model
+    };
+    professionalProfile?: {
+      id: string;
+      expertise: string;
+      // Add more fields here as per the ProfessionalProfile model
+    };
+  };
+  
+  category: {
+    id: number;
+    name: string;
+    description?: string;
+    iconUrl?: string;
+  };
+
+  buyers: Array<{
+    id: string;
+    name: string;
+    // Include other fields as per the Buyer model if necessary
+  }>;
+
+  ratings: Array<{
+    id: string;
+    rating: number;
+    comment?: string;
+    createdAt: Date;
+    // Include additional fields based on the Rating model
+  }>;
+
+  packages: Array<{
+    id: string;
+    price: number;
+    description: string;
+    // Include additional fields based on the ServicePackage model
+  }>;
+
+  Dispute: Array<{
+    id: string;
+    description: string;
+    createdAt: Date;
+    status: string;
+    // Include other fields as per the Dispute model
+  }>;
+
+  Order: Array<{
+    id: string;
+    amount: number;
+    orderDate: Date;
+    // Include additional fields based on the Order model
+  }>;
+};
+
 
 export default function ServicesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
+  const [services, setServices] = useState<Services[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10; // Items per page
+
+  // Fetch services with pagination
+  const fetchServices = async (page = 1) => {
+    const data = await getServices(page, pageSize);
+    setServices(data.services);
+    setTotalPages(data.totalPages);
+    setCurrentPage(data.currentPage);
+  };
+
+  useEffect(() => {
+    fetchServices(currentPage);
+  }, [currentPage, categoryFilter, statusFilter]);
+
+console.log(services)
 
   // Filter services based on search term, category, and status
   const filteredServices = services.filter(service => 
     (service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     service.creator.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (categoryFilter === 'All' || service.category === categoryFilter) &&
+     (service.creator?.name || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (categoryFilter === 'All' || service.category?.name === categoryFilter) &&
     (statusFilter === 'All' || service.status === statusFilter)
-  )
+  );
+
+  const handlePageChange = (page: SetStateAction<number>) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -93,7 +190,7 @@ export default function ServicesTab() {
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Creator</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Public</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -101,9 +198,9 @@ export default function ServicesTab() {
           {filteredServices.map((service) => (
             <TableRow key={service.id}>
               <TableCell>{service.name}</TableCell>
-              <TableCell>{service.category}</TableCell>
-              <TableCell>{service.creator}</TableCell>
-              <TableCell>{service.status}</TableCell>
+              <TableCell>{service.category?.name || 'N/A'}</TableCell>
+              {`${service.creator?.profile?.firstName || 'Unknown'} ${service.creator?.profile?.lastName || ''}`}
+              <TableCell>{service.isPublic.toString()}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -124,6 +221,22 @@ export default function ServicesTab() {
           ))}
         </TableBody>
       </Table>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-6">
+        <Button
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+          Previous
+        </Button>
+        <span className="px-4">Page {currentPage} of {totalPages}</span>
+        <Button
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          Next
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
