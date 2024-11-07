@@ -7,10 +7,12 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
+  const [mounted, setMounted] = useState(false);
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    setMounted(true);
     if (videoRef.current) {
       videoRef.current.load();
     }
@@ -18,6 +20,14 @@ export default function HeroSection() {
 
   const handleVideoLoad = () => setIsVideoLoaded(true);
   const handleVideoError = () => console.error("Failed to load video");
+
+  if (!mounted) {
+    return (
+      <section className="relative mt-6 m-6 flex items-center min-h-[300px] md:max-h-[480px] overflow-hidden rounded-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+      </section>
+    );
+  }
 
   return (
     <section className="relative mt-6 m-6 flex items-center min-h-[300px] md:max-h-[480px] overflow-hidden rounded-lg">
