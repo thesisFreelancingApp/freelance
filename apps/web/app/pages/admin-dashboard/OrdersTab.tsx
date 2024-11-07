@@ -110,8 +110,8 @@ console.log(orders,'__________')
           {filteredOrders.map((order) => (
             <TableRow key={order.id}>
               <TableCell>{order.id}</TableCell>
-              <TableCell>{order.buyer.id}</TableCell> 
-              <TableCell>{order.seller.id}</TableCell> 
+              <TableCell>{order.buyer.profile.firstName} {order.buyer.profile.lastName}</TableCell> 
+              <TableCell>{order.seller.profile.firstName} {order.seller.profile.lastName}</TableCell> 
               <TableCell>${order.totalAmount}</TableCell>
               <TableCell>{order.status.toString()}</TableCell>
               <TableCell>{order.createdAt.toString()}</TableCell>
