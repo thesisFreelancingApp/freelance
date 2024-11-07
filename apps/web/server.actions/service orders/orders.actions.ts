@@ -16,6 +16,7 @@ type CreateOrderResponse =
   | "Le portefeuille de l'acheteur n'a pas été trouvé."
   | "Solde insuffisant dans le portefeuille."
   | "Méthode de paiement non valide."
+  | "Package not found or doesn't belong to this service"
   | null;
 interface InitiatePaymentResponse {
   payUrl: string;
@@ -24,14 +25,30 @@ interface InitiatePaymentResponse {
 export async function createOrder(
   sellerId: string,
   serviceId: string,
+  packageId: string,
   totalAmount: number,
   paymentMethod: PaymentMethodType,
 ): Promise<CreateOrderResponse> {
   try {
+    console.log("sellerId", sellerId);
+    console.log("serviceId", serviceId);
+    console.log("totalAmount", totalAmount);
+    console.log("paymentMethod", paymentMethod);
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
     if (error || !user.user?.id) {
       return null;
+    }
+
+    const servicePackage = await prisma.servicePackage.findFirst({
+      where: {
+        id: packageId,
+        serviceId: serviceId,
+      },
+    });
+
+    if (!servicePackage) {
+      return "Package not found or doesn't belong to this service";
     }
 
     const service = await prisma.service.findUnique({
@@ -72,6 +89,7 @@ export async function createOrder(
           buyerId: buyer.id,
           sellerId,
           serviceId,
+          packageId,
           totalAmount,
           currency: "TND",
           status: OrderStatus.PENDING,
@@ -79,6 +97,10 @@ export async function createOrder(
           paymentStatus: PaymentStatus.COMPLETED,
           walletTransactionId: walletTransaction.id,
           description: orderDescription,
+        },
+        include: {
+          service: true,
+          servicePackage: true,
         },
       });
 
@@ -139,6 +161,7 @@ export async function createOrder(
           buyerId: buyer.id,
           sellerId,
           serviceId,
+          packageId,
           totalAmount,
           currency: "TND",
           status: OrderStatus.PENDING,
@@ -146,6 +169,10 @@ export async function createOrder(
           paymentStatus: PaymentStatus.PENDING,
           payTransactionId: paymentTransaction.transactionId,
           description: orderDescription,
+        },
+        include: {
+          service: true,
+          servicePackage: true,
         },
       });
 
@@ -188,18 +215,21 @@ export async function getOrderById(
   try {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      select: {
-        id: true,
-        buyerId: true,
-        sellerId: true,
-        serviceId: true,
-        totalAmount: true,
-        currency: true,
-        status: true,
-        paymentMethod: true,
-        paymentStatus: true,
-        description: true,
-        createdAt: true,
+      include: {
+        buyer: {
+          include: { profile: true },
+        },
+        seller: {
+          include: { profile: true },
+        },
+        service: true,
+        servicePackage: true,
+        progressUpdates: {
+          orderBy: { createdAt: "desc" },
+        },
+        revisions: {
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
 

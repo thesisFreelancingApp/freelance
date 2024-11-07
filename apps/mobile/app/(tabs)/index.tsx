@@ -4,6 +4,7 @@ import {
   RefreshControl,
   Dimensions,
   Pressable,
+  StyleSheet,
 } from "react-native";
 import { Text } from "~/components/ui/text";
 import { useServices } from "~/lib/hooks/use-services";
@@ -28,6 +29,25 @@ const categories = [
   { name: "Video", icon: "🎥", color: "#F5E8FF", textColor: "#9747FF" },
   { name: "Music", icon: "🎵", color: "#FFE8F5", textColor: "#FF00A8" },
 ];
+
+const styles = StyleSheet.create({
+  searchContainer: {
+    flex: 1,
+    position: "relative",
+  },
+  searchInput: {
+    flex: 1,
+    height: 48,
+    backgroundColor: "rgba(0,0,0,0.05)",
+    paddingLeft: 40,
+  },
+  searchIcon: {
+    position: "absolute",
+    left: 12,
+    top: 14,
+    zIndex: 1,
+  },
+});
 
 export default function HomeScreen() {
   const { services, isLoading, error, refetch } = useServices();
@@ -66,21 +86,18 @@ export default function HomeScreen() {
       </View>
 
       {/* Search Section - Sticky */}
-      <View className="bg-background px-4 py-3 shadow-sm">
-        <View className="flex-row gap-2">
-          <View className="flex-1 relative">
+      <View style={styles.searchSection}>
+        <View style={styles.searchRow}>
+          <View style={styles.searchContainer}>
+            <Search size={20} style={styles.searchIcon} color="#666" />
             <Input
               placeholder="Rechercher un service..."
-              className="pl-10 bg-secondary/50 h-12"
+              style={styles.searchInput}
               onPressIn={() => router.push("/search")}
             />
-            <Search
-              size={20}
-              className="absolute left-3 top-3.5 text-muted-foreground"
-            />
           </View>
-          <Button variant="outline" size="icon" className="h-12 w-12">
-            <Sliders size={20} className="text-foreground" />
+          <Button variant="outline" style={{ height: 48, width: 48 }}>
+            <Sliders size={20} color="#000" />
           </Button>
         </View>
       </View>

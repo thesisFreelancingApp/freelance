@@ -72,6 +72,7 @@ export default function PurchasePage({ params }: PurchasePageProps) {
       const order = await createOrder(
         servicePackage.sellerId,
         servicePackage.serviceId,
+        servicePackage.id,
         Number(servicePackage.price),
         payMethod,
       );

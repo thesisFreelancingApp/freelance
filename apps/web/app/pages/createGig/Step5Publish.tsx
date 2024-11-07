@@ -43,37 +43,42 @@ const Step5Publish: React.FC<{ formData: PostGigFormData }> = ({
       setPublishStatus("idle");
       setErrorMessage(null);
 
-      const categoryId =
-        typeof formData.category === "string"
-          ? parseInt(formData.category, 10)
-          : formData.category.id;
-
-      if (isNaN(categoryId)) {
-        throw new Error("Invalid category ID");
-      }
-
       const dataToSend = {
         name: formData.title,
         description: formData.description,
-        categoryId: categoryId,
-        subcategoryId: formData.subcategory, // Assuming subcategory is now a number
-        images: formData.media.map((file) => URL.createObjectURL(file)),
+        categoryId: formData.category.id,
+        medias: formData.media.map((file) => URL.createObjectURL(file)),
         tags: formData.tags,
         packages: {
-          basic: {
-            ...formData.pricing.basic,
-            description: formData.pricing.basic.description,
-          },
-          standard: {
-            ...formData.pricing.standard,
-            description: formData.pricing.standard.description,
-          },
-          premium: {
-            ...formData.pricing.premium,
-            description: formData.pricing.premium.description,
-          },
+          create: [
+            {
+              name: formData.pricing.basic.name,
+              price: formData.pricing.basic.price,
+              description: formData.pricing.basic.description,
+              deliveryTime: formData.pricing.basic.deliveryTime,
+              revisions: formData.pricing.basic.revisions,
+              features: formData.pricing.basic.features,
+            },
+            {
+              name: formData.pricing.standard.name,
+              price: formData.pricing.standard.price,
+              description: formData.pricing.standard.description,
+              deliveryTime: formData.pricing.standard.deliveryTime,
+              revisions: formData.pricing.standard.revisions,
+              features: formData.pricing.standard.features,
+            },
+            {
+              name: formData.pricing.premium.name,
+              price: formData.pricing.premium.price,
+              description: formData.pricing.premium.description,
+              deliveryTime: formData.pricing.premium.deliveryTime,
+              revisions: formData.pricing.premium.revisions,
+              features: formData.pricing.premium.features,
+            },
+          ],
         },
       };
+      console.log("Data to send:", dataToSend);
 
       const result = await createService(dataToSend);
       console.log("Gig published successfully:", result);
