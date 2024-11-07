@@ -19,6 +19,7 @@ import {
   Package,
   Settings,
   UserCog,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import Messages from "./messages";
@@ -120,12 +121,20 @@ export default function UserMenu({ data, isSeller }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+
+          <DropdownMenuItem asChild>
+            <Link href="/wallet" className="flex items-center">
+              <Wallet className="w-4 h-4 mr-2" />
+              <span>Mon portefeuille</span>
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings" className="flex items-center">
               <Settings className="w-4 h-4 mr-2" />
               <span>Paramètres</span>
             </Link>
           </DropdownMenuItem>
+
           <DropdownMenuItem asChild>
             <Link href="/profile" className="flex items-center">
               <UserCog className="w-4 h-4 mr-2" />

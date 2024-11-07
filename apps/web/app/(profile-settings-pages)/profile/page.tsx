@@ -15,6 +15,7 @@ export default async function ProfilePage() {
       address: userProfile.address || "",
       bio: userProfile.bio || "",
       username: userProfile.username || "",
+      profilePic: userProfile.profilePic || "",
       userEmail: userProfile.userEmail || "",
       phoneNumber: userProfile.phoneNumber || "",
       birthDate: userProfile.birthDate

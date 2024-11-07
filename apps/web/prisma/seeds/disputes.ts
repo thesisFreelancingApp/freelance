@@ -39,7 +39,7 @@ export const seedDisputes = async () => {
             initiatorSellerId: order.sellerId,
             description: faker.lorem.paragraph(),
             status: faker.helpers.arrayElement(Object.values(DisputeStatus)),
-            createdAt: faker.date.past({ months: 6 }),
+            createdAt: faker.date.past({ years: 0.5 }),
             updatedAt: faker.date.recent(),
           },
         });
