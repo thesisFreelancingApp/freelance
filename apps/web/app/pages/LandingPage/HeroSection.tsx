@@ -1,11 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
-import { PlayCircle } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -32,7 +31,7 @@ export default function HeroSection() {
 
   if (!isMounted) {
     return (
-      <section className="relative min-h-screen flex items-center">
+      <section className="relative flex items-center min-h-screen ">
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero/tunisian-workspace.webp"
@@ -44,9 +43,9 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
         </div>
         {/* Fallback content */}
-        <div className="container relative z-10 mx-auto px-4">
+        <div className="container relative z-10 px-4 mx-auto">
           <div className="max-w-3xl text-white">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="mb-6 text-5xl font-bold md:text-7xl">
               Découvrez les Talents{" "}
               <span className="text-primary">Tunisiens</span>
             </h1>
@@ -57,9 +56,9 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative flex items-center  mt-8 overflow-hidden min-h-[720px] rounded-2xl">
       {/* Background Video with Fallback */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 ">
         <AnimatePresence>
           {!isVideoLoaded && (
             <motion.div
@@ -100,8 +99,8 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container relative z-10 px-4 mx-auto">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -109,26 +108,26 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-white"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <h1 className="mb-6 text-5xl font-bold md:text-7xl">
               Découvrez les Talents{" "}
               <span className="text-primary">Tunisiens</span>
             </h1>
-            <p className="text-xl mb-8 text-gray-200">
+            <p className="mb-8 text-xl text-gray-200">
               Connectez-vous avec les meilleurs freelances tunisiens. De la
               création au développement, trouvez le talent parfait pour votre
               projet.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Link href="/sign-up">
-                <Button size="lg" className="text-lg w-full sm:w-auto">
+                <Button size="lg" className="w-full text-lg sm:w-auto">
                   Commencer Maintenant
                 </Button>
               </Link>
               <Link href="/how-it-works">
                 <Button
                   size="lg"
-                  variant="secondary"
-                  className="text-lg w-full sm:w-auto bg-white text-primary hover:bg-white/90"
+                  variant="outline"
+                  className="w-full text-lg bg-transparent hover:bg-white/90"
                 >
                   Comment ça marche ?
                 </Button>
@@ -164,22 +163,22 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="hidden lg:block"
           >
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+            <div className="p-6 border bg-white/10 backdrop-blur-md rounded-xl border-white/20">
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative w-[60px] h-[60px]">
                   <Image
                     src="/success-stories/success-story-1.webp"
                     alt="Success Story"
                     fill
-                    className="rounded-full object-cover"
+                    className="object-cover rounded-full"
                   />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold">Sarah Ben Ali</h3>
+                  <h3 className="font-semibold text-white">Sarah Ben Ali</h3>
                   <p className="text-gray-300">Designer Freelance</p>
                 </div>
               </div>
-              <p className="text-gray-200 mb-4">
+              <p className="mb-4 text-gray-200">
                 "Grâce à cette plateforme, j'ai pu développer mon activité et
                 travailler avec des clients du monde entier tout en restant en
                 Tunisie."
