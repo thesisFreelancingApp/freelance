@@ -7,21 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import * as React from "react";
-import RoleSelectionStep from "./RoleSelectionStep";
-import UsernameStep from "./UsernameStep";
-
 import { Progress } from "@/components/ui/progress";
-
 import { updateProfileWithEmail } from "@/server.actions/welcome/createProfile.actions";
 import {
   checkUsername,
   updateUsernameByEmail,
 } from "@/server.actions/welcome/username.actions";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 import CompletionStep from "./CompletionStep";
 import ProfileStep from "./ProfileStep";
-
-import { useRouter } from "next/navigation";
+import RoleSelectionStep from "./RoleSelectionStep";
+import UsernameStep from "./UsernameStep";
 
 interface ProfileData {
   firstName: string;
@@ -30,6 +27,7 @@ interface ProfileData {
   birthDate: Date | undefined;
   phoneNumber: string;
   bio: string;
+  avatarUrl?: string;
 }
 
 const initialProfile: ProfileData = {
@@ -39,6 +37,7 @@ const initialProfile: ProfileData = {
   birthDate: undefined,
   phoneNumber: "",
   bio: "",
+  avatarUrl: "",
 };
 
 export default function MultiStepFormPage() {

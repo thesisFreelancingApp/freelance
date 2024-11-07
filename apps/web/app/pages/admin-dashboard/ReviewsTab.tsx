@@ -1,24 +1,38 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
-import { Star } from 'lucide-react'
-
-const reviews = [
-  { id: 1, service: 'Web Development', reviewer: 'Alice Johnson', rating: 5, comment: 'Excellent service!' },
-  { id: 2, service: 'Logo Design', reviewer: 'Bob Smith', rating: 4, comment: 'Good work, but took longer than expected.' },
-  { id: 3, service: 'Content Writing', reviewer: 'Charlie Brown', rating: 5, comment: 'Very professional and quick.' },
-  { id: 4, service: 'Video Editing', reviewer: 'Diana Prince', rating: 3, comment: 'Decent work, but needs improvement.' },
-  { id: 5, service: 'Social Media Management', reviewer: 'Ethan Hunt', rating: 5, comment: 'Outstanding results!' },
-]
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getReviews } from "@/server.actions/dashboard/reviews.action";
+import type { FormattedReviewsType } from "@/server.actions/dashboard/reviews.action";
 
 export function ReviewsTab() {
+  const [reviewsData, setReviewsData] = useState<FormattedReviewsType>();
+  useEffect(() => {
+    async function getReviewsData() {
+      const data = await getReviews();
+      setReviewsData(data);
+    }
+    getReviewsData();
+  }, []);
   return (
     <Card>
       <CardHeader>
         <CardTitle>User Reviews</CardTitle>
-        <CardDescription>
-          Manage and moderate user reviews.
-        </CardDescription>
+        <CardDescription>Manage and moderate user reviews.</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -32,7 +46,7 @@ export function ReviewsTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {reviews.map((review) => (
+            {reviewsData?.map((review) => (
               <TableRow key={review.id}>
                 <TableCell className="font-medium">{review.service}</TableCell>
                 <TableCell>{review.reviewer}</TableCell>
@@ -52,5 +66,5 @@ export function ReviewsTab() {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

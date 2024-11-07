@@ -1,4 +1,6 @@
 "use client";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendarFR";
 import { Input } from "@/components/ui/input";
@@ -10,10 +12,11 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils-cn";
+import { uploadImage } from "@/server.actions/uploadMedias.actions";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
-import { useEffect } from "react";
+import { CalendarIcon, Upload } from "lucide-react";
+import { useRef, useState, useTransition } from "react";
 
 interface ProfileData {
   firstName: string;
@@ -22,6 +25,7 @@ interface ProfileData {
   birthDate: Date | undefined;
   phoneNumber: string;
   bio: string;
+  avatarUrl?: string;
 }
 
 interface ProfileStepProps {
@@ -47,16 +51,48 @@ export default function ProfileStep({
   handleInputChange,
   loading,
 }: ProfileStepProps) {
-  useEffect(() => {
-    setProfile((prev) => ({
-      ...prev,
-      firstName: capitalizeFirstLetter(prev.firstName),
-      lastName: capitalizeFirstLetter(prev.lastName),
-    }));
-  }, [profile.firstName, profile.lastName, setProfile]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  const capitalizeFirstLetter = (string: string) =>
-    string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfile((prev) => ({
+          ...prev,
+          avatarUrl: e.target?.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+
+      startTransition(async () => {
+        try {
+          const result = await uploadImage(file); // result est de type string (l'URL directe)
+
+          if (result) {
+            setProfile((prev) => ({ ...prev, avatarUrl: result })); // Utilisez result directement
+            setUploadError(null);
+          } else {
+            setUploadError("Échec du téléchargement de l'avatar.");
+          }
+        } catch (error) {
+          console.error("Erreur lors du téléchargement :", error);
+          setUploadError("Erreur lors du téléchargement de l'image.");
+        }
+      });
+    } else {
+      setUploadError("Seuls les fichiers image sont autorisés.");
+    }
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const validatePhoneNumber = (phone: string) => /^[0-9]{8,15}$/.test(phone);
 
@@ -74,13 +110,11 @@ export default function ProfileStep({
     }
   };
 
-  // Définir la limite d'âge (année actuelle moins 12 ans)
   const birthYearLimit = new Date().getFullYear() - 12;
 
   const handleDateChange = (date: Date | undefined) => {
     setProfile((prev) => ({ ...prev, birthDate: date }));
 
-    // Validation de la date de naissance
     if (date && date.getFullYear() > birthYearLimit) {
       setFieldErrors((prev) => ({
         ...prev,
@@ -95,6 +129,39 @@ export default function ProfileStep({
 
   return (
     <div className="space-y-4">
+      {/* Avatar Upload Section */}
+      <div className="flex items-center my-4 space-x-4">
+        <Avatar className="w-24 h-24">
+          <AvatarImage src={profile.avatarUrl} alt="Photo de profil" />
+          <AvatarFallback>
+            {profile.avatarUrl ? "PP" : "Pas de photo"}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <input
+            type="file"
+            id="avatar-upload"
+            accept="image/*"
+            className="sr-only"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            aria-label="Télécharger une nouvelle photo de profil"
+            disabled={isPending}
+          />
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            disabled={isPending}
+            onClick={handleButtonClick}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            {isPending ? "Téléchargement..." : "Changer la photo"}
+          </Button>
+          {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}
+        </div>
+      </div>
+
+      {/* Existing Profile Fields */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">Prénom</Label>
@@ -160,7 +227,7 @@ export default function ProfileStep({
               mode="single"
               captionLayout="dropdown-buttons"
               selected={profile.birthDate}
-              onSelect={handleDateChange} // Appel de la fonction de validation de la date
+              onSelect={handleDateChange}
               fromYear={new Date().getFullYear() - 100}
               toYear={birthYearLimit}
             />
@@ -189,7 +256,7 @@ export default function ProfileStep({
         <Textarea
           id="bio"
           name="bio"
-          placeholder="parlez-nous de vous"
+          placeholder="Parlez-nous de vous"
           value={profile.bio}
           onChange={(e) =>
             e.target.value.length <= bioMaxLength && handleInputChange(e)

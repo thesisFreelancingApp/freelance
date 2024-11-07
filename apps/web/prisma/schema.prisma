@@ -473,6 +473,8 @@ model Wallet {
   transactions      WalletTransaction[]
 
   PersonalProfile PersonalProfile[] @relation("ProfileWallet")
+
+  WithdrawalRequest WithdrawalRequest[]
 }
 
 // Modèle Transaction
@@ -489,16 +491,51 @@ model WalletTransaction {
 
   // Optional relation with PaymentTransaction
   payment           PaymentTransaction?
-    Order Order[]
+  Order             Order[]
+
+  WithdrawalRequest WithdrawalRequest[]
 }
 
-// Enum pour les types de transaction
+// Enum for transaction types
 enum TransactionType {
   DEPOSIT
   WITHDRAWAL
   TRANSFER
   PAYMENT
 }
+
+model WithdrawalRequest {
+  id                String           @id @default(uuid())
+  amount            Decimal          @db.Decimal(12, 2)
+  status            WithdrawalRequestStatus    @default(PENDING)
+  requestedAt       DateTime         @default(now())
+  processedAt       DateTime?
+  description       String?
+
+  // Relations
+  walletId          String
+  wallet            Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  
+  // Relation to WalletTransaction if processed
+  transaction       WalletTransaction? @relation(fields: [transactionId], references: [id])
+  transactionId     String?
+}
+
+// Enum for request status
+enum WithdrawalRequestStatus {
+  PENDING         // Request is pending approval
+  APPROVED        // Request has been approved and will be processed
+  REJECTED        // Request was rejected due to insufficient balance or other issues
+  BLOCKED         // Request is blocked due to suspicious activity or account issues
+  UNDER_REVIEW    // Request is under manual review by support or compliance
+  CANCELED        // Request was canceled by the user or admin
+  COMPLETED       // Request has been successfully processed
+  FAILED          // Request attempted but failed due to an error (e.g., network issue)
+  ON_HOLD         // Request is on hold, possibly awaiting additional information
+}
+
+
+
 
 // ------------------------
 // Modèle PaymentTransaction
