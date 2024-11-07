@@ -26,9 +26,9 @@ const WebHeader: React.FC<WebHeaderProps> = async ({
             <img
               className="w-12 h-12 md:w-16 md:h-16"
               src={Logo.src}
-              alt="WaiaHub Logo"
+              alt="WaiaHive Logo"
             />
-            <p className="text-3xl font-semibold">WaiaHub</p>
+            <p className="text-3xl font-semibold">WaiaHive</p>
           </div>
         </Link>
         <div className="flex gap-5">

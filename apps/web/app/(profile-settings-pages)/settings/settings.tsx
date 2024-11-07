@@ -144,7 +144,7 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         className="mx-auto mb-6"
       />
       <p className="mb-6 text-lg text-gray-600">
-        Créez votre wallet WaiaHub pour gérer facilement vos finances, payer et
+        Créez votre wallet WaiaHive pour gérer facilement vos finances, payer et
         encaisser vos prestations en toute sécurité.
       </p>
       <form onSubmit={handleSubmit} className="space-y-6">

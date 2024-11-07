@@ -1,17 +1,17 @@
-import { notFound } from "next/navigation";
+import FilterSortBar from "@/components/FilterSortBar";
+import Pagination from "@/components/Pagination";
+import ServiceCard from "@/components/ServiceCard";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   getCategoryByName,
   getServicesByCategory,
 } from "@/server.actions/category.actions";
-import Link from "next/link";
-import ServiceCard from "@/components/ServiceCard";
-import FilterSortBar from "@/components/FilterSortBar";
-import Pagination from "@/components/Pagination";
 import { ChevronRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -21,7 +21,7 @@ export async function generateMetadata({
   const decodedName = decodeURIComponent(params.name);
   const category = await getCategoryByName(decodedName);
   if (!category) return { title: "Category Not Found" };
-  return { title: `${category.name} Services | WAIAHUB` };
+  return { title: `${category.name} Services | WaiaHive` };
 }
 
 export default async function CategoryPage({

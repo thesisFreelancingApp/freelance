@@ -1,5 +1,5 @@
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import Logo from "@/public/WaiaHub-LogoIcon.svg";
+import Logo from "@/public/WaiaHive-LogoIcon.svg";
 import { getAllCategories } from "@/server.actions/category/category.actions";
 import Link from "next/link";
 import CategoryBar from "./DesktopCategoryBar";
@@ -16,9 +16,9 @@ const Header = async () => {
             <img
               className="w-12 h-12 md:w-16 md:h-16"
               src={Logo.src}
-              alt="WaiaHub Logo"
+              alt="WaiaHive Logo"
             />
-            <p className="text-3xl font-semibold">WaiaHub</p>
+            <p className="text-3xl font-semibold">WaiaHive</p>
           </div>
         </Link>
         <div className="flex">

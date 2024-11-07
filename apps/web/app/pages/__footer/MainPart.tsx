@@ -97,7 +97,7 @@ const Footer = () => {
 
         {/* Footer Bottom */}
         <div className="pt-6 mt-10 text-center text-gray-400 border-t border-gray-200">
-          <p>© 2024 Waiahub. Tous droits réservés.</p>
+          <p>© 2024 WaiaHive. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

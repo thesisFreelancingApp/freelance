@@ -24,7 +24,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "WaiaHub - The fastest way to Freelance",
+  title: "WaiaHive - The fastest way to Freelance",
   description: "The fastest way to Freelance",
 };
 

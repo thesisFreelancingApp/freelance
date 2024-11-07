@@ -4,5 +4,4 @@ import MainHomepage from "./pages/MainHomepage";
 export default async function Index() {
   const isUserAuthenticated = await isAuthenticated();
   return !isUserAuthenticated ? <LandingPage /> : <MainHomepage />;
-  // return <MainHomepage />;
 }

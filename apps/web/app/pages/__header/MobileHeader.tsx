@@ -51,11 +51,11 @@ export default function MobileHeader({
         >
           <img
             className="w-12 h-12 mr-2"
-            src="/WaiaHub-LogoIcon.svg"
-            alt="WaiaHub Logo"
+            src="/WaiaHive-LogoIcon.svg"
+            alt="WaiaHive Logo"
           />
           <p className="flex flex-col items-start text-xl font-bold text-left">
-            Waiahub
+            WaiaHive
           </p>
         </Link>
 
@@ -69,10 +69,10 @@ export default function MobileHeader({
               <Link href="/" className="flex items-center" onClick={toggleMenu}>
                 <img
                   className="w-12 h-12 mr-2"
-                  src="/WaiaHub-LogoIcon.svg"
-                  alt="WaiaHub Logo"
+                  src="/WaiaHive-LogoIcon.svg"
+                  alt="WaiaHive Logo"
                 />
-                <p className="text-xl font-bold">Waiahub</p>
+                <p className="text-xl font-bold">WaiaHive</p>
               </Link>
               <Button variant="ghost" size="icon" onClick={toggleMenu}>
                 <AiOutlineClose className="w-6 h-6" />
