@@ -18,10 +18,7 @@ const CategoryPage = async ({
       {/* Hero Banner Section */}
       <div className="relative w-full h-[300px] mb-12">
         <Image
-          src={
-            // category.imageUrl ||
-            "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/Sans%20titre-1.webp"
-          }
+          src={category.imageUrl || null}
           alt={category.name}
           fill
           className="object-cover rounded-xl"

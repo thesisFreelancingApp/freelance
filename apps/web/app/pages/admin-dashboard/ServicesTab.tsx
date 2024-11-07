@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 import { ChevronDown, MoreHorizontal, Search } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,28 +27,144 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { getServices, deleteService } from '@/server.actions/dashboard/services.action'
+import { getAllCategories } from '@/server.actions/category/category.actions'
+import { useRouter } from 'next/navigation'
 
-// Dummy data for services
-const services = [
-  { id: 1, name: 'Web Development', category: 'Programming', creator: 'Alice Johnson', status: 'Active' },
-  { id: 2, name: 'Logo Design', category: 'Design', creator: 'Bob Smith', status: 'Active' },
-  { id: 3, name: 'Content Writing', category: 'Writing', creator: 'Charlie Brown', status: 'Inactive' },
-  { id: 4, name: 'SEO Optimization', category: 'Marketing', creator: 'David Lee', status: 'Active' },
-  { id: 5, name: 'Video Editing', category: 'Multimedia', creator: 'Eva Green', status: 'Active' },
-]
+type Services = {
+  id: string;
+  name: string;
+  description: string | null;
+  medias?: any;
+  isPublic: boolean;
+  tags: string[];
+  creatorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  categoryId: number;
+  status: string;
+
+  creator: {
+    name: string
+    id: string;
+    profileId: string;
+    sellerRating?: number;
+    totalEarnings?: number;
+    createdAt: Date;
+    updatedAt: Date;
+    profile: {
+      lastName: string
+      firstName: string
+      id: string;
+      name: string;
+    };
+    professionalProfile?: {
+      id: string;
+      expertise: string;
+    };
+  };
+
+  category: {
+    id: number;
+    name: string;
+    description?: string;
+    iconUrl?: string;
+  };
+
+  buyers: Array<{
+    id: string;
+    name: string;
+  }>;
+
+  ratings: Array<{
+    id: string;
+    rating: number;
+    comment?: string;
+    createdAt: Date;
+  }>;
+
+  packages: Array<{
+    id: string;
+    price: number;
+    description: string;
+  }>;
+
+  Dispute: Array<{
+    id: string;
+    description: string;
+    createdAt: Date;
+    status: string;
+  }>;
+
+  Order: Array<{
+    id: string;
+    amount: number;
+    orderDate: Date;
+  }>;
+};
 
 export default function ServicesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
+  const [services, setServices] = useState<Services[]>([]);
+  const [categories, setCategories] = useState<{ id: number, name: string }[]>([]); // State for categories
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
+  const router = useRouter();
+
+  // Fetch services with pagination
+  const fetchServices = async (page = 1) => {
+    const data = await getServices(page, pageSize);
+    //@ts-ignore
+    setServices(data.services);
+    setTotalPages(data.totalPages);
+    setCurrentPage(data.currentPage);
+  };
+
+  // Fetch categories for the filter dropdown
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories(); // Fetch categories from server
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchServices(currentPage);
+    fetchCategories(); // Fetch categories when component mounts
+  }, [currentPage]);
 
   // Filter services based on search term, category, and status
   const filteredServices = services.filter(service => 
     (service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     service.creator.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (categoryFilter === 'All' || service.category === categoryFilter) &&
+    (service.creator?.name || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (categoryFilter === 'All' || service.category?.name === categoryFilter) &&
     (statusFilter === 'All' || service.status === statusFilter)
-  )
+  );
+
+  const handlePageChange = (page: SetStateAction<number>) => {
+    setCurrentPage(page);
+  };
+
+  const handleViewDetails = (serviceId: string) => {
+    router.push(`/service/${serviceId}`);
+  };
+
+  const handleDeleteService = async (serviceId: string) => {
+    try {
+      const confirmed = window.confirm("Are you sure you want to delete this service?");
+      if (confirmed) {
+        await deleteService(serviceId);
+        fetchServices(currentPage);
+      }
+    } catch (error) {
+      console.error("Error deleting service:", error);
+    }
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -67,11 +183,11 @@ export default function ServicesTab() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
-              <SelectItem value="Programming">Programming</SelectItem>
-              <SelectItem value="Design">Design</SelectItem>
-              <SelectItem value="Writing">Writing</SelectItem>
-              <SelectItem value="Marketing">Marketing</SelectItem>
-              <SelectItem value="Multimedia">Multimedia</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.name}>
+                  {category.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -85,7 +201,6 @@ export default function ServicesTab() {
             </SelectContent>
           </Select>
         </div>
-        <Button>Add New Service</Button>
       </div>
       <Table>
         <TableHeader>
@@ -93,7 +208,7 @@ export default function ServicesTab() {
             <TableHead>Name</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Creator</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Public</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -101,9 +216,9 @@ export default function ServicesTab() {
           {filteredServices.map((service) => (
             <TableRow key={service.id}>
               <TableCell>{service.name}</TableCell>
-              <TableCell>{service.category}</TableCell>
-              <TableCell>{service.creator}</TableCell>
-              <TableCell>{service.status}</TableCell>
+              <TableCell>{service.category?.name || 'N/A'}</TableCell>
+              <TableCell>{`${service.creator?.profile?.firstName || 'Unknown'} ${service.creator?.profile?.lastName || ''}`}</TableCell>
+              <TableCell>{service.isPublic.toString()}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -113,10 +228,15 @@ export default function ServicesTab() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>View details</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewDetails(service.id)}>View details</DropdownMenuItem>
                     <DropdownMenuItem>Edit service</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">Delete service</DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDeleteService(service.id)}
+                    >
+                      Delete service
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>
@@ -124,6 +244,22 @@ export default function ServicesTab() {
           ))}
         </TableBody>
       </Table>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-6">
+        <Button
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+          Previous
+        </Button>
+        <span className="px-4">Page {currentPage} of {totalPages}</span>
+        <Button
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          Next
+        </Button>
+      </div>
     </div>
-  )
+  );
 }

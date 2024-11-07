@@ -82,7 +82,7 @@ export function OverviewTab() {
       const revenue = await getMonthlyRevenue();
       setOverviewData(stats);
       setMonthlyRevenue(revenue);
-      console.log(stats, revenue);
+      // console.log(stats, revenue);
     }
     stats();
   }, []);
