@@ -9,9 +9,9 @@ export async function updateProfileWithEmail(profileData: {
   birthDate?: Date;
   phoneNumber?: string;
   bio?: string;
+  avatarUrl?: string;
 }): Promise<boolean> {
   try {
-    // Initialiser le client Supabase
     const supabase = createClient();
     const { data: user, error } = await supabase.auth.getUser();
     if (error || !user.user?.email) {
@@ -21,7 +21,6 @@ export async function updateProfileWithEmail(profileData: {
 
     const email = user.user.email;
 
-    // Mise à jour du profil dans la table PersonalProfile
     await prisma.personalProfile.update({
       where: { userEmail: email },
       data: {
@@ -31,13 +30,14 @@ export async function updateProfileWithEmail(profileData: {
         birthDate: profileData.birthDate,
         phoneNumber: profileData.phoneNumber,
         bio: profileData.bio,
+        profilePic: profileData.avatarUrl,
       },
     });
 
-    return true; // Mise à jour réussie
+    return true;
   } catch (error) {
     console.log("Erreur lors de la mise à jour du profil:", error);
-    return false; // En cas d'erreur, retourne false
+    return false;
   }
 }
 

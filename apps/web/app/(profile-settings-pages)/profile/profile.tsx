@@ -29,23 +29,26 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-// Définir l'interface UserProfile
+import ProfilePic from "./profilePic"; // Use "ProfilePic" to match the actual file name
+
+import { uploadImage } from "@/server.actions/uploadMedias.actions"; // Change this to the correct path
+
 interface UserProfile {
   firstName?: string;
   lastName?: string;
   username?: string;
   userEmail?: string;
   address?: string;
-  birthDate?: Date; // Changement au type Date
+  birthDate?: Date;
   phoneNumber?: string;
   bio?: string;
+  profilePic?: string;
 }
 
 interface ProfileFormProps {
   initialProfile: UserProfile;
 }
 
-// Schéma pour la validation de la date
 const FormSchema = z.object({
   dob: z.date({
     required_error: "Une date de naissance est requise.",
@@ -55,8 +58,9 @@ const FormSchema = z.object({
 export default function ProfileForm({ initialProfile }: ProfileFormProps) {
   const [profile, setProfile] = useState<UserProfile>(initialProfile);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
   const router = useRouter();
-  // Initialisation du formulaire
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
@@ -71,14 +75,28 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     }));
   };
 
+  const handleProfilePicChange = (file: File) => {
+    setProfilePicFile(file);
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      // console.log(profile);
+      let updatedProfilePicUrl = profile.profilePic;
+
+      if (profilePicFile) {
+        const result = await uploadImage(profilePicFile); // Upload new profile picture
+        if (result) {
+          updatedProfilePicUrl = result; // Use result directly if it’s a string (URL)
+        }
+      }
+
       const formattedData = {
         ...profile,
         birthDate: profile.birthDate ? new Date(profile.birthDate) : undefined,
+        profilePic: updatedProfilePicUrl,
       };
 
       await updateUserProfile(formattedData);
@@ -99,6 +117,30 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
     }
   };
 
+  const handleProfilePicSubmit = async () => {
+    if (profilePicFile) {
+      setIsLoading(true);
+      try {
+        const result = await uploadImage(profilePicFile);
+        if (result) {
+          setProfile((prev) => ({ ...prev, profilePic: result }));
+          toast({
+            title: "Photo mise à jour",
+            description: "Votre photo de profil a été mise à jour avec succès.",
+          });
+          router.refresh();
+        }
+      } catch (error) {
+        console.error(error);
+        toast({
+          title: "Erreur",
+          description: "La mise à jour de la photo a échoué.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
   return (
     <>
       <div className="space-y-0.5">
@@ -109,6 +151,11 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         </p>
       </div>
       <Separator className="my-6" />
+      <ProfilePic
+        initialAvatarUrl={initialProfile.profilePic}
+        onFileChange={handleProfilePicChange}
+        onSave={handleProfilePicSubmit}
+      />
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="w-full">
