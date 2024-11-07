@@ -1,12 +1,12 @@
-import { getFilteredServices } from "@/server.actions/services.actions";
-import { getCategoryByName } from "@/server.actions/category/category-pages.actions";
 import ServiceCard from "@/components/ServiceCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Filter, SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import FilterForm from "./FilterForm";
+import { getCategoryByName } from "@/server.actions/category/category-pages.actions";
+import { getFilteredServices } from "@/server.actions/services.actions";
+import { Filter, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
+import FilterForm from "./FilterForm";
 
 interface PageProps {
   params: {
@@ -29,7 +29,7 @@ export default async function SubCategoryPage({
   const category = await getCategoryByName(params.subCategory);
 
   if (!category) {
-    return <div>Category not found</div>;
+    return <div>Catégorie non trouvée</div>;
   }
 
   const page = searchParams.page ? parseInt(searchParams.page) : 1;
@@ -61,25 +61,25 @@ export default async function SubCategoryPage({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="bg-muted/30 border-b">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-4xl font-bold mb-3">{category.name}</h1>
-          <p className="text-muted-foreground text-lg max-w-3xl">
+      {/* Section Héros */}
+      <div className="p-4 m-4 mt-6 border-b bg-muted/30 rounded-3xl ">
+        <div className="container px-4 py-8 mx-auto">
+          <h1 className="mb-3 text-4xl font-bold">{category.name}</h1>
+          <p className="max-w-3xl text-lg text-muted-foreground">
             {category.description}
           </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-4 py-8 mx-auto">
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-          {/* Desktop Filters */}
-          <aside className="hidden lg:block space-y-6">
+          {/* Filtres pour bureau */}
+          <aside className="hidden space-y-6 lg:block">
             <div className="sticky top-4">
-              <div className="bg-card rounded-lg shadow-sm p-6">
-                <h2 className="font-semibold mb-6 flex items-center text-lg">
+              <div className="p-6 rounded-lg shadow-sm bg-card">
+                <h2 className="flex items-center mb-6 text-lg font-semibold">
                   <Filter className="w-5 h-5 mr-2" />
-                  Filters
+                  Filtres
                 </h2>
                 <FilterForm
                   initialValues={{
@@ -93,20 +93,20 @@ export default async function SubCategoryPage({
             </div>
           </aside>
 
-          {/* Mobile Filters */}
-          <div className="lg:hidden mb-6">
+          {/* Filtres pour mobile */}
+          <div className="mb-6 lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="w-full">
                   <SlidersHorizontal className="w-4 h-4 mr-2" />
-                  Filters & Sorting
+                  Filtres et Tri
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px]">
                 <div className="py-4">
-                  <h2 className="font-semibold mb-6 flex items-center text-lg">
+                  <h2 className="flex items-center mb-6 text-lg font-semibold">
                     <Filter className="w-5 h-5 mr-2" />
-                    Filters
+                    Filtres
                   </h2>
                   <FilterForm
                     initialValues={{
@@ -121,13 +121,13 @@ export default async function SubCategoryPage({
             </Sheet>
           </div>
 
-          {/* Services Section */}
+          {/* Section des services */}
           <div className="lg:col-span-3">
-            {/* Results Header */}
-            <div className="flex items-center justify-between mb-6 bg-muted/30 p-4 rounded-lg">
+            {/* En-tête des résultats */}
+            <div className="flex items-center justify-between p-4 mb-6 rounded-lg bg-muted/30">
               <div>
                 <p className="text-sm text-muted-foreground">
-                  Showing{" "}
+                  Affichage de{" "}
                   <span className="font-medium text-foreground">
                     {pagination.total}
                   </span>{" "}
@@ -139,16 +139,16 @@ export default async function SubCategoryPage({
                       href={`/categories/${params.dynamicCategory}/${params.subCategory}`}
                       className="text-xs text-primary hover:underline"
                     >
-                      Clear all filters
+                      Effacer tous les filtres
                     </Link>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Services Grid */}
+            {/* Grille des services */}
             {services.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {services.map((service) => (
                   <ServiceCard key={service.id} service={service} />
                 ))}
@@ -156,18 +156,18 @@ export default async function SubCategoryPage({
             ) : (
               <Card className="p-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <h3 className="text-lg font-semibold mb-2">
-                    No services found
+                  <h3 className="mb-2 text-lg font-semibold">
+                    Aucun service trouvé
                   </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your filters or search criteria to find what
-                    you're looking for.
+                  <p className="mb-6 text-muted-foreground">
+                    Essayez de modifier vos filtres ou critères de recherche
+                    pour trouver ce que vous cherchez.
                   </p>
                   <Button variant="outline" asChild>
                     <Link
                       href={`/categories/${params.dynamicCategory}/${params.subCategory}`}
                     >
-                      Clear all filters
+                      Effacer tous les filtres
                     </Link>
                   </Button>
                 </div>
@@ -176,7 +176,7 @@ export default async function SubCategoryPage({
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="mt-12 flex justify-center gap-2">
+              <div className="flex justify-center gap-2 mt-12">
                 <Button
                   variant="outline"
                   size="sm"
@@ -192,7 +192,7 @@ export default async function SubCategoryPage({
                       },
                     }}
                   >
-                    Previous
+                    Précédent
                   </Link>
                 </Button>
 
@@ -234,7 +234,7 @@ export default async function SubCategoryPage({
                       },
                     }}
                   >
-                    Next
+                    Suivant
                   </Link>
                 </Button>
               </div>

@@ -134,6 +134,19 @@ export default function ProfileForm({ initialProfile }: ProfileFormProps) {
         </p>
       </div>
       <Separator className="my-6" />
+      <img
+        src={
+          "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/holaaaaa.webp"
+        }
+        alt="Illustration du Wallet"
+        width={284}
+        height={284}
+        className="mx-auto mb-6"
+      />
+      <p className="mb-6 text-lg text-gray-600">
+        Créez votre wallet WaiaHub pour gérer facilement vos finances, payer et
+        encaisser vos prestations en toute sécurité.
+      </p>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="w-full">
           <Label>Email</Label>

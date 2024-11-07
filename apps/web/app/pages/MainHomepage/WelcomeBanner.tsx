@@ -1,7 +1,8 @@
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
-// Fonction pour obtenir le message de bienvenue en fonction de l'heure
+// Function to get the welcome message based on the hour
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) {
@@ -40,11 +41,40 @@ function WelcomeBanner({
   );
 }
 
+function FeatureCard({
+  title,
+  description,
+  buttonText,
+  onClick,
+}: {
+  title: string;
+  description: string;
+  buttonText: string;
+  onClick: () => void;
+}) {
+  return (
+    <div className="p-6 border rounded-lg bg-card text-card-foreground">
+      <h3 className="mb-2 text-xl font-semibold">{title}</h3>
+      <p className="mb-4">{description}</p>
+      <Button onClick={onClick}>{buttonText}</Button>
+    </div>
+  );
+}
+
 export default function WelcomePage({
   user,
+  userInfo,
 }: {
   user: { firstName: string; lastName: string; profilePic: string };
+  userInfo: {
+    seller: boolean;
+    buyer: boolean;
+    wallet: boolean;
+    isComplete: boolean;
+  };
 }) {
+  const { seller, buyer, wallet, isComplete } = userInfo;
+
   return (
     <div className="flex flex-col">
       <main className="container flex-grow px-4 py-8 mx-auto">
@@ -56,37 +86,68 @@ export default function WelcomePage({
           <h2 className="mb-6 text-3xl font-bold text-center">
             Commencez votre aventure avec nous !
           </h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="p-6 border rounded-lg bg-card text-card-foreground">
-              <h3 className="mb-2 text-xl font-semibold">
-                Complétez votre profil
-              </h3>
-              <p className="mb-4">
-                Personnalisez votre expérience en ajoutant plus d’informations à
-                votre profil.
-              </p>
-              <Button>Mettre à jour le profil</Button>
-            </div>
-            <div className="p-6 border rounded-lg bg-card text-card-foreground">
-              <h3 className="mb-2 text-xl font-semibold">
-                Découvrez nos fonctionnalités
-              </h3>
-              <p className="mb-4">
-                Explorez toutes les possibilités que notre plateforme vous
-                offre.
-              </p>
-              <Button>Commencer la visite</Button>
-            </div>
-            <div className="p-6 border rounded-lg bg-card text-card-foreground">
-              <h3 className="mb-2 text-xl font-semibold">
-                Connectez-vous avec d'autres membres
-              </h3>
-              <p className="mb-4">
-                Rejoignez notre communauté et engagez des discussions
-                enrichissantes.
-              </p>
-              <Button>Trouver des amis</Button>
-            </div>
+          <div className="grid gap-6 md:grid-cols-4">
+            {/* Card prompting user to complete their profile */}
+            {!isComplete && (
+              <FeatureCard
+                title="Complétez votre profil"
+                description="Personnalisez votre expérience en ajoutant plus d’informations à votre profil."
+                buttonText="Mettre à jour le profil"
+                onClick={() => console.log("Mettre à jour le profil")}
+              />
+            )}
+
+            {/* Cards for active features */}
+            {seller && (
+              <FeatureCard
+                title="Gestion des services"
+                description="Gérez vos services pour attirer plus de clients."
+                buttonText="Gérer les services"
+                onClick={() => console.log("Gérer les services")}
+              />
+            )}
+            {buyer && (
+              <FeatureCard
+                title="Explorer les services"
+                description="Recherchez des services qui répondent à vos besoins."
+                buttonText="Explorer les services"
+                onClick={() => console.log("Explorer les services")}
+              />
+            )}
+            {wallet && (
+              <FeatureCard
+                title="Gérer votre portefeuille"
+                description="Consultez et gérez vos finances sur la plateforme."
+                buttonText="Voir le portefeuille"
+                onClick={() => console.log("Voir le portefeuille")}
+              />
+            )}
+
+            {/* Inverse cards for missing features */}
+            {!seller && (
+              <FeatureCard
+                title="Devenez vendeur"
+                description="Activez l'option de vente pour proposer vos services sur la plateforme."
+                buttonText="Activer la vente"
+                onClick={() => console.log("Activer la vente")}
+              />
+            )}
+            {!buyer && (
+              <FeatureCard
+                title="Devenez acheteur"
+                description="Accédez à des services proposés par notre communauté."
+                buttonText="Activer l'achat"
+                onClick={() => console.log("Activer l'achat")}
+              />
+            )}
+            {!wallet && (
+              <FeatureCard
+                title="Configurer votre portefeuille"
+                description="Ajoutez un portefeuille pour gérer vos transactions."
+                buttonText="Configurer le portefeuille"
+                onClick={() => console.log("Configurer le portefeuille")}
+              />
+            )}
           </div>
         </section>
       </main>

@@ -1,7 +1,9 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -10,11 +12,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { DollarSign } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 
 interface FilterFormProps {
   initialValues: {
@@ -54,13 +54,13 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
     [searchParams],
   );
 
-  // Update input values when slider changes
+  // Mettre à jour les valeurs d'entrée lorsque le curseur change
   const handleSliderChange = (values: [number, number]) => {
     setPriceRange(values);
     setInputValues({ min: values[0], max: values[1] });
   };
 
-  // Update slider when input changes
+  // Mettre à jour le curseur lorsque les valeurs d'entrée changent
   const handleInputChange = (type: "min" | "max", value: string) => {
     const numValue = parseInt(value) || 0;
     const newInputValues = {
@@ -69,7 +69,7 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
     };
     setInputValues(newInputValues);
 
-    // Update slider only if values are valid
+    // Mettre à jour le curseur seulement si les valeurs sont valides
     if (type === "min" && numValue <= inputValues.max) {
       setPriceRange([numValue, priceRange[1]]);
     } else if (type === "max" && numValue >= inputValues.min) {
@@ -77,7 +77,7 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
     }
   };
 
-  // Apply price filter
+  // Appliquer le filtre de prix
   const applyPriceFilter = () => {
     router.push(
       `?${createQueryString({
@@ -90,7 +90,7 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
 
   return (
     <div className="space-y-6">
-      {/* Price Range Filter */}
+      {/* Filtre de plage de prix */}
       <Card className="p-6">
         <div className="space-y-6">
           <div>
@@ -100,12 +100,12 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
             </p>
           </div>
 
-          {/* Price Display */}
-          <div className="flex justify-between items-center">
+          {/* Affichage du prix */}
+          <div className="flex items-center justify-between">
             <div className="flex-1 space-y-2">
               <Label htmlFor="min-price">Prix minimum</Label>
               <div className="relative">
-                <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <DollarSign className="absolute w-4 h-4 -translate-y-1/2 left-2 top-1/2 text-muted-foreground" />
                 <Input
                   id="min-price"
                   type="number"
@@ -117,11 +117,11 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
                 />
               </div>
             </div>
-            <div className="px-2 self-end">—</div>
+            <div className="self-end px-2">—</div>
             <div className="flex-1 space-y-2">
               <Label htmlFor="max-price">Prix maximum</Label>
               <div className="relative">
-                <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <DollarSign className="absolute w-4 h-4 -translate-y-1/2 left-2 top-1/2 text-muted-foreground" />
                 <Input
                   id="max-price"
                   type="number"
@@ -134,8 +134,8 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
             </div>
           </div>
 
-          {/* Slider */}
-          <div className="pt-2 px-2">
+          {/* Curseur */}
+          <div className="px-2 pt-2">
             <Slider
               value={priceRange}
               min={0}
@@ -156,7 +156,7 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
         </div>
       </Card>
 
-      {/* Delivery Time Filter */}
+      {/* Filtre de délai de livraison */}
       <Card className="p-6">
         <div className="space-y-4">
           <div>
@@ -189,7 +189,7 @@ export default function FilterForm({ initialValues }: FilterFormProps) {
         </div>
       </Card>
 
-      {/* Sort Options */}
+      {/* Options de tri */}
       <Card className="p-6">
         <div className="space-y-4">
           <div>
