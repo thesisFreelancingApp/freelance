@@ -61,7 +61,7 @@ export function UsersTab() {
             {userData?.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user?.name}</TableCell>
-                <TableCell>{user?.email}</TableCell>
+                <TableCell>{user?.email}</TableCell>  
                 <TableCell>{user?.role}</TableCell>
                 <TableCell>{user?.lastLogin}</TableCell>
                 <TableCell>

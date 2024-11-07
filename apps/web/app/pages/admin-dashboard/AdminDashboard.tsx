@@ -10,8 +10,8 @@ import OrdersTab from "./OrdersTab";
 import DisputesTab from "./DisputesTab";
 import MessagesTab from "./MessagesTab";
 import { ReviewsTab } from "./ReviewsTab";
-import { AnalyticsTab } from "./AnalyticsTab";
-import { SettingsTab } from "./SettingsTab";
+// import { AnalyticsTab } from "./AnalyticsTab";
+// import { SettingsTab } from "./SettingsTab";
 import { WithdrawalRequestsTab } from "./WithdrawalRequestsTab";
 // import {getAllOrders} from "@/server.actions/admin/getAuthUserRole"
 import { useEffect, useState } from "react";
@@ -84,10 +84,10 @@ const AdminDashboard = async () => {
             <ReviewsTab />
           </TabsContent>
           <TabsContent value="analytics">
-            <AnalyticsTab />
+            {/* <AnalyticsTab /> */}
           </TabsContent>
           <TabsContent value="settings">
-            <SettingsTab />
+            {/* <SettingsTab /> */}
           </TabsContent>
         </Tabs>
       </div>
