@@ -227,7 +227,6 @@ export default function OrderDetailsPage({
                   placeholder="Share progress update with buyer..."
                   value={progressMessage}
                   onChange={(e) => setProgressMessage(e.target.value)}
-                  x
                   className="mb-4"
                 />
 
