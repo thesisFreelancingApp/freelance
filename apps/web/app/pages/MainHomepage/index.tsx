@@ -1,14 +1,10 @@
-import FeaturedServices from "@/app/pages/MainHomepage/FeaturedServices";
-import TopFreelancers from "@/app/pages/MainHomepage/TopFreelancers";
-import WhyChooseUs from "@/app/pages/MainHomepage/WhyChooseUs";
+import WelcomBanner from "@/app/pages/MainHomepage/WelcomeBanner";
+import RecommendedFreelancers from "@/app/pages/MainHomepage/YourNavigation";
 import { isAuthenticated } from "@/server.actions/auth/auth.actions";
 import { getCategories } from "@/server.actions/category/category.actions";
-import { getFeaturedServices } from "@/server.actions/services.actions";
-import { Service } from "@/types/FeaturedServices";
-import Hero from "./BannerHero";
-import CategoryList from "./CategoryList";
-import SearchBar from "./SearchBar";
+import { getUserProfile } from "@/server.actions/profile/profile.actions";
 import { getAllUserProfile } from "@/server.actions/profilePublic/profilePublic.actions";
+import { getFeaturedServices } from "@/server.actions/services.actions";
 // const freelancers = [
 //   { name: "Alice Johnson", expertise: "Web Developer", rating: 4.9 },
 //   { name: "John Smith", expertise: "Graphic Designer", rating: 4.7 },
@@ -24,22 +20,23 @@ export interface Freelancer {
     certifications?: { certification: string }[];
     educations?: { faculty: string }[];
     profilePic: string;
-    
-    
   };
   // ... other properties ...
 }
+
 export default async function Index() {
   const categories = await getCategories();
   const authenticated = await isAuthenticated();
   const services = await getFeaturedServices();
   const freelancers = await getAllUserProfile();
-
+  const user = await getUserProfile();
+  console.log(user);
   return (
     <>
       <section>
-        <Hero authenticated={authenticated} />
-
+        <WelcomBanner user={user} />
+        <RecommendedFreelancers />
+        {/* <Hero authenticated={authenticated} />
         <SearchBar placeholder="Rechercher..." />
 
         <CategoryList categories={categories} />
@@ -48,7 +45,7 @@ export default async function Index() {
 
         <FeaturedServices services={services as Service[]} />
 
-        <WhyChooseUs />
+        <WhyChooseUs /> */}
       </section>
     </>
   );
