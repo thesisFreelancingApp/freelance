@@ -272,6 +272,7 @@ model ServicePackage {
 
   // Relations
   service       Service   @relation(fields: [serviceId], references: [id])
+  Order         Order[]   // Add this relation
 }
 
 // ------------------------
@@ -622,13 +623,33 @@ model Order {
   seller              Seller               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
 
   serviceId           String?
-  service             Service?             @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  packageId           String?          // Add this field
+  service             Service?         @relation(fields: [serviceId], references: [id])
+  servicePackage      ServicePackage?  @relation(fields: [packageId], references: [id])
 
   projectId           String?
   project             Projects?            @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   disputeid           String?
   dispute             Dispute?             @relation("DisputeOrder", fields: [disputeid], references: [id], onDelete: SetNull)
+
+  requirements       String?
+  requirementFiles   Json?          // Store requirement file URLs
+  deliveryMessage    String?
+  deliveryFiles      Json?          // Store delivery file URLs
+  revisionCount      Int            @default(0)
+  revisionLimit      Int?           // From package.revisions
+  deliveryDeadline   DateTime?      // Calculated from package.deliveryTime
+  revisions         OrderRevision[]
+}
+
+model OrderRevision {
+  id              String    @id @default(uuid())
+  orderId         String
+  revisionMessage String
+  revisionFiles   Json?     // Store revision file URLs
+  createdAt       DateTime  @default(now())
+  order           Order     @relation(fields: [orderId], references: [id])
 }
 
 enum PaymentMethodType {
@@ -639,10 +660,14 @@ enum PaymentMethodType {
 
 
 enum OrderStatus {
-  PENDING
-  ACCEPTED
-  IN_PROGRESS
-  IN_REVISION
-  COMPLETED
-  CANCELLED
+  PENDING         // Initial state after payment
+  ACCEPTED        // Seller accepted the order
+  REQUIREMENTS    // Requirements gathering phase
+  IN_PROGRESS     // Work in progress
+  DELIVERED       // Work delivered, awaiting review
+  IN_REVISION     // Revision requested
+  COMPLETED       // Order completed
+  DECLINED        // Seller declined order
+  CANCELLED       // Order cancelled (auto or manual)
+  DISPUTED        // In dispute
 }

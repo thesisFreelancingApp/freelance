@@ -6,7 +6,6 @@ import {
   markAllAsRead,
 } from "@/server.actions/notifications/notifications.actions";
 
-// Define the NotificationType enum to match your schema
 export type NotificationType =
   | "NEW_ORDER"
   | "ORDER_STATUS_CHANGE"
@@ -30,59 +29,130 @@ interface Notification {
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
 
   const fetchNotifications = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      setLoading(true);
+      setError(null);
 
-    const { data: notifications } = await supabase
-      .from("Notification")
-      .select("*")
-      .eq("recipientId", user.id)
-      .order("createdAt", { ascending: false })
-      .limit(50);
+      // Get current session
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-    if (notifications) {
-      setNotifications(notifications);
-      setUnreadCount(notifications.filter((n) => !n.isRead).length);
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw new Error("Authentication error");
+      }
+
+      if (!user) {
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
+
+      // Add authorization header
+      const { data, error: fetchError } = await supabase
+        .from("Notification")
+        .select("*")
+        .eq("recipientId", user.id)
+        .order("createdAt", { ascending: false })
+        .limit(50)
+        .throwOnError(); // This will throw an error if there's an issue
+
+      if (fetchError) {
+        console.error("Fetch error:", fetchError);
+        throw new Error(fetchError.message);
+      }
+
+      if (data) {
+        setNotifications(data);
+        setUnreadCount(data.filter((n) => !n.isRead).length);
+      }
+    } catch (err) {
+      console.error("Error in fetchNotifications:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch notifications",
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Initial fetch
     fetchNotifications();
 
-    const channel = supabase
-      .channel("notifications")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "Notification" },
-        () => fetchNotifications(),
-      )
-      .subscribe();
+    // Set up real-time subscription
+    const setupSubscription = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
+      if (!user) return;
+
+      const channel = supabase
+        .channel(`notifications:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "Notification",
+            filter: `recipientId=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log("Received notification update:", payload);
+            fetchNotifications();
+          },
+        )
+        .subscribe((status) => {
+          console.log("Subscription status:", status);
+        });
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    };
+
+    const cleanup = setupSubscription();
     return () => {
-      supabase.removeChannel(channel);
+      cleanup.then((cleanupFn) => cleanupFn && cleanupFn());
     };
   }, []);
 
   return {
     notifications,
     unreadCount,
+    loading,
+    error,
     markAsRead: async (id: string) => {
-      await markAsRead(id);
-      await fetchNotifications();
+      try {
+        await markAsRead(id);
+        await fetchNotifications();
+      } catch (err) {
+        console.error("Error marking as read:", err);
+        setError("Failed to mark notification as read");
+      }
     },
     markAllAsRead: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return;
-      await markAllAsRead(user.id);
-      await fetchNotifications();
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        await markAllAsRead(user.id);
+        await fetchNotifications();
+      } catch (err) {
+        console.error("Error marking all as read:", err);
+        setError("Failed to mark all notifications as read");
+      }
     },
+    refresh: fetchNotifications,
   };
 }
 

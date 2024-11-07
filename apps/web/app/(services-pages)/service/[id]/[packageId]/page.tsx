@@ -69,14 +69,13 @@ export default function PurchasePage({ params }: PurchasePageProps) {
       }
 
       const payMethod = paymentMethod === "wallet" ? "WALLET" : "EXTERNAL";
-      console.log("servicePackage ", servicePackage);
       const order = await createOrder(
         servicePackage.sellerId,
         servicePackage.serviceId,
+        servicePackage.id,
         Number(servicePackage.price),
         payMethod,
       );
-      console.log("order", order);
 
       if (typeof order === "string") {
         setError(order); // Display any specific error returned from createOrder
