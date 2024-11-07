@@ -7,33 +7,32 @@ import {
 
 const sections = [
   {
-    title: "Product",
+    title: "Produit",
     links: [
-      { name: "Overview", href: "#" },
-      { name: "Pricing", href: "#" },
+      { name: "Aperçu", href: "#" },
+      { name: "Tarifs", href: "#" },
       { name: "Marketplace", href: "#" },
-      { name: "Features", href: "#" },
-      { name: "Integrations", href: "#" },
-      { name: "Pricing", href: "#" },
+      { name: "Fonctionnalités", href: "#" },
+      { name: "Intégrations", href: "#" },
     ],
   },
   {
-    title: "Company",
+    title: "Entreprise",
     links: [
-      { name: "About", href: "#" },
-      { name: "Team", href: "#" },
+      { name: "À propos", href: "#" },
+      { name: "Équipe", href: "#" },
       { name: "Blog", href: "#" },
-      { name: "Careers", href: "#" },
+      { name: "Carrières", href: "#" },
       { name: "Contact", href: "#" },
-      { name: "Privacy", href: "#" },
+      { name: "Confidentialité", href: "#" },
     ],
   },
   {
-    title: "Resources",
+    title: "Ressources",
     links: [
-      { name: "Help", href: "#" },
-      { name: "Sales", href: "#" },
-      { name: "Advertise", href: "#" },
+      { name: "Aide", href: "#" },
+      { name: "Ventes", href: "#" },
+      { name: "Publicité", href: "#" },
     ],
   },
 ];
@@ -44,15 +43,16 @@ const FooterLink = ({ href, children }) => (
   </li>
 );
 
-const MainPart = () => {
+const Footer = () => {
   return (
-    <footer className="items-center justify-center mb-20 border-t border-b-foreground/6">
-      <div className="flex flex-col max-w-screen-xl px-4 mx-auto mt-4 md:px-12 lg:px-20">
+    <footer className="py-10 text-gray-600 bg-gray-50">
+      <div className="max-w-screen-xl px-6 mx-auto">
         <div className="grid gap-10 md:grid-cols-4">
+          {/* Sections */}
           {sections.map((section, sectionIdx) => (
             <div key={sectionIdx}>
-              <h3 className="mb-4 font-bold">{section.title}</h3>
-              <ul className="space-y-4 text-muted-foreground">
+              <h3 className="mb-4 text-lg font-bold">{section.title}</h3>
+              <ul className="space-y-3 text-gray-400">
                 {section.links.map((link, linkIdx) => (
                   <FooterLink key={linkIdx} href={link.href}>
                     {link.name}
@@ -61,43 +61,47 @@ const MainPart = () => {
               </ul>
             </div>
           ))}
+
+          {/* Legal and Social Section */}
           <div>
-            <h3 className="mb-4 font-bold">Legal</h3>
-            <ul className="space-y-4 text-muted-foreground">
-              <FooterLink href="#">Term of Services</FooterLink>
-              <FooterLink href="#">Privacy Policy</FooterLink>
+            <h3 className="mb-4 text-lg font-bold">Légal</h3>
+            <ul className="space-y-3 text-gray-400">
+              <FooterLink href="#">Conditions d'utilisation</FooterLink>
+              <FooterLink href="#">Politique de confidentialité</FooterLink>
             </ul>
-            <h3 className="mt-8 mb-4 font-bold">Social</h3>
-            <ul className="flex items-center space-x-6 text-muted-foreground">
-              <li className="font-medium hover:text-primary">
+            <h3 className="mt-8 mb-4 text-lg font-bold">Suivez-nous</h3>
+            <ul className="flex space-x-6 text-gray-400">
+              <li className="hover:text-primary">
                 <a href="#">
-                  <FaDiscord className="text-lg" />
+                  <FaDiscord className="text-2xl" />
                 </a>
               </li>
-              <li className="font-medium hover:text-primary">
+              <li className="hover:text-primary">
                 <a href="#">
-                  <FaRedditAlien className="text-lg" />
+                  <FaRedditAlien className="text-2xl" />
                 </a>
               </li>
-              <li className="font-medium hover:text-primary">
+              <li className="hover:text-primary">
                 <a href="#">
-                  <FaTwitter className="text-lg" />
+                  <FaTwitter className="text-2xl" />
                 </a>
               </li>
-              <li className="font-medium hover:text-primary">
+              <li className="hover:text-primary">
                 <a href="#">
-                  <FaTelegramPlane className="text-lg" />
+                  <FaTelegramPlane className="text-2xl" />
                 </a>
               </li>
             </ul>
           </div>
         </div>
+
+        {/* Footer Bottom */}
+        <div className="pt-6 mt-10 text-center text-gray-400 border-t border-gray-200">
+          <p>© 2024 Waiahub. Tous droits réservés.</p>
+        </div>
       </div>
-      <p className="flex justify-center my-8 text-sm text-muted-foreground">
-        © 2024 Waiahub. All rights reserved.
-      </p>
     </footer>
   );
 };
 
-export default MainPart;
+export default Footer;
