@@ -27,13 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { getServices } from '@/server.actions/dashboard/services.action'
+import { getServices, deleteService } from '@/server.actions/dashboard/services.action'
+import { getAllCategories } from '@/server.actions/category/category.actions'
+import { useRouter } from 'next/navigation'
 
 type Services = {
   id: string;
   name: string;
   description: string | null;
-  medias?: any; // Assuming `Json?` in Prisma, adjust as needed for specific types
+  medias?: any;
   isPublic: boolean;
   tags: string[];
   creatorId: string;
@@ -42,7 +44,6 @@ type Services = {
   categoryId: number;
   status: string;
 
-  // Relations
   creator: {
     name: string
     id: string;
@@ -51,22 +52,18 @@ type Services = {
     totalEarnings?: number;
     createdAt: Date;
     updatedAt: Date;
-    
-    // Nested related data
     profile: {
       lastName: string
       firstName: string
       id: string;
       name: string;
-      // Add more fields here as per the PersonalProfile model
     };
     professionalProfile?: {
       id: string;
       expertise: string;
-      // Add more fields here as per the ProfessionalProfile model
     };
   };
-  
+
   category: {
     id: number;
     name: string;
@@ -77,7 +74,6 @@ type Services = {
   buyers: Array<{
     id: string;
     name: string;
-    // Include other fields as per the Buyer model if necessary
   }>;
 
   ratings: Array<{
@@ -85,14 +81,12 @@ type Services = {
     rating: number;
     comment?: string;
     createdAt: Date;
-    // Include additional fields based on the Rating model
   }>;
 
   packages: Array<{
     id: string;
     price: number;
     description: string;
-    // Include additional fields based on the ServicePackage model
   }>;
 
   Dispute: Array<{
@@ -100,51 +94,76 @@ type Services = {
     description: string;
     createdAt: Date;
     status: string;
-    // Include other fields as per the Dispute model
   }>;
 
   Order: Array<{
     id: string;
     amount: number;
     orderDate: Date;
-    // Include additional fields based on the Order model
   }>;
 };
-
 
 export default function ServicesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
   const [services, setServices] = useState<Services[]>([]);
+  const [categories, setCategories] = useState<{ id: number, name: string }[]>([]); // State for categories
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10; // Items per page
+  const pageSize = 10;
+  const router = useRouter();
 
   // Fetch services with pagination
   const fetchServices = async (page = 1) => {
     const data = await getServices(page, pageSize);
+    //@ts-ignore
     setServices(data.services);
     setTotalPages(data.totalPages);
     setCurrentPage(data.currentPage);
   };
 
+  // Fetch categories for the filter dropdown
+  const fetchCategories = async () => {
+    try {
+      const data = await getAllCategories(); // Fetch categories from server
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchServices(currentPage);
-  }, [currentPage, categoryFilter, statusFilter]);
-
-console.log(services)
+    fetchCategories(); // Fetch categories when component mounts
+  }, [currentPage]);
 
   // Filter services based on search term, category, and status
   const filteredServices = services.filter(service => 
     (service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     (service.creator?.name || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (service.creator?.name || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
     (categoryFilter === 'All' || service.category?.name === categoryFilter) &&
     (statusFilter === 'All' || service.status === statusFilter)
   );
 
   const handlePageChange = (page: SetStateAction<number>) => {
     setCurrentPage(page);
+  };
+
+  const handleViewDetails = (serviceId: string) => {
+    router.push(`/service/${serviceId}`);
+  };
+
+  const handleDeleteService = async (serviceId: string) => {
+    try {
+      const confirmed = window.confirm("Are you sure you want to delete this service?");
+      if (confirmed) {
+        await deleteService(serviceId);
+        fetchServices(currentPage);
+      }
+    } catch (error) {
+      console.error("Error deleting service:", error);
+    }
   };
 
   return (
@@ -164,11 +183,11 @@ console.log(services)
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All">All Categories</SelectItem>
-              <SelectItem value="Programming">Programming</SelectItem>
-              <SelectItem value="Design">Design</SelectItem>
-              <SelectItem value="Writing">Writing</SelectItem>
-              <SelectItem value="Marketing">Marketing</SelectItem>
-              <SelectItem value="Multimedia">Multimedia</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.name}>
+                  {category.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -182,7 +201,6 @@ console.log(services)
             </SelectContent>
           </Select>
         </div>
-        <Button>Add New Service</Button>
       </div>
       <Table>
         <TableHeader>
@@ -199,7 +217,7 @@ console.log(services)
             <TableRow key={service.id}>
               <TableCell>{service.name}</TableCell>
               <TableCell>{service.category?.name || 'N/A'}</TableCell>
-              {`${service.creator?.profile?.firstName || 'Unknown'} ${service.creator?.profile?.lastName || ''}`}
+              <TableCell>{`${service.creator?.profile?.firstName || 'Unknown'} ${service.creator?.profile?.lastName || ''}`}</TableCell>
               <TableCell>{service.isPublic.toString()}</TableCell>
               <TableCell>
                 <DropdownMenu>
@@ -210,10 +228,15 @@ console.log(services)
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>View details</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleViewDetails(service.id)}>View details</DropdownMenuItem>
                     <DropdownMenuItem>Edit service</DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">Delete service</DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDeleteService(service.id)}
+                    >
+                      Delete service
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

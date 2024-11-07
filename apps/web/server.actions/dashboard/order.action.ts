@@ -47,3 +47,24 @@ export async function getOrders(page = 1, pageSize = 10) {
     throw error;
   }
 }
+
+const VALID_ORDER_STATUSES = ["PENDING", "ACCEPTED", "IN_PROGRESS", "IN_REVISION", "COMPLETED", "CANCELLED"];
+
+export async function updateOrderStatus(orderId: string, newStatus: string) {
+  // Validate that the new status is a valid OrderStatus
+  if (!VALID_ORDER_STATUSES.includes(newStatus)) {
+    throw new Error(`Invalid order status: ${newStatus}. Must be one of ${VALID_ORDER_STATUSES.join(", ")}`);
+  }
+
+  try {
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { status: newStatus },
+    });
+
+    return updatedOrder;
+  } catch (error) {
+    console.error("Error updating order status:", JSON.stringify(error, null, 2));
+    throw error;
+  }
+}

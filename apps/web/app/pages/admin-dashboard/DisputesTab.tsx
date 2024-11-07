@@ -29,29 +29,29 @@ import {
 } from "@/components/ui/select"
 import { DisputeType, getDisputes } from '@/server.actions/dashboard/disputes.action'
 
-// Dummy data for disputes
-const disputes = [
-  { id: 'DSP001', initiator: 'Alice Johnson', respondent: 'David Lee', relatedItem: 'ORD001', status: 'OPEN', createdAt: '2023-05-15' },
-  { id: 'DSP002', initiator: 'Bob Smith', respondent: 'Eva Green', relatedItem: 'PRJ002', status: 'IN_PROGRESS', createdAt: '2023-05-16' },
-  { id: 'DSP003', initiator: 'Charlie Brown', respondent: 'Frank White', relatedItem: 'ORD003', status: 'RESOLVED', createdAt: '2023-05-17' },
-  { id: 'DSP004', initiator: 'Diana Prince', respondent: 'George Black', relatedItem: 'PRJ004', status: 'OPEN', createdAt: '2023-05-18' },
-  { id: 'DSP005', initiator: 'Ethan Hunt', respondent: 'Helen Red', relatedItem: 'ORD005', status: 'CLOSED', createdAt: '2023-05-19' },
-]
-
 export default function DisputesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
-
-  const [disputesData, setDisputesData] = useState<DisputeType[] | null>();
+  const [disputesData, setDisputesData] = useState<DisputeType[] | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
-    async function getDisputesData() {
-      const data = await getDisputes();
-      setDisputesData(data);
-      console.log(data);
-    }
-    getDisputesData();
-  }, []);
+    // Fetch disputes when the component is mounted or when page/state changes
+    const fetchData = async () => {
+      try {
+        const disputes = await getDisputes(currentPage, 10, searchTerm, statusFilter);
+        setDisputesData(disputes);
+
+        // Assuming you have a way to calculate the total number of pages
+        // You might need to fetch the total number of disputes or set it via a backend call
+        setTotalPages(5); // Adjust this based on your backend response
+      } catch (error) {
+        console.error('Error fetching disputes:', error);
+      }
+    };
+    fetchData();
+  }, [currentPage, searchTerm, statusFilter]); // Dependencies to refetch when any of these values change
 
   // Filter disputes based on search term and status
   const filteredDisputes = disputesData?.filter(dispute =>
@@ -100,35 +100,60 @@ export default function DisputesTab() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredDisputes?.map((dispute) => (
-            <TableRow key={dispute.id}>
-              <TableCell>{dispute.id}</TableCell>
-              <TableCell>{dispute.initiator}</TableCell>
-              <TableCell>{dispute.respondent}</TableCell>
-              <TableCell>{dispute.relatedItem}</TableCell>
-              <TableCell>{dispute.status}</TableCell>
-              <TableCell>{dispute.createdAt}</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>View details</DropdownMenuItem>
-                    <DropdownMenuItem>Update status</DropdownMenuItem>
-                    <DropdownMenuItem>Assign mediator</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-600">Close dispute</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
+          {filteredDisputes?.length ? (
+            filteredDisputes.map((dispute) => (
+              <TableRow key={dispute.id}>
+                <TableCell>{dispute.id}</TableCell>
+                <TableCell>{dispute.initiator}</TableCell>
+                <TableCell>{dispute.respondent}</TableCell>
+                <TableCell>{dispute.relatedItem}</TableCell>
+                <TableCell>{dispute.status}</TableCell>
+                <TableCell>{dispute.createdAt}</TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem>View details</DropdownMenuItem>
+                      <DropdownMenuItem>Update status</DropdownMenuItem>
+                      <DropdownMenuItem>Assign mediator</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-red-600">Close dispute</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={7}>No disputes found.</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
+      
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </Button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <Button 
+          variant="ghost" 
+          onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   )
 }

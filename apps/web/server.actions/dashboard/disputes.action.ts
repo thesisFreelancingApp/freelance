@@ -10,9 +10,14 @@ export type DisputeType = {
   createdAt: string;
 };
 
-export const getDisputes = async (): Promise<DisputeType[]> => {
+export const getDisputes = async (page: number = 1, limit: number = 10, searchTerm: string, statusFilter: string): Promise<DisputeType[]> => {
   try {
+    const skip = (page - 1) * limit; // Calculate the number of records to skip based on the current page
+
+    // Fetch disputes with pagination
     const disputes = await prisma.dispute.findMany({
+      skip,
+      take: limit,
       select: {
         id: true,
         Order: {
@@ -52,10 +57,10 @@ export const getDisputes = async (): Promise<DisputeType[]> => {
       initiator: dispute.initiatorSeller
         ? dispute.initiatorSeller.profile?.firstName
         : dispute.initiatorBuyer?.profile?.firstName || null,
-      status: dispute.status, // TODO: ???????
+      status: dispute.status, // Add your status logic here
       respondent: dispute.initiatorBuyer
         ? dispute.initiatorBuyer.profile?.firstName
-        : dispute.initiatorSeller?.profile?.firstName || null, 
+        : dispute.initiatorSeller?.profile?.firstName || null,
       relatedItem: dispute.Order[0]?.service?.name || "Unknown",
       createdAt: dispute.createdAt.toISOString().split("T")[0],
     }));

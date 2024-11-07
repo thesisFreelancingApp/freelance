@@ -44,3 +44,38 @@ export async function getServices(page = 1, pageSize = 10) {
     throw error;
   }
 }
+
+
+
+
+
+export async function deleteService(serviceId: string) {
+  try {
+    // Ensure the service exists before attempting to delete it
+    const service = await prisma.service.findUnique({
+      where: { id: serviceId },
+    });
+
+    if (!service) {
+      throw new Error("Service not found");
+    }
+
+    // Delete related ServicePackages first
+    await prisma.servicePackage.deleteMany({
+      where: { serviceId },
+    });
+
+    // Then delete the service
+    await prisma.service.delete({
+      where: { id: serviceId },
+    });
+
+    return {
+      message: "Service deleted successfully",
+      serviceId,
+    };
+  } catch (error) {
+    console.error("Error deleting service:", JSON.stringify(error, null, 2));
+    throw error;
+  }
+}
