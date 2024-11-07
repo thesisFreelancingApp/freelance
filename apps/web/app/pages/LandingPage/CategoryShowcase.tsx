@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -10,23 +11,25 @@ const categories = [
   {
     name: "Tech & Développement",
     image:
-      "https%3A%2F%2Fhlxsztkqfvxjbrwmmfww.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fimages%2Fassets%2Fwebdev.webp&w=3840&q=75",
+      "https://f.hellowork.com/obs-static-images/seo/ObsJob/developpeur-web.jpg",
     count: "2,500+",
-    color: "from-blue-500/20",
+    color: "bg-blue-500",
     slug: "tech-development",
   },
   {
     name: "Design & Créatifs",
-    image: "/categories/design.jpg",
+    image:
+      "https://storage.letudiant.fr/mediatheque/letudiant/2/4/2743224-le-graphiste-est-un-specialiste-de-la-communication-visuelle-original.jpg",
     count: "1,800+",
-    color: "from-purple-500/20",
+    color: "bg-purple-500",
     slug: "design-creative",
   },
   {
     name: "Marketing Digital",
-    image: "/categories/marketing.jpg",
+    image:
+      "https://mundocontact.com/wp-content/uploads/2024/10/marketing-digital.jpg",
     count: "1,500+",
-    color: "from-green-500/20",
+    color: "bg-green-500",
     slug: "digital-marketing",
   },
 ];
@@ -43,8 +46,11 @@ export default function CategoryShowcase() {
   }
 
   return (
-    <section className="py-20">
-      <div className="container px-4">
+    <section className="py-20 bg-gradient-to-b from-background to-secondary/10">
+      <div className="container px-4 mx-auto">
+        <h2 className="mb-12 text-4xl font-bold text-center text-foreground">
+          Découvrez nos talents
+        </h2>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {categories.map((category, index) => (
             <motion.div
@@ -52,31 +58,37 @@ export default function CategoryShowcase() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="cursor-pointer group"
             >
-              <Link href={`/categories/${category.slug}`}>
-                <div className="relative h-[300px] rounded-2xl overflow-hidden">
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-t ${category.color} to-transparent`}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="mb-2 text-2xl font-bold text-white">
-                      {category.name}
-                    </h3>
-                    <p className="mb-4 text-white/80">
-                      {category.count} services
-                    </p>
-                    <Button variant="secondary" className="w-full">
-                      Explorer
-                    </Button>
-                  </div>
-                </div>
+              <Link
+                href={`/categories/${category.slug}`}
+                className="block h-full group"
+              >
+                <Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+                  <CardContent className="p-0">
+                    <div className="relative aspect-[16/9]">
+                      <img
+                        src={category.image}
+                        alt={category.name}
+                        className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0" />
+                      <Badge
+                        className={`absolute text-white top-4 left-4 ${category.color}`}
+                      >
+                        {category.count} services
+                      </Badge>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="mb-2 text-2xl font-semibold transition-colors text-foreground group-hover:text-primary">
+                        {category.name}
+                      </h3>
+                      <p className="flex items-center transition-colors text-muted-foreground group-hover:text-foreground">
+                        Explorer la catégorie
+                        <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             </motion.div>
           ))}
