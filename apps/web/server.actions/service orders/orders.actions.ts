@@ -215,20 +215,21 @@ export async function getOrderById(
   try {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
-      select: {
-        id: true,
-        buyerId: true,
-        sellerId: true,
-        serviceId: true,
-        totalAmount: true,
-        currency: true,
-        status: true,
-        paymentMethod: true,
-        paymentStatus: true,
-        description: true,
-        createdAt: true,
+      include: {
+        buyer: {
+          include: { profile: true },
+        },
+        seller: {
+          include: { profile: true },
+        },
         service: true,
         servicePackage: true,
+        progressUpdates: {
+          orderBy: { createdAt: "desc" },
+        },
+        revisions: {
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
 

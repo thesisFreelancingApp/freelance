@@ -640,7 +640,18 @@ model Order {
   revisionCount      Int            @default(0)
   revisionLimit      Int?           // From package.revisions
   deliveryDeadline   DateTime?      // Calculated from package.deliveryTime
+  progressUpdates    ProgressUpdate[]
   revisions         OrderRevision[]
+}
+
+model ProgressUpdate {
+  id              String    @id @default(uuid())
+  orderId         String
+  message         String
+  percentage      Int
+  files           Json?     // For progress attachments
+  createdAt       DateTime  @default(now())
+  order           Order     @relation(fields: [orderId], references: [id])
 }
 
 model OrderRevision {

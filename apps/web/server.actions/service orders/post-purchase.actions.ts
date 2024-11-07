@@ -583,3 +583,47 @@ function validateStatusTransition(
 
   return validTransitions[currentStatus]?.includes(newStatus) || false;
 }
+
+export async function addProgressUpdate(
+  orderId: string,
+  message: string,
+  percentage: number,
+  files?: string[],
+) {
+  try {
+    const fileData: Prisma.JsonValue = files ? files : [];
+
+    await prisma.progressUpdate.create({
+      data: {
+        orderId,
+        message,
+        percentage,
+        files: fileData,
+      },
+    });
+
+    // Notify buyer about progress update
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { buyer: { include: { profile: true } } },
+    });
+
+    if (order) {
+      await createNotification({
+        recipientId: order.buyer.profile.id,
+        type: "ORDER_STATUS_CHANGE",
+        content: `Progress Update: ${message}`,
+        link: `/orders/${orderId}`,
+        metadata: {
+          orderId,
+          percentage,
+        },
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding progress update:", error);
+    throw error;
+  }
+}
