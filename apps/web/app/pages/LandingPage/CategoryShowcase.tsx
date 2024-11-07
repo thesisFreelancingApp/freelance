@@ -47,7 +47,7 @@ export default function CategoryShowcase() {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-secondary/10">
+    <section className="py-20 ">
       <div className="container px-4 mx-auto">
         <h2 className="mb-12 text-4xl font-bold text-center text-foreground">
           Découvrez nos talents
