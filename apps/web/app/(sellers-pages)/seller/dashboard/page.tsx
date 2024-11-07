@@ -309,7 +309,7 @@ export default function SellerDashboard() {
                   </Select>
                 </div>
                 <Button asChild>
-                  <Link href="/createGig">
+                  <Link href="/create-service">
                     <Plus className="w-4 h-4 mr-2" /> Créer un Nouveau Service
                   </Link>
                 </Button>
