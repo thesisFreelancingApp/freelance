@@ -58,6 +58,7 @@ export default async function SubCategoryPage({
     deliveryTime ||
     searchParams.sort
   );
+  // console.log("services /////////////////////////////////", services);
 
   return (
     <div className="min-h-screen bg-background">

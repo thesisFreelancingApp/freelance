@@ -10,6 +10,7 @@ interface ServiceCardProps {
     name: string;
     medias: {
       images: string[];
+      videos: string[];
     } | null;
     creator: {
       profile: {
