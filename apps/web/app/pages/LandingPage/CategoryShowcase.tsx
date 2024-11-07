@@ -12,6 +12,7 @@ const categories = [
     name: "Tech & Développement",
     image:
       "https://f.hellowork.com/obs-static-images/seo/ObsJob/developpeur-web.jpg",
+
     count: "2,500+",
     color: "bg-blue-500",
     slug: "tech-development",
