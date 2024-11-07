@@ -10,7 +10,7 @@ const categories = [
   {
     name: "Tech & Développement",
     image:
-      "https%3A%2F%2Fhlxsztkqfvxjbrwmmfww.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fimages%2Fassets%2Fwebdev.webp&w=3840&q=75",
+      "https://hlxsztkqfvxjbrwmmfww.supabase.co/storage/v1/object/public/images/assets/webdev.webp?w=3840&q=75",
     count: "2,500+",
     color: "from-blue-500/20",
     slug: "tech-development",
