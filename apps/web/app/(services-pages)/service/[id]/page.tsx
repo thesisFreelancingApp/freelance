@@ -15,6 +15,7 @@ import { Check, Clock, RefreshCcw, Star } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import VideoPlayer from "@/components/VideoPlayer";
 
 interface ServiceMedia {
   images?: string[];
@@ -108,9 +109,20 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
               </div>
             </div>
             <Suspense fallback={<Loading />}>
-              <div className="mb-8">
-                <ImageCarousel images={service.medias?.images || []} />
-              </div>
+            <div className="mb-8">
+  {service.medias?.videos && service.medias.videos.length > 0 ? (
+    service.medias.videos.map((videoSrc, index) => (
+      <div key={index} className="relative w-full h-64 max-w-md mx-auto overflow-hidden">
+        <VideoPlayer 
+          src={videoSrc} 
+          alt={`Video ${index + 1} for ${service.name}`}
+        />
+      </div>
+    ))
+  ) : (
+    <ImageCarousel images={service.medias?.images || []} />
+              )}
+            </div>
             </Suspense>
             <Card className="mb-8">
               <CardHeader>
