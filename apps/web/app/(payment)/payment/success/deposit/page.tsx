@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { completeTransaction } from "@/server.actions/payment/update-transaction.actions ";
+import { completeTransaction } from "@/server.actions/payment/update-transaction.actions";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

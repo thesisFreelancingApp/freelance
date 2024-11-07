@@ -19,7 +19,7 @@ const WebHeader: React.FC<WebHeaderProps> = async ({
   isSeller,
 }) => {
   return (
-    <header className="flex-col hidden w-full border-b md:flex border-b-foreground/6">
+    <header className="sticky top-0 z-50 flex-col hidden w-full border-b bg-background md:flex border-b-foreground/6">
       <nav className="container flex items-center justify-between h-16 px-4 mx-auto md:px-8 border-b-foreground/6">
         <Link href="/">
           <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ const WebHeader: React.FC<WebHeaderProps> = async ({
             <p className="text-3xl font-semibold">WaiaHub</p>
           </div>
         </Link>
-        <div className="flex">
+        <div className="flex gap-5">
           <ThemeSwitcher />
           <HeaderAuth isSeller={isSeller} user={user} userData={userData} />
         </div>

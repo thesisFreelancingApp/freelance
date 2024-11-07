@@ -1,84 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function HeroSection() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    setIsMounted(true);
-
-    // Preload video
     if (videoRef.current) {
       videoRef.current.load();
     }
   }, []);
 
-  const handleVideoLoad = () => {
-    setIsVideoLoaded(true);
-  };
-
-  const handleVideoError = () => {
-    console.error("Video failed to load");
-    setIsVideoLoaded(false);
-  };
-
-  if (!isMounted) {
-    return (
-      <section className="relative flex items-center min-h-screen ">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/hero/tunisian-workspace.webp"
-            alt="Hero Background"
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
-        </div>
-        {/* Fallback content */}
-        <div className="container relative z-10 px-4 mx-auto">
-          <div className="max-w-3xl text-white">
-            <h1 className="mb-6 text-5xl font-bold md:text-7xl">
-              Découvrez les Talents{" "}
-              <span className="text-primary">Tunisiens</span>
-            </h1>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const handleVideoLoad = () => setIsVideoLoaded(true);
+  const handleVideoError = () => console.error("Failed to load video");
 
   return (
-    <section className="relative flex items-center  mt-8 overflow-hidden min-h-[720px] rounded-2xl">
-      {/* Background Video with Fallback */}
-      <div className="absolute inset-0 z-0 ">
-        <AnimatePresence>
-          {!isVideoLoaded && (
-            <motion.div
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0"
-            >
-              <Image
-                src="/hero/tunisian-workspace.jpg"
-                alt="Hero Background"
-                fill
-                priority
-                className="object-cover"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <video
+    <section className="relative mt-6 m-6 flex items-center min-h-[300px] md:max-h-[480px] overflow-hidden rounded-lg">
+      {/* Background Video with Fallback Image */}
+      <div className="absolute inset-0 z-0">
+        <motion.video
           ref={videoRef}
           autoPlay
           loop
@@ -86,21 +31,30 @@ export default function HeroSection() {
           playsInline
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
-          className={`object-cover w-full h-full transition-opacity duration-1000 ${
-            isVideoLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          poster="/hero/tunisian-workspace.jpg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isVideoLoaded ? 1 : 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="object-cover w-full h-full transition-opacity duration-500 rounded-lg shadow-lg bg-gradient-to-r from-black/85 to-black/30"
+          style={{
+            width: "100%",
+            height: "100%",
+            maxHeight: "500px",
+          }}
         >
           <source src="/hero/hero-background.mp4" type="video/mp4" />
-        </video>
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40" />
+        </motion.video>
+        {/* Gradient Overlay with Fade-in Animation */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        />
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 px-4 mx-auto">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+      <div className="relative z-10 max-w-screen-lg px-6 py-8 mx-auto sm:px-8 sm:py-12">
+        <div className="grid items-center gap-8 lg:gap-12 lg:grid-cols-2">
           {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -108,18 +62,20 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-white"
           >
-            <h1 className="mb-6 text-5xl font-bold md:text-7xl">
+            <h1 className="mb-4 text-xl font-extrabold leading-tight sm:text-2xl md:text-4xl">
               Découvrez les Talents{" "}
               <span className="text-primary">Tunisiens</span>
             </h1>
-            <p className="mb-8 text-xl text-gray-200">
-              Connectez-vous avec les meilleurs freelances tunisiens. De la
-              création au développement, trouvez le talent parfait pour votre
+            <p className="mb-6 text-base leading-relaxed text-gray-200 sm:text-lg">
+              Connectez-vous avec des freelances tunisiens experts pour votre
               projet.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
+            <div className="flex flex-wrap gap-4 mb-8">
               <Link href="/sign-up">
-                <Button size="lg" className="w-full text-lg sm:w-auto">
+                <Button
+                  size="lg"
+                  className="px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-lg bg-primary"
+                >
                   Commencer Maintenant
                 </Button>
               </Link>
@@ -127,7 +83,7 @@ export default function HeroSection() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full text-lg bg-transparent hover:bg-white/90"
+                  className="px-4 py-2 text-sm bg-transparent border-white sm:px-6 sm:py-3 sm:text-lg hover:bg-white"
                 >
                   Comment ça marche ?
                 </Button>
@@ -139,19 +95,27 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="grid grid-cols-3 gap-8 mt-12"
+              className="grid grid-cols-3 gap-4 sm:gap-8"
             >
               <div className="text-center">
-                <h3 className="text-4xl font-bold text-primary">50K+</h3>
-                <p className="text-gray-300">Freelances</p>
+                <h3 className="text-xl font-extrabold text-primary sm:text-3xl">
+                  50K+
+                </h3>
+                <p className="text-sm text-gray-300 sm:text-base">Freelances</p>
               </div>
               <div className="text-center">
-                <h3 className="text-4xl font-bold text-primary">98%</h3>
-                <p className="text-gray-300">Satisfaction</p>
+                <h3 className="text-xl font-extrabold text-primary sm:text-3xl">
+                  98%
+                </h3>
+                <p className="text-sm text-gray-300 sm:text-base">
+                  Satisfaction
+                </p>
               </div>
               <div className="text-center">
-                <h3 className="text-4xl font-bold text-primary">24/7</h3>
-                <p className="text-gray-300">Support</p>
+                <h3 className="text-xl font-extrabold text-primary sm:text-3xl">
+                  24/7
+                </h3>
+                <p className="text-sm text-gray-300 sm:text-base">Support</p>
               </div>
             </motion.div>
           </motion.div>
@@ -163,22 +127,26 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="hidden lg:block"
           >
-            <div className="p-6 border bg-white/10 backdrop-blur-md rounded-xl border-white/20">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="relative w-[60px] h-[60px]">
+            <div className="p-4 border rounded-lg sm:p-6 bg-white/10 backdrop-blur-lg border-white/20">
+              <div className="flex items-center gap-3 mb-4 sm:gap-4">
+                <div className="relative w-12 h-12 sm:w-16 sm:h-16">
                   <Image
                     src="/success-stories/success-story-1.webp"
                     alt="Success Story"
-                    fill
+                    layout="fill"
                     className="object-cover rounded-full"
                   />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">Sarah Ben Ali</h3>
-                  <p className="text-gray-300">Designer Freelance</p>
+                  <h3 className="text-sm font-semibold text-white sm:text-base">
+                    Sarah Ben Ali
+                  </h3>
+                  <p className="text-xs text-gray-300 sm:text-sm">
+                    Designer Freelance
+                  </p>
                 </div>
               </div>
-              <p className="mb-4 text-gray-200">
+              <p className="text-sm text-gray-200 sm:text-base">
                 "Grâce à cette plateforme, j'ai pu développer mon activité et
                 travailler avec des clients du monde entier tout en restant en
                 Tunisie."

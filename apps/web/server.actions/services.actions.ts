@@ -192,7 +192,8 @@ export const getFeaturedServices = async (limit = 3) => {
 export const createService = async (data: {
   name: string;
   description: string;
-  images: string[];
+  categoryId: number;
+  medias?: string[];
   tags: string[];
   packages: {
     basic: {
@@ -230,7 +231,6 @@ export const createService = async (data: {
     throw new Error("You must be logged in to create a service");
   }
 
-  // Get the seller profile for the user
   const seller = await prisma.seller.findFirst({
     where: {
       profile: {
@@ -247,8 +247,9 @@ export const createService = async (data: {
     data: {
       name: data.name,
       description: data.description,
+      categoryId: data.categoryId,
       creatorId: seller.id,
-      images: data.images,
+      medias: data.medias || [],
       tags: data.tags,
       packages: {
         create: [
@@ -280,6 +281,7 @@ export const createService = async (data: {
     })),
   };
 };
+
 export async function getServiceById(id: string) {
   const service = await prisma.service.findUnique({
     where: { id },
