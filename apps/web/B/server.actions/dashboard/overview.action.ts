@@ -44,7 +44,7 @@ const SIXTY_DAYS_AGO = new Date(new Date().setDate(new Date().getDate() - 60));
 
 function calculatePercentageChange(previous: number, current: number): number {
   if (previous === 0) return current > 0 ? 100 : 0;
-  return parseFloat((((current - previous) / previous) * 100).toFixed(2));
+  return ((current - previous) / previous) * 100;
 }
 
 const getMonthlyPercentageChanges = async () => {

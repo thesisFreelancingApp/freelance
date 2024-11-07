@@ -1,9 +1,19 @@
+<<<<<<< HEAD
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+=======
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, MoreHorizontal, Search } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+>>>>>>> 680cc03670e2ca8a3ecc9d2cbccd622f4647352d
 import {
   Table,
   TableBody,
@@ -11,6 +21,76 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+<<<<<<< HEAD
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { getDisputes } from "@/server.actions/dashboard/disputes.action";
+import type { DisputeType } from "@/server.actions/dashboard/disputes.action";
+
+export function DisputesTab() {
+  const [disputesData, setDisputesData] = useState<DisputeType[] | null>();
+
+  useEffect(() => {
+    async function getDisputesData() {
+      const data = await getDisputes();
+      setDisputesData(data);
+      console.log(data);
+    }
+    getDisputesData();
+  }, []);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Dispute Resolution</CardTitle>
+        <CardDescription>Manage and resolve user disputes.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Dispute ID</TableHead>
+              <TableHead>Related Order</TableHead>
+              <TableHead>Raised By</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {disputesData?.map((dispute) => (
+              <TableRow key={dispute.id}>
+                <TableCell className="font-medium">{dispute.id}</TableCell>
+                <TableCell>{dispute.order}</TableCell>
+                <TableCell>{dispute.disputeBy}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      dispute.status === "OPEN"
+                        ? "destructive"
+                        : dispute.status === "IN_PROGRESS"
+                          ? "default"
+                          : "outline"
+                    }
+                  >
+                    {dispute.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>{dispute.date}</TableCell>
+                <TableCell>
+                  <Button variant="ghost">View Details</Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+=======
 } from "@/components/ui/table"
 import {
   DropdownMenu,
@@ -20,14 +100,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { DisputeType, getDisputes } from '@/server.actions/dashboard/disputes.action'
 
 // Dummy data for disputes
 const disputes = [
@@ -42,23 +121,12 @@ export default function DisputesTab() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
 
-  const [disputesData, setDisputesData] = useState<DisputeType[] | null>();
-
-  useEffect(() => {
-    async function getDisputesData() {
-      const data = await getDisputes();
-      setDisputesData(data);
-      console.log(data);
-    }
-    getDisputesData();
-  }, []);
-
   // Filter disputes based on search term and status
-  const filteredDisputes = disputesData?.filter(dispute =>
+  const filteredDisputes = disputes.filter(dispute => 
     (dispute.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     dispute.initiator?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     dispute.respondent?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     dispute.relatedItem?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+     dispute.initiator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     dispute.respondent.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     dispute.relatedItem.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (statusFilter === 'All' || dispute.status === statusFilter)
   )
 
@@ -100,7 +168,7 @@ export default function DisputesTab() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredDisputes?.map((dispute) => (
+          {filteredDisputes.map((dispute) => (
             <TableRow key={dispute.id}>
               <TableCell>{dispute.id}</TableCell>
               <TableCell>{dispute.initiator}</TableCell>
@@ -132,3 +200,4 @@ export default function DisputesTab() {
     </div>
   )
 }
+>>>>>>> 680cc03670e2ca8a3ecc9d2cbccd622f4647352d
