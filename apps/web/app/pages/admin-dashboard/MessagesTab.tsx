@@ -47,7 +47,7 @@ export default function MessagesTab() {
                   <div className="flex items-center space-x-3">
                     <Avatar>
                       <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${room.title}`} />
-                      <AvatarFallback>{room.title.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{room.title?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-grow min-w-0">
                       <h3 className="font-semibold truncate">{room.title}</h3>
@@ -73,7 +73,7 @@ export default function MessagesTab() {
                   <div className="flex items-center space-x-3">
                     <Avatar>
                       <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${selectedRoom.title}`} />
-                      <AvatarFallback>{selectedRoom.title.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{selectedRoom.title?.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <h2 className="font-semibold text-lg">{selectedRoom.title}</h2>
