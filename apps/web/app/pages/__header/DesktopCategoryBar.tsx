@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-// import Link from "next/link";
+import getProfileCompletionStatus from "@/server.actions/userInfo/infoUser.actions";
 
 // Définition des types
 interface SubCategory {
@@ -69,9 +69,26 @@ const SubMenu: React.FC<SubMenuProps> = ({ subCategories }) => {
 export default function CategoryBar({ allCategories }: CategoryBarProps) {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const menuRef = useRef<HTMLUListElement>(null);
   const timeoutRef = useRef<number | null>(null);
   const HOVER_DELAY = 300; // Constante pour le délai de survol
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      const profileStatus = await getProfileCompletionStatus();
+      setIsSeller(profileStatus?.seller || false);
+    };
+    checkUserStatus();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   // Scroll to the left
   const scrollLeft = () => {
@@ -119,16 +136,7 @@ export default function CategoryBar({ allCategories }: CategoryBarProps) {
     }, HOVER_DELAY);
   };
 
-  // Cleanup timeouts on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  return (
+  return isSeller ? null : (
     <div className="relative">
       {/* Left Chevron */}
       <button
